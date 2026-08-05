@@ -23,25 +23,8 @@ final List<ServiceCategory> sampleServices = [
     icon: Icons.badge_rounded,
     color: const Color(0xFF2563EB), // Vibrant blue
     subServices: [
-      'Perekaman KTP-el',
-      'Kartu Identitas Anak (KIA)',
-      'Penerbitan Akta Kelahiran',
-      'Cetak Kartu Keluarga',
-      'Surat Pindah Penduduk',
-      'Akta Kematian',
-    ],
-  ),
-  ServiceCategory(
-    id: 'perizinan',
-    title: 'Perizinan',
-    icon: Icons.assignment_turned_in_rounded,
-    color: const Color(0xFF10B981), // Emerald green
-    subServices: [
-      'Izin Usaha Mikro (IUMK)',
-      'Persetujuan Bangunan Gedung (PBG)',
-      'Izin Operasional Kesehatan',
-      'Izin Trayek Transportasi',
-      'SIP Tenaga Medis',
+      'Data Jumlah Penduduk',
+      'Persyaratan Layanan',
     ],
   ),
   ServiceCategory(
@@ -51,10 +34,10 @@ final List<ServiceCategory> sampleServices = [
     color: const Color(0xFFEF4444), // Coral Red
     subServices: [
       'Antrean Online RSUD',
-      'Layanan Telemedicine Gratis',
+      'Layanan Ambulans Darurat (081132277119)',
+      'Stok Darah PMI Bojonegoro',
       'Cek Fasilitas BPJS Kesehatan',
-      'Jadwal Donor Darah PMI',
-      'Layanan Ambulans Darurat 112',
+      'Layanan Telemedicine Gratis',
     ],
   ),
   ServiceCategory(
@@ -109,10 +92,8 @@ final List<ServiceCategory> sampleServices = [
     icon: Icons.theater_comedy_rounded,
     color: const Color(0xFF06B6D4), // Cyan
     subServices: [
-      'Destinasi Wisata Kayangan Api',
-      'Wisata Negeri Atas Angin',
-      'Kalitidu Geopark Tour',
-      'Jadwal Event Kebudayaan',
+      'Tempat Rekreasi (Alam & Taman)',
+      'Tempat Sejarah & Budaya',
     ],
   ),
   ServiceCategory(
@@ -144,10 +125,10 @@ final List<ServiceCategory> sampleServices = [
     icon: Icons.notifications_active_rounded,
     color: const Color(0xFFDC2626), // Crimson Red
     subServices: [
-      'Call Center 112 Bojonegoro',
       'Ambulans Gawat Darurat',
       'Pemadam Kebakaran (Damkar)',
-      'Posko BPBD Bencana Alam',
+      'Kepolisian (Polres Bojonegoro)',
+      'Call Center 112 Bojonegoro',
     ],
   ),
   ServiceCategory(

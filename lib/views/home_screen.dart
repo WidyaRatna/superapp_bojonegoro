@@ -12,6 +12,9 @@ import 'profile_screen.dart';
 import 'laporan_screen.dart';
 import 'emergency_screen.dart';
 import 'pendidikan_screen.dart';
+import 'kesehatan_screen.dart';
+import 'kependudukan_screen.dart';
+import 'pariwisata_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -81,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(
         builder: (context) => AllServicesScreen(
           allServices: sampleServices,
-          onServiceTap: _showServiceModal,
+          onServiceTap: _handleServiceTap,
           isDarkMode: widget.isDarkMode,
           onToggleDarkMode: widget.onToggleDarkMode,
         ),
@@ -101,11 +104,54 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _openKesehatanScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => KesehatanScreen(
+          isDarkMode: widget.isDarkMode,
+          onToggleDarkMode: widget.onToggleDarkMode,
+        ),
+      ),
+    );
+  }
+
+  void _openKependudukanScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => KependudukanScreen(
+          isDarkMode: widget.isDarkMode,
+          onToggleDarkMode: widget.onToggleDarkMode,
+        ),
+      ),
+    );
+  }
+
+  void _openPariwisataScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PariwisataScreen(
+          isDarkMode: widget.isDarkMode,
+        ),
+      ),
+    );
+  }
+
   void _handleServiceTap(ServiceCategory category) {
     if (category.id == 'lainnya') {
       _openAllServicesScreen();
     } else if (category.id == 'pendidikan') {
       _openPendidikanScreen();
+    } else if (category.id == 'kesehatan') {
+      _openKesehatanScreen();
+    } else if (category.id == 'kependudukan') {
+      _openKependudukanScreen();
+    } else if (category.id == 'pariwisata') {
+      _openPariwisataScreen();
+    } else if (category.id == 'kontak_darurat' || category.id == 'darurat') {
+      _showEmergencyContactsModal();
     } else {
       _showServiceModal(category);
     }
@@ -217,12 +263,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       onTap: () {
                         Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Membuka formulir "$subItem"...'),
-                            backgroundColor: const Color(0xFF0D62F1),
-                          ),
-                        );
+                        if (category.id == 'pendidikan') {
+                          _openPendidikanScreen();
+                        } else if (category.id == 'kesehatan') {
+                          _openKesehatanScreen();
+                        } else if (category.id == 'kependudukan') {
+                          _openKependudukanScreen();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Membuka formulir "$subItem"...'),
+                              backgroundColor: const Color(0xFF0D62F1),
+                            ),
+                          );
+                        }
                       },
                     ),
                   ),

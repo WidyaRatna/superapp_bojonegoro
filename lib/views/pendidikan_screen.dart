@@ -270,6 +270,7 @@ class _PendidikanScreenState extends State<PendidikanScreen> {
             padding: const EdgeInsets.only(top: 2),
             child: Text(
               subtitle,
+              textAlign: TextAlign.justify,
               style: TextStyle(
                 fontSize: 12,
                 color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
