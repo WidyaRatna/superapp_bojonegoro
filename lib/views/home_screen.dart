@@ -1,4 +1,8 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../models/news_model.dart';
 import '../models/service_model.dart';
 import '../widgets/top_header.dart';
@@ -15,6 +19,11 @@ import 'pendidikan_screen.dart';
 import 'kesehatan_screen.dart';
 import 'kependudukan_screen.dart';
 import 'pariwisata_screen.dart';
+import 'loker_screen.dart';
+import 'kontak_instansi_screen.dart';
+
+
+
 
 class HomeScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -139,6 +148,51 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> _openInformasiPanganScreen() async {
+    const String urlStr = 'https://disdag-online.bojonegorokab.go.id/trend/tabel';
+    final Uri url = Uri.parse(urlStr);
+
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+        return;
+      }
+    } catch (_) {}
+
+    if (!kIsWeb) {
+      try {
+        if (Platform.isWindows) {
+          await Process.run('cmd', ['/c', 'start', '', urlStr]);
+          return;
+        }
+      } catch (_) {}
+    }
+  }
+
+  void _openLokerScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LokerScreen(
+          isDarkMode: widget.isDarkMode,
+          onToggleDarkMode: widget.onToggleDarkMode,
+        ),
+      ),
+    );
+  }
+
+  void _openKontakInstansiScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => KontakInstansiScreen(
+          isDarkMode: widget.isDarkMode,
+          onToggleDarkMode: widget.onToggleDarkMode,
+        ),
+      ),
+    );
+  }
+
   void _handleServiceTap(ServiceCategory category) {
     if (category.id == 'lainnya') {
       _openAllServicesScreen();
@@ -150,6 +204,12 @@ class _HomeScreenState extends State<HomeScreen> {
       _openKependudukanScreen();
     } else if (category.id == 'pariwisata') {
       _openPariwisataScreen();
+    } else if (category.id == 'umkm' || category.id == 'pangan' || category.title.toLowerCase().contains('pangan')) {
+      _openInformasiPanganScreen();
+    } else if (category.id == 'tenaga_kerja' || category.id == 'loker' || category.title.toLowerCase().contains('lowongan') || category.title.toLowerCase().contains('pekerjaan')) {
+      _openLokerScreen();
+    } else if (category.id == 'kontak_instansi' || category.title.toLowerCase().contains('instansi')) {
+      _openKontakInstansiScreen();
     } else if (category.id == 'kontak_darurat' || category.id == 'darurat') {
       _showEmergencyContactsModal();
     } else {
@@ -269,6 +329,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           _openKesehatanScreen();
                         } else if (category.id == 'kependudukan') {
                           _openKependudukanScreen();
+                        } else if (category.id == 'kontak_instansi') {
+                          _openKontakInstansiScreen();
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(

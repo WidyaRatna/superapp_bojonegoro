@@ -135,7 +135,7 @@ final List<ServiceCategory> sampleServices = [
     id: 'tenaga_kerja',
     title: 'Lowongan Pekerjaan',
     icon: Icons.work_rounded,
-    color: const Color(0xFFEA580C), // Warm Orange
+    color: const Color(0xFF0D9488), // Ocean Teal
     subServices: [
       'Pembuatan Kartu Kuning (AK-1)',
       'Lowongan Kerja Disnaker',
