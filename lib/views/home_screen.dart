@@ -21,6 +21,8 @@ import 'kependudukan_screen.dart';
 import 'pariwisata_screen.dart';
 import 'loker_screen.dart';
 import 'kontak_instansi_screen.dart';
+import 'layanan_pengaduan_dpmptsp_screen.dart';
+import 'pajak_screen.dart';
 
 
 
@@ -148,10 +150,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _openInformasiPanganScreen() async {
-    const String urlStr = 'https://disdag-online.bojonegorokab.go.id/trend/tabel';
-    final Uri url = Uri.parse(urlStr);
+  void _openPajakScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PajakScreen(
+          isDarkMode: widget.isDarkMode,
+          onToggleDarkMode: widget.onToggleDarkMode,
+        ),
+      ),
+    );
+  }
 
+  Future<void> _openExternalUrl(String urlStr) async {
+    final Uri url = Uri.parse(urlStr);
     try {
       if (await canLaunchUrl(url)) {
         await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -167,6 +179,60 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       } catch (_) {}
     }
+  }
+
+  Future<void> _openWhatsAppUrl(String phone) async {
+    final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
+    final formattedPhone = cleanPhone.startsWith('0') ? '62${cleanPhone.substring(1)}' : cleanPhone;
+    await _openExternalUrl('https://wa.me/$formattedPhone');
+  }
+
+  Future<void> _openEmailUrl(String email) async {
+    final Uri mailUrl = Uri.parse('mailto:$email');
+    try {
+      if (await canLaunchUrl(mailUrl)) {
+        await launchUrl(mailUrl);
+        return;
+      }
+    } catch (_) {}
+
+    if (!kIsWeb && Platform.isWindows) {
+      try {
+        await Process.run('cmd', ['/c', 'start', '', 'mailto:$email']);
+        return;
+      } catch (_) {}
+    }
+  }
+
+  void _openLayananPengaduanDpmptspScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LayananPengaduanDpmptspScreen(
+          isDarkMode: widget.isDarkMode,
+          onToggleDarkMode: widget.onToggleDarkMode,
+        ),
+      ),
+    );
+  }
+
+  void _handlePengaduanSubServiceTap(String subItem) {
+    if (subItem.contains('DPMPTSP') || subItem.contains('Tatap Muka') || subItem.contains('Surat')) {
+      _openLayananPengaduanDpmptspScreen();
+    } else if (subItem.contains('SP4N-LAPOR') || subItem.contains('lapor.go.id')) {
+      _openExternalUrl('https://www.lapor.go.id/');
+    } else if (subItem.contains('Hotline') || subItem.contains('WA') || subItem.contains('822')) {
+      _openWhatsAppUrl('082233099988');
+    } else if (subItem.contains('Email')) {
+      _openEmailUrl('dpmptsp.kabbjn@gmail.com');
+    } else {
+      _openLaporanWargaModal();
+    }
+  }
+
+  Future<void> _openInformasiPanganScreen() async {
+    const String urlStr = 'https://disdag-online.bojonegorokab.go.id/trend/tabel';
+    await _openExternalUrl(urlStr);
   }
 
   void _openLokerScreen() {
@@ -204,6 +270,10 @@ class _HomeScreenState extends State<HomeScreen> {
       _openKependudukanScreen();
     } else if (category.id == 'pariwisata') {
       _openPariwisataScreen();
+    } else if (category.id == 'perpajakan' || category.id == 'pajak' || category.title.toLowerCase().contains('pajak')) {
+      _openPajakScreen();
+    } else if (category.id == 'pengaduan' || category.id == 'lapor' || category.title.toLowerCase().contains('pengaduan')) {
+      _openLayananPengaduanDpmptspScreen();
     } else if (category.id == 'umkm' || category.id == 'pangan' || category.title.toLowerCase().contains('pangan')) {
       _openInformasiPanganScreen();
     } else if (category.id == 'tenaga_kerja' || category.id == 'loker' || category.title.toLowerCase().contains('lowongan') || category.title.toLowerCase().contains('pekerjaan')) {
@@ -219,6 +289,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Open Service Detail Bottom Sheet
   void _showServiceModal(ServiceCategory category) {
+    if (category.id == 'pengaduan' || category.title.toLowerCase().contains('pengaduan')) {
+      _openLayananPengaduanDpmptspScreen();
+      return;
+    }
     final isDark = widget.isDarkMode;
     showModalBottomSheet(
       context: context,
@@ -329,8 +403,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           _openKesehatanScreen();
                         } else if (category.id == 'kependudukan') {
                           _openKependudukanScreen();
+                        } else if (category.id == 'perpajakan' || category.title.toLowerCase().contains('pajak')) {
+                          _openPajakScreen();
                         } else if (category.id == 'kontak_instansi') {
                           _openKontakInstansiScreen();
+                        } else if (category.id == 'pengaduan') {
+                          _handlePengaduanSubServiceTap(subItem);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(

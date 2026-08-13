@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'khayangan_api_data.dart';
@@ -540,16 +541,28 @@ class _PariwisataScreenState extends State<PariwisataScreen> with SingleTickerPr
           'Pariwisata Bojonegoro',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          tabAlignment: TabAlignment.start,
-          indicatorColor: Colors.white,
-          indicatorWeight: 3,
-          labelColor: Colors.white,
-          unselectedLabelColor: const Color(0xFFCFFAFE),
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-          tabs: const [
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(kTextTabBarHeight + 10),
+          child: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(
+              dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+                PointerDeviceKind.trackpad,
+                PointerDeviceKind.stylus,
+              },
+            ),
+            child: TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+              tabAlignment: TabAlignment.start,
+              indicatorColor: Colors.white,
+              indicatorWeight: 3,
+              labelColor: Colors.white,
+              unselectedLabelColor: const Color(0xFFCFFAFE),
+              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              tabs: const [
             Tab(
               icon: Icon(Icons.attractions_rounded, size: 20),
               text: 'Tempat Rekreasi',
@@ -565,7 +578,9 @@ class _PariwisataScreenState extends State<PariwisataScreen> with SingleTickerPr
           ],
         ),
       ),
-      body: Column(
+    ),
+  ),
+  body: Column(
         children: [
           // Search Input Bar
           Container(

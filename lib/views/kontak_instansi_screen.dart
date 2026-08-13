@@ -28,54 +28,82 @@ class InstansiItem {
 }
 
 final List<InstansiItem> sampleInstansiList = [
-  // BADAN
+  // BADAN & INSPEKTORAT (8 Badan Resmi Pemkab Bojonegoro)
+  const InstansiItem(
+    id: 'bkpp',
+    name: 'BADAN KEPEGAWAIAN, PENDIDIKAN, DAN PELATIHAN',
+    category: 'BADAN',
+    address: 'Jln. Teuku Umar No. 42 Bojonegoro',
+    phone: '(0353) 881552',
+    email: 'bkpp@bojonegorokab.go.id, bkdbojonegoro2015@gmail.com',
+    website: 'bkpp.bojonegorokab.go.id',
+  ),
   const InstansiItem(
     id: 'bappeda',
-    name: 'BAPPEDA (Badan Perencanaan Pembangunan Daerah)',
+    name: 'BADAN PERENCANAAN PEMBANGUNAN DAERAH',
     category: 'BADAN',
-    address: 'Jl. P. Mastrip No. 5, Kota Bojonegoro',
+    address: 'Jalan P. Mas Tumapel No. 01 Gedung Pemkab Lantai 4 Bojonegoro',
     phone: '(0353) 881456',
     email: 'bappeda@bojonegorokab.go.id',
     website: 'bappeda.bojonegorokab.go.id',
   ),
   const InstansiItem(
     id: 'bpkad',
-    name: 'BPKAD (Badan Pengelola Keuangan & Aset Daerah)',
+    name: 'BADAN PENGELOLAAN KEUANGAN DAN ASET DAERAH',
     category: 'BADAN',
-    address: 'Jl. P. Mastrip No. 3, Kota Bojonegoro',
+    address: 'Jl. Trunojoyo No. 12a, Kadipaten, Kec. Bojonegoro, Kabupaten Bojonegoro, Jawa Timur 62111',
     phone: '(0353) 881321',
-    email: 'bpkad@bojonegorokab.go.id',
+    email: 'bpkadbojonegoro@gmail.com',
     website: 'bpkad.bojonegorokab.go.id',
+    operationalHours: 'Senin - Jumat: 08.00 - 16.00 WIB',
   ),
   const InstansiItem(
     id: 'bapenda',
-    name: 'BAPENDA (Badan Pendapatan Daerah)',
+    name: 'BADAN PENDAPATAN DAERAH',
     category: 'BADAN',
-    address: 'Jl. Chusus No. 1, Kota Bojonegoro',
-    phone: '(0353) 881554',
+    address: 'Jl P. Mas Tumapel No. 1 Bojonegoro Gedung Pemkab Lt. 1',
+    phone: '(0353) 881826',
     whatsapp: '08113554100',
-    email: 'bapenda@bojonegorokab.go.id',
+    email: 'bapenda@bojonegorokab.go.id, mail@bapendabojonegoro.id',
     website: 'bapenda.bojonegorokab.go.id',
   ),
   const InstansiItem(
-    id: 'bpbd',
-    name: 'BPBD (Badan Penanggulangan Bencana Daerah)',
+    id: 'bakesbangpol',
+    name: 'BADAN KESATUAN BANGSA DAN POLITIK',
     category: 'BADAN',
-    address: 'Jl. Raya Kapas No. 1, Kec. Kapas, Bojonegoro',
-    phone: '(0353) 887811',
-    whatsapp: '08113356112',
-    email: 'bpbd@bojonegorokab.go.id',
+    address: 'JL. Trunojoyo No. 12 Bojonegoro',
+    phone: '(0353) 893526',
+    email: 'kesbangpolbgoro@gmail.com',
+    website: 'bakesbangpol.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'bpbd',
+    name: 'BADAN PENANGGULANGAN BENCANA DAERAH',
+    category: 'BADAN',
+    address: 'Jalan Ahmad Yani No. 06, Desa Sukorejo, Kec. Bojonegoro, Kab. Bojonegoro 62115',
+    phone: '08113356444',
+    whatsapp: '08113356444',
+    email: 'bpbd.bjn@gmail.com, bpbd@bojonegorokab.go.id',
     website: 'bpbd.bojonegorokab.go.id',
     operationalHours: '24 Jam Nonstop (Layanan Darurat)',
   ),
   const InstansiItem(
-    id: 'bkpp',
-    name: 'BKPP (Badan Kepegawaian, Pendidikan & Pelatihan)',
+    id: 'brida',
+    name: 'BADAN RISET DAN INOVASI DAERAH',
     category: 'BADAN',
-    address: 'Jl. Teuku Umar No. 42, Kota Bojonegoro',
-    phone: '(0353) 881776',
-    email: 'bkpp@bojonegorokab.go.id',
-    website: 'bkpp.bojonegorokab.go.id',
+    address: 'JL. P Mas Tumapel No.1, Kadipaten, Kec. Bojonegoro, Kab. Bojonegoro 62111',
+    phone: '(0353) 881826',
+    email: 'brida.bojonegorokab@gmail.com',
+    website: 'brida.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'inspektorat',
+    name: 'INSPEKTORAT KABUPATEN BOJONEGORO',
+    category: 'BADAN',
+    address: 'Jl. Trunojoyo No. 12 Lt. 1 Bojonegoro',
+    phone: '(0353) 881336',
+    email: 'inspektorat.bjn@gmail.com, inspektorat@bojonegorokab.go.id',
+    website: 'inspektorat.bojonegorokab.go.id',
   ),
 
   // DINAS (22 Dinas Resmi Pemkab Bojonegoro)
@@ -269,164 +297,423 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'dinasnakkan@bojonegorokab.go.id',
   ),
 
-  // SETDA
+  // SETDA (9 Bagian Resmi Sekretariat Daerah Kab. Bojonegoro)
   const InstansiItem(
-    id: 'setda_utama',
-    name: 'Sekretariat Daerah (SETDA) Kab. Bojonegoro',
+    id: 'setda_adbang',
+    name: 'BAGIAN ADMINISTRASI PEMBANGUNAN',
     category: 'SETDA',
-    address: 'Jl. P. Mastrip No. 1, Kota Bojonegoro',
+    address: 'Jl. P. MAS TUMAPEL No. 1 Gedung Pemkab Lt. 5, Bojonegoro, Jawa Timur',
+    phone: '(0353) 881826 ext 133',
+    email: 'bagpembangunan@bojonegorokab.go.id, pembangunanbojonegoro@gmail.com',
+    website: 'bagpembangunan.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'setda_pemerintahan',
+    name: 'BAGIAN PEMERINTAHAN',
+    category: 'SETDA',
+    address: 'JL. P. Mas Tumapel No. 1 Bojonegoro',
+    phone: '082289977789',
+    whatsapp: '082289977789',
+    email: 'bagpembjn@gmail.com',
+    website: 'bagpem.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'setda_perekonomian',
+    name: 'BAGIAN PEREKONOMIAN DAN SUMBER DAYA ALAM',
+    category: 'SETDA',
+    address: 'Jalan P. Mas Tumapel No 1 Bojonegoro',
+    phone: '(0353) 881826 ext 157',
+    email: 'ekonomi.bjn@gmail.com',
+    website: 'bagekonomi.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'setda_kesra',
+    name: 'BAGIAN KESEJAHTERAAN RAKYAT',
+    category: 'SETDA',
+    address: 'Jl. P. Mas Tumapel No. 1 Bojonegoro',
+    phone: '(0353) 881628',
+    email: 'kesrabojonegoro24@gmail.com',
+    website: 'bagkesra.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'setda_prokopim',
+    name: 'BAGIAN PROTOKOL DAN KOMUNIKASI PIMPINAN',
+    category: 'SETDA',
+    address: 'JL. P. Mas Tumapel No. 1 Bojonegoro',
     phone: '(0353) 881001',
-    email: 'setda@bojonegorokab.go.id',
-    website: 'bojonegorokab.go.id',
+    email: 'bagprokopim@bojonegorokab.go.id',
+    website: 'bagprokopim.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'setda_umum',
+    name: 'BAGIAN UMUM',
+    category: 'SETDA',
+    address: 'Jl. Mas Tumapel No.1 Bojonegoro',
+    phone: '(0353) 881826',
+    email: 'bagumum@bojonegorokab.go.id',
+    website: 'bagumumkeu.bojonegorokab.go.id',
   ),
   const InstansiItem(
     id: 'setda_hukum',
-    name: 'Bagian Hukum & HAM SETDA',
+    name: 'BAGIAN HUKUM',
     category: 'SETDA',
-    address: 'Gedung Pemkab Bojonegoro Lt. 3, Jl. P. Mastrip No. 1',
-    phone: '(0353) 881002',
-    email: 'hukum@bojonegorokab.go.id',
+    address: 'JL. P. Mas Tumapel No. 01 Bojonegoro',
+    phone: '(0353) 887193 ext 114',
+    email: 'hukumsetdabjn@gmail.com',
+    website: 'baghukum.bojonegorokab.go.id',
   ),
   const InstansiItem(
     id: 'setda_organisasi',
-    name: 'Bagian Organisasi SETDA',
+    name: 'BAGIAN ORGANISASI',
     category: 'SETDA',
-    address: 'Gedung Pemkab Bojonegoro Lt. 2, Jl. P. Mastrip No. 1',
-    phone: '(0353) 881003',
-    email: 'organisasi@bojonegorokab.go.id',
+    address: 'JL. P. Mas Tumapel No. 01 Bojonegoro',
+    phone: '(0353) 881826',
+    email: 'bagortalabjn@gmail.com',
+    website: 'bagortala.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'setda_pbj',
+    name: 'BAGIAN PENGADAAN BARANG / JASA',
+    category: 'SETDA',
+    address: 'JL. P. Mas Tumapel No. 1 Bojonegoro',
+    phone: '(0353) 881001',
+    email: 'baglpbj@bojonegorokab.go.id',
+    website: 'baglpbj.bojonegorokab.go.id',
   ),
 
-  // KECAMATAN
-  const InstansiItem(
-    id: 'kec_bojonegoro',
-    name: 'Kantor Kecamatan Bojonegoro (Kota)',
-    category: 'KECAMATAN',
-    address: 'Jl. AKBP M. Soeroko No. 45, Kota Bojonegoro',
-    phone: '(0353) 881100',
-    email: 'kec.bojonegoro@bojonegorokab.go.id',
-  ),
+  // KECAMATAN (28 Kecamatan Resmi Kab. Bojonegoro)
   const InstansiItem(
     id: 'kec_balen',
-    name: 'Kantor Kecamatan Balen',
+    name: 'KANTOR KECAMATAN BALEN',
     category: 'KECAMATAN',
-    address: 'Jl. Raya Balen No. 12, Kec. Balen, Bojonegoro',
-    phone: '(0353) 331122',
-    email: 'kec.balen@bojonegorokab.go.id',
-  ),
-  const InstansiItem(
-    id: 'kec_kapas',
-    name: 'Kantor Kecamatan Kapas',
-    category: 'KECAMATAN',
-    address: 'Jl. Raya Kapas No. 5, Kec. Kapas, Bojonegoro',
-    phone: '(0353) 331133',
-    email: 'kec.kapas@bojonegorokab.go.id',
+    address: 'Jalan Raya Balen Nomor 56 Balen, Bojonegoro',
+    phone: '(0353) 331829',
+    email: 'kecamatanbalen.balendamai@gmail.com',
+    website: 'kecbalen.bojonegorokab.go.id',
   ),
   const InstansiItem(
     id: 'kec_baureno',
-    name: 'Kantor Kecamatan Baureno',
+    name: 'KANTOR KECAMATAN BAURENO',
     category: 'KECAMATAN',
-    address: 'Jl. Raya Baureno No. 88, Kec. Baureno, Bojonegoro',
-    phone: '(0353) 331144',
-    email: 'kec.baureno@bojonegorokab.go.id',
+    address: 'Jl. Raya Baureno No. 152, Bojonegoro',
+    phone: '(0322) 453539',
+    email: 'kecamatanbaureno@ymail.com',
+    website: 'kecbaureno.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_bubulan',
+    name: 'KANTOR KECAMATAN BUBULAN',
+    category: 'KECAMATAN',
+    address: 'Jln. Raya Bubulan No. 116, Bojonegoro',
+    phone: '081259287676',
+    whatsapp: '081259287676',
+    email: 'bubulankecamatan@gmail.com',
+    website: 'kecbubulan.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_bojonegoro',
+    name: 'KANTOR KECAMATAN BOJONEGORO (KOTA)',
+    category: 'KECAMATAN',
+    address: 'Jl. AKBP M. Soeroko No. 45, Kota Bojonegoro',
+    phone: '(0353) 881770',
+    email: 'kec.bojonegoro@bojonegorokab.go.id',
+    website: 'kecbojonegoro.bojonegorokab.go.id',
   ),
   const InstansiItem(
     id: 'kec_kalitidu',
-    name: 'Kantor Kecamatan Kalitidu',
+    name: 'KANTOR KECAMATAN KALITIDU',
     category: 'KECAMATAN',
-    address: 'Jl. Raya Kalitidu No. 15, Kec. Kalitidu, Bojonegoro',
-    phone: '(0353) 331155',
-    email: 'kec.kalitidu@bojonegorokab.go.id',
+    address: 'Jl. Raya Kalitidu No. 139, Bojonegoro',
+    phone: '(0353) 511255',
+    email: 'kecamatankalitidu98@gmail.com',
+    website: 'keckalitidu.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_gondang',
+    name: 'KANTOR KECAMATAN GONDANG',
+    category: 'KECAMATAN',
+    address: 'Jalan Raya Gondang No. 21, Gondang, Bojonegoro 62173',
+    phone: '(0353) 531006',
+    email: 'kecamatangondang26@gmail.com',
+    website: 'kecgondang.bojonegorokab.go.id',
   ),
   const InstansiItem(
     id: 'kec_dander',
-    name: 'Kantor Kecamatan Dander',
+    name: 'KANTOR KECAMATAN DANDER',
     category: 'KECAMATAN',
-    address: 'Jl. Raya Dander No. 20, Kec. Dander, Bojonegoro',
-    phone: '(0353) 331166',
-    email: 'kec.dander@bojonegorokab.go.id',
+    address: 'Jl Raya Dander Temayang No 53 Dander 62171 Kabupaten Bojonegoro',
+    phone: '(0353) 882342',
+    email: 'kecamatandander@gmail.com',
+    website: 'kecdander.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_kanor',
+    name: 'KANTOR KECAMATAN KANOR',
+    category: 'KECAMATAN',
+    address: 'Jalan Raya Kanor Nomor 01, Kanor, Bojonegoro 62193',
+    phone: '(0353) 331468',
+    email: 'kec.kanor@gmail.com',
+    website: 'keckanor.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_kapas',
+    name: 'KANTOR KECAMATAN KAPAS',
+    category: 'KECAMATAN',
+    address: 'Jl. Ahmad Yani No. 37 Desa Tikusan Kecamatan Kapas Kabupaten Bojonegoro',
+    phone: '(0353) 885080',
+    whatsapp: '0895328576522',
+    email: 'kapas@bojonegorokab.go.id',
+    website: 'keckapas.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_kasiman',
+    name: 'KANTOR KECAMATAN KASIMAN',
+    category: 'KECAMATAN',
+    address: 'Jalan Diponegoro No. 14 Batokan, Kasiman, Bojonegoro',
+    phone: '(0353) 531031',
+    email: 'kecamatan.kasiman@gmail.com',
+    website: 'keckasiman.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_kedewan',
+    name: 'KANTOR KECAMATAN KEDEWAN',
+    category: 'KECAMATAN',
+    address: 'Jl Raya Kedewan No. 30 Kedewan, Bojonegoro',
+    phone: '(0353) 881454',
+    email: 'kecamatankedewan@gmail.com',
+    website: 'keckedewan.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_kedungadem',
+    name: 'KANTOR KECAMATAN KEDUNGADEM',
+    category: 'KECAMATAN',
+    address: 'Jalan Gajah Mada 813 Kedungadem Bojonegoro',
+    phone: '(0353) 351087',
+    email: 'sekretariatkedungadem@gmail.com',
+    website: 'keckedungadem.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_kepohbaru',
+    name: 'KANTOR KECAMATAN KEPOHBARU',
+    category: 'KECAMATAN',
+    address: 'Jl. Raya Kepohbaru No. 268, Bojonegoro',
+    phone: '(0353) 331233',
+    email: 'kepohbaru@bojonegorokab.go.id',
+    website: 'keckepohbaru.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_malo',
+    name: 'KANTOR KECAMATAN MALO',
+    category: 'KECAMATAN',
+    address: 'Jl Brawijaya No 277 Malo, Bojonegoro',
+    phone: '(0353) 511023',
+    email: 'kecamatanmalo@gmail.com',
+    website: 'kecmalo.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_margomulyo',
+    name: 'KANTOR KECAMATAN MARGOMULYO',
+    category: 'KECAMATAN',
+    address: 'Jl. A. Yani Nomor 46 Kecamatan Margomulyo Kabupaten Bojonegoro - Jawa Timur',
+    phone: '-',
+    email: 'kec.margomulyo@gmail.com, margomulyo@bojonegorokab.go.id',
+    website: 'kecmargomulyo.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_ngambon',
+    name: 'KANTOR KECAMATAN NGAMBON',
+    category: 'KECAMATAN',
+    address: 'jln.Diponegoro No.402 KodePos : 62167 Ngambon, Bojonegoro',
+    phone: '(0353) 7798314',
+    email: 'kantorkecamatanngambon@gmail.com',
+    website: 'kecngambon.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_ngasem',
+    name: 'KANTOR KECAMATAN NGASEM',
+    category: 'KECAMATAN',
+    address: 'Jl. Raya Kalitidu-Ngasem, Bojonegoro',
+    phone: '082227722270',
+    whatsapp: '082227722270',
+    email: 'ngasem.prima1230@gmail.com',
+    website: 'kecngasem.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_ngraho',
+    name: 'KANTOR KECAMATAN NGRAHO',
+    category: 'KECAMATAN',
+    address: 'Jl. Ahmad Yani No. 119 Ngraho 62165, Bojonegoro',
+    phone: '(0353) 591075',
+    email: 'kantorkecamatanngraho@gmail.com',
+    website: 'kecngraho.bojonegorokab.go.id',
   ),
   const InstansiItem(
     id: 'kec_padangan',
-    name: 'Kantor Kecamatan Padangan',
+    name: 'KANTOR KECAMATAN PADANGAN',
     category: 'KECAMATAN',
-    address: 'Jl. Raya Padangan No. 99, Kec. Padangan, Bojonegoro',
-    phone: '(0353) 331177',
-    email: 'kec.padangan@bojonegorokab.go.id',
+    address: 'Jalan Ahmad Yani Nomor 80 PADANGAN 62162',
+    phone: '(0353) 5215027',
+    email: 'kec.padangan@gmail.com',
+    website: 'kecpadangan.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_purwosari',
+    name: 'KANTOR KECAMATAN PURWOSARI',
+    category: 'KECAMATAN',
+    address: 'Jl. Soeprijadi No. 586A Purwosari Kode Pos 62161',
+    phone: '(0353) 551027',
+    email: 'kecamatan.purwosari@gmail.com, purwosari@bojonegorokab.go.id',
+    website: 'kecpurwosari.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_temayang',
+    name: 'KANTOR KECAMATAN TEMAYANG',
+    category: 'KECAMATAN',
+    address: 'Jl. Basuki Rahmad No.312 Temayang, Bojonegoro',
+    phone: '(0353) 881454',
+    email: 'kec.temayang@bojonegorokab.go.id',
+    website: 'kectemayang.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_trucuk',
+    name: 'KANTOR KECAMATAN TRUCUK',
+    category: 'KECAMATAN',
+    address: 'Jl Raya Sumberejo Kentong No. 01 Trucuk Bojonegoro',
+    phone: '(0353) 887952',
+    email: 'kecamatantrucuk@gmail.com',
+    website: 'kectrucuk.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_tambakrejo',
+    name: 'KANTOR KECAMATAN TAMBAKREJO',
+    category: 'KECAMATAN',
+    address: 'Jl Taji-Ngambon Km. 01 Tambakrejo, Bojonegoro',
+    phone: '-',
+    email: 'kecamatantambakrejo@gmail.com',
+    website: 'kectambakrejo.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_gayam',
+    name: 'KANTOR KECAMATAN GAYAM',
+    category: 'KECAMATAN',
+    address: 'Jalan Raya Gayam No. 01, Bojonegoro',
+    phone: '082257311614',
+    whatsapp: '082257311614',
+    email: 'kecamatangayam@yahoo.co.id',
+    website: 'kecgayam.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_sumberrejo',
+    name: 'KANTOR KECAMATAN SUMBERREJO',
+    category: 'KECAMATAN',
+    address: 'Jln. Sikatan No. 333 Sumberrejo, Bojonegoro',
+    phone: '-',
+    email: 'Sumberrejokec@gmail.com',
+    website: 'kecsumberrejo.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_sukosewu',
+    name: 'KANTOR KECAMATAN SUKOSEWU',
+    category: 'KECAMATAN',
+    address: 'Jalan Raya Sukosewu Desa Sukosewu Kabupaten Bojonegoro Kode Pos 62183',
+    phone: '-',
+    email: 'sukosewu@bojonegorokab.go.id',
+    website: 'kecsukosewu.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_sugihwaras',
+    name: 'KANTOR KECAMATAN SUGIHWARAS',
+    category: 'KECAMATAN',
+    address: 'Jl. Raya No. 46 Sugihwaras Kab. Bojonegoro',
+    phone: '(0353) 7711270',
+    email: 'garaskec@gmail.com',
+    website: 'kecsugihwaras.bojonegorokab.go.id',
+  ),
+  const InstansiItem(
+    id: 'kec_sekar',
+    name: 'KANTOR KECAMATAN SEKAR',
+    category: 'KECAMATAN',
+    address: 'Jl. Raya Sekar Nomor. 12 Kecamatan Sekar Kabupaten Bojonegoro Kode Pos : 62169',
+    phone: '-',
+    email: 'sekar@bojonegorokab.go.id',
+    website: 'kecsekar.bojonegorokab.go.id',
   ),
 
-  // RSUD
+  // RSUD (3 Rumah Sakit Umum Daerah Resmi Kab. Bojonegoro)
   const InstansiItem(
     id: 'rsud_sosodoro',
-    name: 'RSUD dr. R. Sosodoro Djatikoesoemo',
+    name: 'RSUD dr. R. SOSODORO DJATIKOESOEMO (RSUD BOJONEGORO)',
     category: 'RSUD',
     address: 'Jl. Veteran No. 36, Kota Bojonegoro',
     phone: '(0353) 881193',
-    whatsapp: '081132277119',
+    whatsapp: '08113224972',
     email: 'rsud.sosodoro@bojonegorokab.go.id',
-    website: 'rsudbojonegoro.com',
-    operationalHours: '24 Jam Nonstop (UGD & Rawat Inap)',
-  ),
-  const InstansiItem(
-    id: 'rsud_padangan',
-    name: 'RSUD Padangan Bojonegoro',
-    category: 'RSUD',
-    address: 'Jl. Raya Padangan-Ngawi No. 1, Kec. Padangan',
-    phone: '(0353) 531122',
-    email: 'rsudpadangan@bojonegorokab.go.id',
-    website: 'rsudpadangan.bojonegorokab.go.id',
+    website: 'rsudsosodoro.bojonegorokab.go.id',
     operationalHours: '24 Jam Nonstop (UGD & Rawat Inap)',
   ),
   const InstansiItem(
     id: 'rsud_sumberrejo',
-    name: 'RSUD Sumberrejo Bojonegoro',
+    name: 'RSUD SUMBERREJO KABUPATEN BOJONEGORO',
     category: 'RSUD',
-    address: 'Jl. Raya Sumberrejo No. 158, Kec. Sumberrejo',
-    phone: '(0353) 351024',
-    email: 'rsudsumberrejo@bojonegorokab.go.id',
+    address: 'Jl. Raya Sumberrejo no. 231, Sumuragung, Kec. Sumberejo, Kabupaten Bojonegoro, Jawa Timur 62191',
+    phone: '(0353) 331530',
+    email: 'rsudsumberrejobjn@gmail.com',
     website: 'rsudsumberrejo.bojonegorokab.go.id',
     operationalHours: '24 Jam Nonstop (UGD & Rawat Inap)',
   ),
-
-  // BUMD
   const InstansiItem(
-    id: 'bumd_bank_daerah',
-    name: 'BPR Bank Daerah Bojonegoro (Perseroda)',
+    id: 'rsud_padangan',
+    name: 'RSUD PADANGAN KABUPATEN BOJONEGORO',
+    category: 'RSUD',
+    address: 'Jl. Dr. Soetomo No. 02 Padangan Bojonegoro',
+    phone: '(0353) 551166 (IGD) / (0353) 551666',
+    email: 'rsudpadangan@yahoo.co.id',
+    website: 'rsudpadangan.bojonegorokab.go.id',
+    operationalHours: '24 Jam Nonstop (UGD & Rawat Inap)',
+  ),
+
+  // BUMD (3 Badan Usaha Milik Daerah Resmi Kab. Bojonegoro)
+  const InstansiItem(
+    id: 'bumd_bbs',
+    name: 'PT. Bojonegoro Bangun Sarana (BBS)',
     category: 'BUMD',
-    address: 'Jl. Gajah Mada No. 10, Kota Bojonegoro',
-    phone: '(0353) 881888',
-    whatsapp: '081234567788',
-    email: 'info@bankdaerahbojonegoro.co.id',
-    website: 'bankdaerahbojonegoro.co.id',
+    address: 'Jl. Veteran, RT.20/RW.02, Ngrowo, Kec. Bojonegoro, Kab. Bojonegoro, Jawa Timur 62119',
+    phone: '(0353) 883956',
+    whatsapp: '08113045050',
+    email: 'pt.bbs.bojonegoro@gmail.com',
+    website: 'ptbbs.bojonegorokab.go.id',
   ),
   const InstansiItem(
     id: 'bumd_pdam',
-    name: 'Perumda Air Minum Tirta Buana (PDAM)',
+    name: 'PD. Air Minum (PDAM) Tirta Buana',
     category: 'BUMD',
     address: 'Jl. Rajawali No. 16, Kota Bojonegoro',
     phone: '(0353) 881515',
     whatsapp: '085231234567',
     email: 'pdambojonegoro@gmail.com',
-    website: 'pdambojonegoro.co.id',
+    website: 'pdam.bojonegorokab.go.id',
     operationalHours: 'Senin - Sabtu: 07.30 - 16.00 WIB',
   ),
   const InstansiItem(
-    id: 'bumd_ads',
-    name: 'PT Asri Dharma Sejahtera (ADS)',
+    id: 'bumd_bpr',
+    name: 'PD. Bank Perkreditan Rakyat (BPR) Bank Daerah Bojonegoro',
     category: 'BUMD',
-    address: 'Jl. Veteran No. 8, Kota Bojonegoro',
-    phone: '(0353) 887766',
-    email: 'info@ads-bojonegoro.co.id',
+    address: 'Jl. Gajah Mada No. 10, Kota Bojonegoro',
+    phone: '(0353) 881888',
+    whatsapp: '081234567788',
+    email: 'info@bankdaerahbojonegoro.co.id',
+    website: 'bpr.bojonegorokab.go.id',
   ),
 
-  // SETWAN
+  // SETWAN (Sekretariat DPRD Kab. Bojonegoro)
   const InstansiItem(
     id: 'setwan',
     name: 'Sekretariat DPRD (SETWAN) Kab. Bojonegoro',
     category: 'SETWAN',
-    address: 'Jl. Trunojoyo No. 35, Kota Bojonegoro',
-    phone: '(0353) 881050',
-    email: 'dprd@bojonegorokab.go.id',
-    website: 'dprd.bojonegorokab.go.id',
+    address: 'Jl. Veteran Nomor 84 Bojonegoro 62115',
+    phone: '(0353) 881745',
+    email: 'humasdprdbjn@gmail.com',
+    website: 'setwan.bojonegorokab.go.id',
   ),
 ];
 
@@ -505,14 +792,6 @@ class _KontakInstansiScreenState extends State<KontakInstansiScreen> {
       'color': const Color(0xFF0284C7),
       'lightBg': const Color(0xFFF0F9FF),
       'darkBg': const Color(0xFF0C4A6E),
-    },
-    {
-      'code': 'DARURAT',
-      'name': 'DARURAT 112',
-      'icon': Icons.notifications_active_rounded,
-      'color': const Color(0xFFDC2626),
-      'lightBg': const Color(0xFFFEF2F2),
-      'darkBg': const Color(0xFF450A0A),
     },
   ];
 
@@ -954,30 +1233,104 @@ class _KontakInstansiScreenState extends State<KontakInstansiScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  ElevatedButton.icon(
-                                    onPressed: () {
-                                      setState(() {
-                                        _selectedCategory = null;
-                                        _searchController.clear();
-                                        _searchQuery = '';
-                                      });
-                                    },
-                                    icon: const Icon(Icons.arrow_back_rounded, size: 16, color: Colors.white),
-                                    label: const Text('Kembali ke Menu Kategori', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF2563EB),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectedCategory = null;
+                                          _searchController.clear();
+                                          _searchQuery = '';
+                                        });
+                                      },
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                        decoration: BoxDecoration(
+                                          color: isDark
+                                              ? const Color(0xFF2563EB).withAlpha(40)
+                                              : const Color(0xFF2563EB).withAlpha(18),
+                                          borderRadius: BorderRadius.circular(20),
+                                          border: Border.all(
+                                            color: isDark
+                                                ? const Color(0xFF3B82F6).withAlpha(80)
+                                                : const Color(0xFF2563EB).withAlpha(50),
+                                            width: 1,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: const Color(0xFF2563EB).withAlpha(15),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(4),
+                                              decoration: const BoxDecoration(
+                                                color: Color(0xFF2563EB),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(
+                                                Icons.arrow_back_rounded,
+                                                size: 13,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              'Kembali ke Menu Kategori',
+                                              style: TextStyle(
+                                                color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8),
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                  const Spacer(),
-                                  Text(
-                                    '${_filteredList.length} Instansi',
-                                    style: TextStyle(
-                                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                                    decoration: BoxDecoration(
+                                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                                        width: 1,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withAlpha(10),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 1),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.domain_rounded,
+                                          size: 14,
+                                          color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          '${_filteredList.length} Instansi',
+                                          style: TextStyle(
+                                            color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -986,30 +1339,37 @@ class _KontakInstansiScreenState extends State<KontakInstansiScreen> {
 
                               if (_selectedCategory != null) ...[
                                 Center(
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        _selectedCategory == 'DINAS'
-                                            ? 'DINAS KABUPATEN BOJONEGORO'
-                                            : 'KABUPATEN BOJONEGORO - $_selectedCategory',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w900,
-                                          letterSpacing: 0.8,
-                                        ),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: isDark
+                                          ? const Color(0xFF1E293B)
+                                          : const Color(0xFFEFF6FF),
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: isDark
+                                            ? const Color(0xFF3B82F6).withAlpha(50)
+                                            : const Color(0xFFBFDBFE),
+                                        width: 1,
                                       ),
-                                      const SizedBox(height: 4),
-                                      Container(
-                                        width: 48,
-                                        height: 3,
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF2563EB),
-                                          borderRadius: BorderRadius.circular(2),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          _selectedCategory == 'DINAS'
+                                              ? 'DINAS KABUPATEN BOJONEGORO'
+                                              : 'KABUPATEN BOJONEGORO - $_selectedCategory',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF1D4ED8),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w900,
+                                            letterSpacing: 0.8,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: 16),
@@ -1057,20 +1417,38 @@ class _KontakInstansiScreenState extends State<KontakInstansiScreen> {
                                   padding: const EdgeInsets.only(bottom: 10),
                                   child: InkWell(
                                     onTap: () => _showInstansiContactModal(context, item, isDark),
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(14),
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                                       decoration: BoxDecoration(
-                                        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFEFF4F8),
-                                        borderRadius: BorderRadius.circular(12),
+                                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                                        borderRadius: BorderRadius.circular(14),
                                         border: Border.all(
                                           color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                                           width: 1,
                                         ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withAlpha(isDark ? 30 : 8),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
                                       ),
                                       child: Row(
                                         children: [
-                                          const Icon(Icons.play_arrow_outlined, color: Color(0xFF2563EB), size: 20),
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF2563EB).withAlpha(isDark ? 40 : 15),
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            child: const Icon(
+                                              Icons.business_rounded,
+                                              color: Color(0xFF2563EB),
+                                              size: 18,
+                                            ),
+                                          ),
                                           const SizedBox(width: 14),
                                           Expanded(
                                             child: Text(
@@ -1079,11 +1457,15 @@ class _KontakInstansiScreenState extends State<KontakInstansiScreen> {
                                                 color: isDark ? Colors.white : const Color(0xFF1E293B),
                                                 fontSize: 13,
                                                 fontWeight: FontWeight.w700,
-                                                letterSpacing: 0.3,
+                                                letterSpacing: 0.2,
                                               ),
                                             ),
                                           ),
-                                          const Icon(Icons.chevron_right_rounded, color: Colors.grey, size: 18),
+                                          Icon(
+                                            Icons.chevron_right_rounded,
+                                            color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                                            size: 20,
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -1148,25 +1530,20 @@ class _KontakInstansiScreenState extends State<KontakInstansiScreen> {
                                   final Color catColor = cat['color'] as Color;
                                   final Color lightBg = cat['lightBg'] as Color;
                                   final Color darkBg = cat['darkBg'] as Color;
-                                  final isDarurat = cat['code'] == 'DARURAT';
-                                  final count = isDarurat ? 24 : sampleInstansiList.where((item) => item.category == cat['code']).length;
+                                  final count = sampleInstansiList.where((item) => item.category == cat['code']).length;
 
                                   return InkWell(
                                     onTap: () {
-                                      if (isDarurat) {
-                                        _makePhoneCall(context, '112');
-                                      } else {
-                                        setState(() {
-                                          _selectedCategory = cat['code'] as String;
-                                        });
-                                      }
+                                      setState(() {
+                                        _selectedCategory = cat['code'] as String;
+                                      });
                                     },
-                                    borderRadius: BorderRadius.circular(22),
+                                    borderRadius: BorderRadius.circular(20),
                                     child: Container(
-                                      padding: const EdgeInsets.all(14),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                       decoration: BoxDecoration(
                                         color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                                        borderRadius: BorderRadius.circular(22),
+                                        borderRadius: BorderRadius.circular(20),
                                         border: Border.all(
                                           color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                                           width: 1.2,
@@ -1174,55 +1551,69 @@ class _KontakInstansiScreenState extends State<KontakInstansiScreen> {
                                         boxShadow: [
                                           BoxShadow(
                                             color: catColor.withAlpha(20),
-                                            blurRadius: 12,
-                                            offset: const Offset(0, 4),
+                                            blurRadius: 10,
+                                            offset: const Offset(0, 3),
                                           ),
                                         ],
                                       ),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          // Centered Glowing Circular Icon Badge
-                                          Container(
-                                            width: 52,
-                                            height: 52,
-                                            decoration: BoxDecoration(
-                                              color: isDark ? darkBg.withAlpha(180) : lightBg,
-                                              shape: BoxShape.circle,
-                                              border: Border.all(color: catColor.withAlpha(60), width: 1.2),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: catColor.withAlpha(40),
-                                                  blurRadius: 10,
-                                                  offset: const Offset(0, 3),
+                                      child: Center(
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Container(
+                                                width: 44,
+                                                height: 44,
+                                                decoration: BoxDecoration(
+                                                  color: isDark ? darkBg.withAlpha(180) : lightBg,
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(color: catColor.withAlpha(60), width: 1.2),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: catColor.withAlpha(40),
+                                                      blurRadius: 8,
+                                                      offset: const Offset(0, 2),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
-                                            ),
-                                            child: Center(
-                                              child: Icon(cat['icon'] as IconData, color: catColor, size: 26),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 10),
-
-                                          // Centered Title Only
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                                            child: FittedBox(
-                                              fit: BoxFit.scaleDown,
-                                              child: Text(
-                                                cat['name'] as String,
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
-                                                  fontSize: 14.5,
-                                                  fontWeight: FontWeight.w900,
-                                                  letterSpacing: 0.5,
+                                                child: Center(
+                                                  child: Icon(cat['icon'] as IconData, color: catColor, size: 22),
                                                 ),
                                               ),
-                                            ),
+                                              const SizedBox(height: 6),
+                                              Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      cat['name'] as String,
+                                                      textAlign: TextAlign.center,
+                                                      style: TextStyle(
+                                                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                                        fontSize: 13.5,
+                                                        fontWeight: FontWeight.w900,
+                                                        letterSpacing: 0.3,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 2),
+                                                    Text(
+                                                      '$count Instansi',
+                                                      style: TextStyle(
+                                                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                                        fontSize: 10.5,
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
+                                        ),
                                       ),
                                     ),
                                   );

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/informasi_pangan_model.dart';
@@ -689,12 +690,21 @@ class _InformasiPanganScreenState extends State<InformasiPanganScreen> {
                   const SizedBox(height: 12),
 
                   // Horizontal Category Filter Chips
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      children: _categories.map((cat) {
+                  ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context).copyWith(
+                      dragDevices: {
+                        PointerDeviceKind.touch,
+                        PointerDeviceKind.mouse,
+                        PointerDeviceKind.trackpad,
+                        PointerDeviceKind.stylus,
+                      },
+                    ),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: _categories.map((cat) {
                         final isSelected = _selectedCategoryFilter == cat;
                         return Padding(
                           padding: const EdgeInsets.only(right: 8),
@@ -722,6 +732,7 @@ class _InformasiPanganScreenState extends State<InformasiPanganScreen> {
                       }).toList(),
                     ),
                   ),
+                ),
 
                   const SizedBox(height: 16),
 
@@ -965,9 +976,19 @@ class _InformasiPanganScreenState extends State<InformasiPanganScreen> {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
         ),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(
+            dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+              PointerDeviceKind.trackpad,
+              PointerDeviceKind.stylus,
+            },
+          ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            child: DataTable(
             columnSpacing: 16,
             headingRowColor: WidgetStateProperty.all(
               isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
@@ -1005,6 +1026,7 @@ class _InformasiPanganScreenState extends State<InformasiPanganScreen> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

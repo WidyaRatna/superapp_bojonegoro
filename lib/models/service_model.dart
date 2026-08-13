@@ -102,10 +102,12 @@ final List<ServiceCategory> sampleServices = [
     icon: Icons.chat_bubble_rounded,
     color: const Color(0xFFF43F5E), // Rose Pink
     subServices: [
-      'Layanan Wadul Bupati',
-      'Lapor Jalan & Fasilitas Rusak',
-      'Pengaduan Kebersihan Sampah',
-      'Cek Status Laporan Pengaduan',
+      'Layanan Pengaduan DPMPTSP Kab. Bojonegoro',
+      'Form Online Wadul Bupati',
+      'Website SP4N-LAPOR! (lapor.go.id)',
+      'Hotline WA / SMS (+62 822 3309 9988)',
+      'Email Pengaduan (dpmptsp.kabbjn@gmail.com)',
+      'Media Surat & Tatap Muka (MPP)',
     ],
   ),
   ServiceCategory(

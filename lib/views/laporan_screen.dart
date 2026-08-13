@@ -1,5 +1,10 @@
+import 'dart:io';
+import 'dart:ui';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'profile_screen.dart';
+import 'layanan_pengaduan_dpmptsp_screen.dart';
 
 class LaporanWargaService {
   static bool dontShowDisclaimerAgain = false;
@@ -8,9 +13,8 @@ class LaporanWargaService {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => LaporanScreen(
+        builder: (context) => LayananPengaduanDpmptspScreen(
           isDarkMode: isDarkMode,
-          initialStep: dontShowDisclaimerAgain ? 2 : 1,
         ),
       ),
     );
@@ -64,6 +68,109 @@ class _LaporanScreenState extends State<LaporanScreen> {
   void dispose() {
     _descController.dispose();
     super.dispose();
+  }
+
+  // URL Launching Helpers
+  Future<void> _makePhoneCall(String phone) async {
+    final cleanPhone = phone.replaceAll(RegExp(r'[^0-9+]'), '');
+    if (cleanPhone.isEmpty) return;
+    final Uri url = Uri.parse('tel:$cleanPhone');
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
+        return;
+      }
+    } catch (_) {}
+
+    if (!kIsWeb && Platform.isWindows) {
+      try {
+        await Process.run('cmd', ['/c', 'start', '', 'tel:$cleanPhone']);
+        return;
+      } catch (_) {}
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Menghubungi $phone...')),
+      );
+    }
+  }
+
+  Future<void> _openWhatsApp(String phone) async {
+    var cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
+    if (cleanPhone.startsWith('0')) {
+      cleanPhone = '62${cleanPhone.substring(1)}';
+    }
+    final Uri waUrl = Uri.parse('https://wa.me/$cleanPhone');
+    try {
+      if (await canLaunchUrl(waUrl)) {
+        await launchUrl(waUrl, mode: LaunchMode.externalApplication);
+        return;
+      }
+    } catch (_) {}
+
+    if (!kIsWeb && Platform.isWindows) {
+      try {
+        await Process.run('cmd', ['/c', 'start', '', waUrl.toString()]);
+        return;
+      } catch (_) {}
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Membuka WhatsApp $phone...')),
+      );
+    }
+  }
+
+  Future<void> _openEmail(String email) async {
+    final Uri mailUrl = Uri.parse('mailto:$email');
+    try {
+      if (await canLaunchUrl(mailUrl)) {
+        await launchUrl(mailUrl);
+        return;
+      }
+    } catch (_) {}
+
+    if (!kIsWeb && Platform.isWindows) {
+      try {
+        await Process.run('cmd', ['/c', 'start', '', 'mailto:$email']);
+        return;
+      } catch (_) {}
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Membuka Email $email...')),
+      );
+    }
+  }
+
+  Future<void> _openWebUrl(String urlStr) async {
+    var formattedUrl = urlStr.trim();
+    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+      formattedUrl = 'https://$formattedUrl';
+    }
+    final Uri uri = Uri.parse(formattedUrl);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      }
+    } catch (_) {}
+
+    if (!kIsWeb && Platform.isWindows) {
+      try {
+        await Process.run('cmd', ['/c', 'start', '', formattedUrl]);
+        return;
+      } catch (_) {}
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Membuka website $urlStr...')),
+      );
+    }
   }
 
   // Photo Source Picker (Kamera vs Galeri)
@@ -538,6 +645,9 @@ class _LaporanScreenState extends State<LaporanScreen> {
             isDark: isDark,
           ),
 
+          // Layanan Pengaduan DPMPTSP & SP4N-LAPOR! Resmi
+          _buildDpmptspLayananSection(isDark),
+
           const SizedBox(height: 16),
           Divider(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
 
@@ -649,6 +759,389 @@ class _LaporanScreenState extends State<LaporanScreen> {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDpmptspLayananSection(bool isDark) {
+    return Container(
+      margin: const EdgeInsets.only(top: 18),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0D62F1).withAlpha(15),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Badge & Title
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF0D62F1), Color(0xFF0284C7)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(Icons.support_agent_rounded, color: Colors.white, size: 28),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0D62F1).withAlpha(25),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'KANAL PENGADUAN RESMI',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF0D62F1),
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'LAYANAN PENGADUAN DPMPTSP KABUPATEN BOJONEGORO',
+                      style: TextStyle(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w900,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        height: 1.25,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.access_time_filled_rounded, size: 14, color: Color(0xFF10B981)),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            'Jadwal Tatap Muka: Senin - Jumat (08.00 - 15.00 WIB)',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Open Dedicated Screen Button
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                side: const BorderSide(color: Color(0xFF0D62F1), width: 1.5),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LayananPengaduanDpmptspScreen(
+                      isDarkMode: isDark,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.open_in_new_rounded, color: Color(0xFF0D62F1), size: 18),
+              label: const Text(
+                'Buka Halaman Lengkap & SOP Pengaduan DPMPTSP',
+                style: TextStyle(
+                  color: Color(0xFF0D62F1),
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // Intro Statement
+          Text(
+            'Dalam rangka memberikan pelayanan yang baik kepada masyarakat terkait masalah pelayanan, disediakan beberapa cara untuk menangani keluhan/pengaduan masyarakat selama rentang pemrosesan perizinan dan non perizinan yang diajukan, antara lain :',
+            style: TextStyle(
+              fontSize: 12,
+              height: 1.45,
+              fontWeight: FontWeight.w500,
+              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // 1. Website lapor.go.id
+          _buildKanalPengaduanItem(
+            icon: Icons.language_rounded,
+            iconBgColor: const Color(0xFF0D62F1),
+            title: 'Website lapor.go.id',
+            value: 'https://www.lapor.go.id/',
+            subtitle: 'Kabupaten Bojonegoro yang khusus menangani keluhan masyarakat, dengan alamat website : https://www.lapor.go.id/',
+            buttonLabel: 'Buka Web',
+            onTap: () => _openWebUrl('https://www.lapor.go.id/'),
+            isDark: isDark,
+          ),
+          const SizedBox(height: 10),
+
+          // 2. Media Surat / tertulis
+          _buildKanalPengaduanItem(
+            icon: Icons.mark_unread_chat_alt_rounded,
+            iconBgColor: const Color(0xFFF59E0B),
+            title: 'Media Surat / Tertulis',
+            value: 'Kantor DPMPTSP Kab. Bojonegoro',
+            subtitle: 'Surat di alamatkan ke kantor DPMPTSP Kabupaten Bojonegoro Jl. Veteran No. 227, Mal Pelayanan Publik Kabupaten Bojonegoro (Telp: 0353-5256661)',
+            buttonLabel: 'Telepon MPP',
+            onTap: () => _makePhoneCall('03535256661'),
+            isDark: isDark,
+          ),
+          const SizedBox(height: 10),
+
+          // 3. Email
+          _buildKanalPengaduanItem(
+            icon: Icons.email_rounded,
+            iconBgColor: const Color(0xFFEF4444),
+            title: 'Email Pengaduan',
+            value: 'dpmptsp.kabbjn@gmail.com',
+            subtitle: 'Email terkait keluhan dan pelayanan DPMPTSP Kabupaten Bojonegoro dapat di kirim ke alamat email : dpmptsp.kabbjn@gmail.com',
+            buttonLabel: 'Kirim Email',
+            onTap: () => _openEmail('dpmptsp.kabbjn@gmail.com'),
+            isDark: isDark,
+          ),
+          const SizedBox(height: 10),
+
+          // 4. Media Langsung / Tatap Muka
+          _buildKanalPengaduanItem(
+            icon: Icons.location_on_rounded,
+            iconBgColor: const Color(0xFF10B981),
+            title: 'Media Langsung / Tatap Muka',
+            value: 'Mal Pelayanan Publik (MPP) Bojonegoro',
+            subtitle: 'Masyarakat dapat langsung datang ke kantor DPMPTSP Kabupaten Bojonegoro dengan tujuan untuk mengajukan keluhan, maka akan diterima petugas pengaduan untuk dicatat isi dari pengaduan tersebut.',
+            buttonLabel: 'Alamat Klik Disini',
+            onTap: () => _openWebUrl('https://maps.google.com/?q=DPMPTSP+Kabupaten+Bojonegoro+Jl+Veteran+No+227'),
+            isDark: isDark,
+          ),
+          const SizedBox(height: 10),
+
+          // 5. Nomor Layanan Pengaduan
+          _buildKanalPengaduanItem(
+            icon: Icons.chat_rounded,
+            iconBgColor: const Color(0xFF22C55E),
+            title: 'Nomor Layanan Pengaduan',
+            value: '+62 822 3309 9988',
+            subtitle: 'Masyarakat dapat menghubungi layanan pengaduan lewat WA/SMS ke nomor : +62 822 3309 9988',
+            buttonLabel: 'Chat WA',
+            onTap: () => _openWhatsApp('082233099988'),
+            isDark: isDark,
+          ),
+          const SizedBox(height: 10),
+
+          // 6. Website DPMPTSP Kabupaten Bojonegoro
+          _buildKanalPengaduanItem(
+            icon: Icons.public_rounded,
+            iconBgColor: const Color(0xFF8B5CF6),
+            title: 'Website DPMPTSP Kab. Bojonegoro',
+            value: 'dpmptsp.bojonegorokab.go.id/bukutamu/add',
+            subtitle: 'Formulir Pengaduan / Buku Tamu Website DPMPTSP Kab. Bojonegoro',
+            buttonLabel: 'Klik Website',
+            onTap: () => _openWebUrl('https://dpmptsp.bojonegorokab.go.id/bukutamu/add'),
+            isDark: isDark,
+          ),
+          const SizedBox(height: 14),
+
+          // Detailed Explanatory Paragraph Box
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.info_outline_rounded, color: Color(0xFF0D62F1), size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Informasi & Ketentuan Pengaduan',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Melalui pengaduan ini, pengguna jasa dapat menyampaikan keluhan maupun komentar terhadap fasilitas gedung, pelayanan, pelanggaran kode etik, serta hal-hal yang terkait dengan pelaksanaan prosedur pelayanan di Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kabupaten Bojonegoro. Pengaduan ini disampaikan secara langsung atau melalui email dengan mengisi formulir pengaduan dibawah secara lengkap, agar petugas kami dapat menindaklanjuti pengaduan yang telah disampaikan. Apabila data yang disampaikan tidak benar, pengaduan tidak akan diproses lebih lanjut.',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    height: 1.45,
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Commitment Banner
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [const Color(0xFF1E3A8A).withAlpha(120), const Color(0xFF1E293B)]
+                    : [const Color(0xFFEFF6FF), const Color(0xFFDBEAFE)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFF0D62F1).withAlpha(50),
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.verified_user_rounded, color: Color(0xFF0D62F1), size: 22),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Pengaduan anda akan membantu Kami meningkatkan kualitas pelayanan dan menegakkan integritas pegawai',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF1E40AF),
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildKanalPengaduanItem({
+    required IconData icon,
+    required Color iconBgColor,
+    required String title,
+    required String value,
+    required String subtitle,
+    required String buttonLabel,
+    required VoidCallback onTap,
+    required bool isDark,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: iconBgColor.withAlpha(30),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: iconBgColor, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: iconBgColor,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: onTap,
+            child: Text(
+              buttonLabel,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -768,11 +1261,20 @@ class _LaporanScreenState extends State<LaporanScreen> {
           const SizedBox(height: 8),
           SizedBox(
             height: 48,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              child: Row(
-                children: _categories.map((cat) {
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(
+                dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                  PointerDeviceKind.trackpad,
+                  PointerDeviceKind.stylus,
+                },
+              ),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                child: Row(
+                  children: _categories.map((cat) {
                   final isSel = _selectedCategory == cat;
                   return Padding(
                     padding: const EdgeInsets.only(right: 10),
@@ -810,7 +1312,8 @@ class _LaporanScreenState extends State<LaporanScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+        ),
+        const SizedBox(height: 20),
 
           Text(
             'Detail Laporan / Keluhan',
