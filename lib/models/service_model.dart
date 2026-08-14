@@ -80,8 +80,8 @@ final List<ServiceCategory> sampleServices = [
     icon: Icons.grass_rounded,
     color: const Color(0xFF059669), // Forest Green
     subServices: [
-      'Kartu Tani Digital',
-      'Alokasi Pupuk Bersubsidi',
+      'Pupuk Bersubsidi',
+      'Pengaduan Pertanian',
       'Info Harga Komoditas Tani',
       'Klaim Asuransi Pertanian',
     ],

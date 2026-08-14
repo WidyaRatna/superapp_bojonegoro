@@ -533,136 +533,277 @@ class _PajakScreenState extends State<PajakScreen> {
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFF0D62F1),
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Pajak & Retribusi Daerah',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16, 
+                fontWeight: FontWeight.w900,
+                color: Colors.white,
+                letterSpacing: 0.2,
+              ),
             ),
             Text(
-              'BAPENDA Kabupaten Bojonegoro',
-              style: TextStyle(fontSize: 11, color: Colors.white70),
+              'BAPENDA Kab. Bojonegoro',
+              style: TextStyle(
+                fontSize: 12, 
+                color: Colors.white70,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
         actions: [
           if (widget.onToggleDarkMode != null)
-            IconButton(
-              icon: Icon(isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
-              onPressed: widget.onToggleDarkMode,
-              tooltip: 'Ganti Tema',
+            Container(
+              margin: const EdgeInsets.only(right: 12),
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(30),
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                icon: Icon(isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
+                color: Colors.white,
+                onPressed: widget.onToggleDarkMode,
+                tooltip: 'Ganti Tema',
+              ),
             ),
         ],
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.zero,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top BAPENDA Info Card Banner
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isDark
-                      ? [const Color(0xFF1E3A8A), const Color(0xFF1E293B)]
-                      : [const Color(0xFFEFF6FF), const Color(0xFFDBEAFE)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: const Color(0xFF0D62F1).withAlpha(60),
-                  width: 1.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF0D62F1).withAlpha(20),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+            // Modern Header Background (Compact header bar)
+            Stack(
+              children: [
+                Container(
+                  height: MediaQuery.of(context).padding.top + kToolbarHeight + 14,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: isDark
+                          ? [const Color(0xFF0F172A), const Color(0xFF1E293B)]
+                          : [const Color(0xFF0D62F1), const Color(0xFF0A47B8)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(28),
+                      bottomRight: Radius.circular(28),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF0D62F1).withAlpha(isDark ? 20 : 35),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
+                ),
+                // Decorative Circle in Header
+                Positioned(
+                  right: -20,
+                  top: -20,
+                  child: Container(
+                    width: 130,
+                    height: 130,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0D62F1),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Icon(
-                      Icons.account_balance_rounded,
-                      color: Colors.white,
-                      size: 26,
+                      shape: BoxShape.circle,
+                      color: Colors.white.withAlpha(isDark ? 5 : 12),
                     ),
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'BADAN PENDAPATAN DAERAH',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w900,
-                            color: isDark ? Colors.white : const Color(0xFF0F172A),
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Kabupaten Bojonegoro (Jl. Teuku Umar No. 12)',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        InkWell(
-                          onTap: () => _openWebUrl('https://pajakonlinebojonegorokab.id/'),
-                          borderRadius: BorderRadius.circular(8),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 14),
+
+            // Card BADAN PENDAPATAN DAERAH (Outside Header - Modern Transparent Gradient)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  gradient: LinearGradient(
+                    colors: isDark
+                        ? [
+                            const Color(0xFF1E293B).withAlpha(210),
+                            const Color(0xFF0F172A).withAlpha(190),
+                          ]
+                        : [
+                            Colors.white.withAlpha(210),
+                            const Color(0xFFE0F2FE).withAlpha(170),
+                            const Color(0xFFDBEAFE).withAlpha(150),
+                          ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.white.withAlpha(25)
+                        : const Color(0xFF0D62F1).withAlpha(40),
+                    width: 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF0D62F1).withAlpha(isDark ? 20 : 25),
+                      blurRadius: 20,
+                      spreadRadius: -2,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: Padding(
+                      padding: const EdgeInsets.all(18),
+                      child: Row(
+                        children: [
+                          // Modern Crisp Icon Box (Clean & Minimalist Squircle)
+                          Container(
+                            width: 50,
+                            height: 50,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF0D62F1).withAlpha(20),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: const Color(0xFF0D62F1).withAlpha(60),
+                              gradient: LinearGradient(
+                                colors: isDark
+                                    ? [const Color(0xFF3B82F6), const Color(0xFF1D4ED8)]
+                                    : [const Color(0xFF0D62F1), const Color(0xFF1D4ED8)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF0D62F1).withAlpha(isDark ? 30 : 45),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.account_balance_rounded,
+                                color: Colors.white,
+                                size: 26,
                               ),
                             ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(Icons.language_rounded,
-                                    color: Color(0xFF0D62F1), size: 13),
-                                SizedBox(width: 4),
                                 Text(
-                                  'pajakonlinebojonegorokab.id 🔗',
+                                  'BADAN PENDAPATAN DAERAH',
                                   style: TextStyle(
-                                    fontSize: 10.5,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0D62F1),
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w900,
+                                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                    letterSpacing: 0.4,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on_rounded,
+                                      size: 13,
+                                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF0D62F1),
+                                    ),
+                                    const SizedBox(width: 3),
+                                    Expanded(
+                                      child: Text(
+                                        'Jl. Teuku Umar No. 12, Bojonegoro',
+                                        style: TextStyle(
+                                          fontSize: 11.5,
+                                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                InkWell(
+                                  onTap: () => _openWebUrl('https://pajakonlinebojonegorokab.id/'),
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: isDark
+                                            ? [
+                                                const Color(0xFF3B82F6).withAlpha(40),
+                                                const Color(0xFF1D4ED8).withAlpha(30),
+                                              ]
+                                            : [
+                                                const Color(0xFF0D62F1).withAlpha(20),
+                                                const Color(0xFF3B82F6).withAlpha(15),
+                                              ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: (isDark ? Colors.white : const Color(0xFF0D62F1)).withAlpha(35),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.language_rounded,
+                                          color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF0D62F1),
+                                          size: 13,
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Text(
+                                          'pajakonlinebojonegorokab.id',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF0D62F1),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Icon(
+                                          Icons.arrow_outward_rounded,
+                                          color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF0D62F1),
+                                          size: 11,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ],
+                ),
               ),
             ),
+            
+            // Rest of Body content (Search, Filters, Grid)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
             const SizedBox(height: 16),
 
             // Search Bar
@@ -942,6 +1083,9 @@ class _PajakScreenState extends State<PajakScreen> {
             ),
 
             const SizedBox(height: 24),
+                ],
+              ),
+            ),
           ],
         ),
       ),

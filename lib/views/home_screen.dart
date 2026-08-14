@@ -23,6 +23,7 @@ import 'loker_screen.dart';
 import 'kontak_instansi_screen.dart';
 import 'layanan_pengaduan_dpmptsp_screen.dart';
 import 'pajak_screen.dart';
+import 'pertanian_screen.dart';
 
 
 
@@ -162,6 +163,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _openPertanianScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PertanianScreen(
+          isDarkMode: widget.isDarkMode,
+          onToggleDarkMode: widget.onToggleDarkMode,
+        ),
+      ),
+    );
+  }
+
   Future<void> _openExternalUrl(String urlStr) async {
     final Uri url = Uri.parse(urlStr);
     try {
@@ -270,6 +283,8 @@ class _HomeScreenState extends State<HomeScreen> {
       _openKependudukanScreen();
     } else if (category.id == 'pariwisata') {
       _openPariwisataScreen();
+    } else if (category.id == 'pertanian' || category.title.toLowerCase().contains('pertanian') || category.title.toLowerCase().contains('tani')) {
+      _openPertanianScreen();
     } else if (category.id == 'perpajakan' || category.id == 'pajak' || category.title.toLowerCase().contains('pajak')) {
       _openPajakScreen();
     } else if (category.id == 'pengaduan' || category.id == 'lapor' || category.title.toLowerCase().contains('pengaduan')) {
@@ -407,6 +422,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           _openPajakScreen();
                         } else if (category.id == 'kontak_instansi') {
                           _openKontakInstansiScreen();
+                        } else if (category.id == 'pertanian' || category.title.toLowerCase().contains('pertanian')) {
+                          _openPertanianScreen();
                         } else if (category.id == 'pengaduan') {
                           _handlePengaduanSubServiceTap(subItem);
                         } else {
