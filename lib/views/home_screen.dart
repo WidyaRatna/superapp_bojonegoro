@@ -24,6 +24,7 @@ import 'kontak_instansi_screen.dart';
 import 'layanan_pengaduan_dpmptsp_screen.dart';
 import 'pajak_screen.dart';
 import 'pertanian_screen.dart';
+import 'perhubungan_screen.dart';
 
 
 
@@ -72,21 +73,26 @@ class _HomeScreenState extends State<HomeScreen> {
         final titleMatches = service.title.toLowerCase().contains(query);
         final subMatches =
             service.subServices.any((sub) => sub.toLowerCase().contains(query));
-        return titleMatches || subMatches;
+        return (titleMatches || subMatches) && service.id != 'lainnya';
       }).toList();
     }
-    final top7 = sampleServices.where((s) => s.id != 'lainnya').take(7).toList();
-    final lainnya = sampleServices.firstWhere(
-      (s) => s.id == 'lainnya',
-      orElse: () => ServiceCategory(
-        id: 'lainnya',
-        title: 'Lainnya',
-        icon: Icons.grid_view_rounded,
-        color: const Color(0xFF64748B),
-        subServices: [],
-      ),
-    );
-    return [...top7, lainnya];
+    // Return exact 4 main services for Home: Kependudukan, Kesehatan, Pendidikan, Pajak & Retribusi
+    final mainIds = ['kependudukan', 'kesehatan', 'pendidikan', 'perpajakan'];
+    final mainServices = <ServiceCategory>[];
+    for (final id in mainIds) {
+      final found = sampleServices.firstWhere(
+        (s) => s.id == id,
+        orElse: () => ServiceCategory(
+          id: id,
+          title: id,
+          icon: Icons.design_services_rounded,
+          color: const Color(0xFF0284C7),
+          subServices: [],
+        ),
+      );
+      mainServices.add(found);
+    }
+    return mainServices;
   }
 
   // Open All Services Category Screen ("Kategori Layanan") - Full Page Route
@@ -173,6 +179,23 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  void _openPerhubunganScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PerhubunganScreen(
+          isDarkMode: widget.isDarkMode,
+          onToggleDarkMode: widget.onToggleDarkMode,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openCctvScreen() async {
+    const String urlStr = 'https://bojonegorokab.go.id/gis-cctv/0';
+    await _openExternalUrl(urlStr);
   }
 
   Future<void> _openExternalUrl(String urlStr) async {
@@ -285,6 +308,10 @@ class _HomeScreenState extends State<HomeScreen> {
       _openPariwisataScreen();
     } else if (category.id == 'pertanian' || category.title.toLowerCase().contains('pertanian') || category.title.toLowerCase().contains('tani')) {
       _openPertanianScreen();
+    } else if (category.id == 'perhubungan' || category.title.toLowerCase().contains('perhubungan')) {
+      _openPerhubunganScreen();
+    } else if (category.id == 'cctv' || category.title.toLowerCase().contains('cctv')) {
+      _openCctvScreen();
     } else if (category.id == 'perpajakan' || category.id == 'pajak' || category.title.toLowerCase().contains('pajak')) {
       _openPajakScreen();
     } else if (category.id == 'pengaduan' || category.id == 'lapor' || category.title.toLowerCase().contains('pengaduan')) {
@@ -304,6 +331,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Open Service Detail Bottom Sheet
   void _showServiceModal(ServiceCategory category) {
+    if (category.id == 'perhubungan' || category.title.toLowerCase().contains('perhubungan')) {
+      _openPerhubunganScreen();
+      return;
+    }
+    if (category.id == 'cctv' || category.title.toLowerCase().contains('cctv')) {
+      _openCctvScreen();
+      return;
+    }
     if (category.id == 'pengaduan' || category.title.toLowerCase().contains('pengaduan')) {
       _openLayananPengaduanDpmptspScreen();
       return;
@@ -769,197 +804,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Quick Info Cards Widget ("Informasi Cepat") - Modern 3-Card Design (PPID removed)
-  Widget _buildQuickInfoSection(bool isDark) {
-    final quickItems = [
-      {
-        'id': 'pangan',
-        'title': 'Harga Pangan',
-        'subtitle': 'Update Hari Ini',
-        'icon': Icons.shopping_basket_rounded,
-        'color': const Color(0xFF10B981), // Emerald Green
-        'bgColor': isDark ? const Color(0xFF064E3B).withAlpha(150) : const Color(0xFFECFDF5),
-        'onTap': () {
-          final panganCategory = sampleServices.firstWhere(
-            (s) => s.id == 'umkm',
-            orElse: () => sampleServices.first,
-          );
-          _showServiceModal(panganCategory);
-        },
-      },
-      {
-        'id': 'cuaca',
-        'title': 'Cuaca Daerah',
-        'subtitle': '$_weatherTemp • $_weatherCondition',
-        'icon': _weatherIcon,
-        'color': _weatherColor,
-        'bgColor': isDark ? const Color(0xFF78350F).withAlpha(150) : const Color(0xFFFEFCE8),
-        'onTap': _showWeatherDetailsModal,
-      },
-      {
-        'id': 'darurat',
-        'title': 'Panggilan Darurat',
-        'subtitle': 'Call Center 112',
-        'icon': Icons.phone_in_talk_rounded,
-        'color': const Color(0xFFEF4444), // Coral Red
-        'bgColor': isDark ? const Color(0xFF7F1D1D).withAlpha(150) : const Color(0xFFFEF2F2),
-        'onTap': _showEmergencyContactsModal,
-      },
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Informasi Cepat',
-                style: TextStyle(
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.2,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF10B981),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Live Update',
-                      style: TextStyle(
-                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-
-          // 3-Equal Columns Row (Ultra-Modern Cards)
-          Row(
-            children: quickItems.map((item) {
-              final color = item['color'] as Color;
-              final bgColor = item['bgColor'] as Color;
-              final onTap = item['onTap'] as VoidCallback;
-
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: InkWell(
-                    onTap: onTap,
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
-                      decoration: BoxDecoration(
-                        color: bgColor,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: color.withAlpha(60),
-                          width: 1.2,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: color.withAlpha(20),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Circular Icon Container with Soft Glow
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF0F172A) : Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: color.withAlpha(40),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: Center(
-                              child: Icon(
-                                item['icon'] as IconData,
-                                color: color,
-                                size: 22,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-
-                          // Title
-                          Text(
-                            item['title'] as String,
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: isDark ? Colors.white : const Color(0xFF0F172A),
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-
-                          // Subtitle Pill / Badge
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: color.withAlpha(30),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              item['subtitle'] as String,
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: isDark ? color : color.withAlpha(230),
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = widget.isDarkMode;
@@ -974,7 +818,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. Curved Top Blue Header with Greeting, Search Bar & Theme Toggle
+                // 1. Curved Header with Greeting, Search Bar & Weather Info
                 TopHeaderWidget(
                   searchController: _searchController,
                   onSearchChanged: (value) {
@@ -993,20 +837,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   onWeatherTap: _showWeatherDetailsModal,
                 ),
 
-                // 2. Banner Slider Carousel (Placed neatly below top header)
+                // 2. Banner Layanan Digital
                 const SizedBox(height: 16),
                 BannerCarouselWidget(
-                  onViewServicesTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Menampilkan daftar lengkap layanan daerah...'),
-                      ),
-                    );
-                  },
+                  onViewServicesTap: _openAllServicesScreen,
                 ),
                 const SizedBox(height: 20),
 
-                // 3. Layanan Populer Section (2x4 Grid)
+                // 3. Layanan Populer Section (2x2 Grid)
                 PopularServicesWidget(
                   services: _homeGridServices,
                   onServiceTap: _handleServiceTap,
@@ -1015,19 +853,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // 4. Informasi Cepat Section
-                _buildQuickInfoSection(isDark),
-                const SizedBox(height: 26),
-
-                // 5. News & Information Feed Section
+                // 4. Informasi Terbaru Feed Section (1-2 Compact Items)
                 NewsSectionWidget(
                   newsList: _filteredNews,
                   onNewsTap: _openNewsDetail,
+                  onViewAllNewsTap: () {
+                    // Open full news / category list
+                  },
                   isDarkMode: isDark,
                 ),
 
                 // Bottom padding to clear floating nav bar
-                const SizedBox(height: 60),
+                const SizedBox(height: 100),
               ],
             ),
           ),
@@ -1043,7 +880,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 setState(() {
                   _currentNavIndex = index;
                 });
-                if (index == 2) {
+                if (index == 1) {
+                  _openAllServicesScreen();
+                } else if (index == 2) {
                   _showEmergencyContactsModal();
                 } else if (index == 3) {
                   _showProfile();

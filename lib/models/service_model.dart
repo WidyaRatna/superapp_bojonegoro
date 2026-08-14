@@ -83,7 +83,6 @@ final List<ServiceCategory> sampleServices = [
       'Pupuk Bersubsidi',
       'Pengaduan Pertanian',
       'Info Harga Komoditas Tani',
-      'Klaim Asuransi Pertanian',
     ],
   ),
   ServiceCategory(
@@ -163,9 +162,9 @@ final List<ServiceCategory> sampleServices = [
     icon: Icons.directions_bus_rounded,
     color: const Color(0xFF0284C7), // Sky Blue
     subServices: [
-      'Uji Berkala (Kir) Kendaraan',
-      'Jadwal Angkutan Umum Daerah',
-      'Pengaduan Lampu Jalan & Rambu',
+      'Pengaduan Perhubungan (Call Center 081333555695)',
+      'Informasi Transportasi (APEL Gratis)',
+      'Bojonegoro TIC (BOTIC)',
     ],
   ),
   ServiceCategory(
@@ -188,6 +187,18 @@ final List<ServiceCategory> sampleServices = [
       'Layanan LPSE Bojonegoro',
       'Katalog Rencana Pengadaan (SiRUP)',
       'Info Lelang & Tender Publik',
+    ],
+  ),
+  ServiceCategory(
+    id: 'cctv',
+    title: 'CCTV',
+    icon: Icons.videocam_rounded,
+    color: const Color(0xFF0284C7), // Sky Blue
+    subServices: [
+      'CCTV Real-Time Simpang Kota',
+      'CCTV Area Publik & Alun-Alun',
+      'CCTV Pantau Lalu Lintas',
+      'CCTV Terminal & Pasar Kota',
     ],
   ),
   ServiceCategory(

@@ -109,248 +109,348 @@ class _ProfileScreenState extends State<ProfileScreen> {
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 24),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E293B) : const Color(0xFF0052D4),
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(32),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(isDark ? 50 : 25),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
+            // Modern, Premium, Compact Header with Subtle Blue Gradient & Visual Depth
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(22),
               ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      const Text(
-                        'Profil Saya',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.fromLTRB(16, (topPadding > 0 ? topPadding : 12) + 4, 16, 20),
+                decoration: BoxDecoration(
+                  gradient: isDark
+                      ? const LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [Color(0xFF063A8B), Color(0xFF075685)],
+                        )
+                      : const LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [Color(0xFF0757D5), Color(0xFF087FC4)],
                         ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          isDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
-                          color: isDark ? Colors.amber : Colors.white,
-                        ),
-                        onPressed: widget.onToggleDarkMode,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Stack(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(4),
+                ),
+                child: Stack(
+                  children: [
+                    // Subtle Abstract Background Decorative Circles for Visual Depth
+                    Positioned(
+                      right: -30,
+                      top: -30,
+                      child: Container(
+                        width: 140,
+                        height: 140,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 3),
-                        ),
-                        child: buildAvatarCircle(_avatarType, 42, 50, avatarImagePath: _avatarImagePath),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: InkWell(
-                          onTap: _openEditProfileScreen,
-                          borderRadius: BorderRadius.circular(20),
-                          child: Container(
-                            padding: const EdgeInsets.all(7),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF0F172A).withAlpha(200),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                            child: const Icon(
-                              Icons.edit_rounded,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ),
+                          color: Colors.white.withAlpha(12),
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  InkWell(
-                    onTap: _openEditProfileScreen,
-                    borderRadius: BorderRadius.circular(10),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            _userName,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          const Icon(Icons.edit_rounded, color: Colors.white70, size: 16),
-                        ],
+                    ),
+                    Positioned(
+                      left: -40,
+                      bottom: -50,
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withAlpha(8),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'NIK: $_userNik',
-                    style: const TextStyle(
-                      color: Color(0xFFDBEAFE),
-                      fontSize: 12.5,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withAlpha(40),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFF10B981), width: 1),
-                    ),
-                    child: const Row(
+
+                    // Header Foreground Content
+                    Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.verified_rounded, color: Color(0xFF10B981), size: 14),
-                        SizedBox(width: 4),
-                        Text(
-                          'Warga Terverifikasi NIK',
-                          style: TextStyle(
-                            color: Color(0xFF10B981),
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
+                        // Top Navigation Bar (← Profil Saya ☾)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 22),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            const Text(
+                              'Profil Saya',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: -0.2,
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                                color: Colors.white,
+                                size: 22,
+                              ),
+                              onPressed: widget.onToggleDarkMode,
+                              tooltip: 'Ganti Tema',
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+
+                        // Horizontal Profile Row: [Avatar] Widya Ratna ✎ / NIK / ✓ Warga Terverifikasi
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Row(
+                            children: [
+                              // Left Avatar (Size ~68-72px) with Bottom Right Edit Badge (22px)
+                              Stack(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white, width: 1.5),
+                                    ),
+                                    child: buildAvatarCircle(
+                                      _avatarType,
+                                      34,
+                                      40,
+                                      avatarImagePath: _avatarImagePath,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: InkWell(
+                                      onTap: _openEditProfileScreen,
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Container(
+                                        width: 22,
+                                        height: 22,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF0757D5),
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: Colors.white, width: 1.5),
+                                        ),
+                                        child: const Icon(
+                                          Icons.edit_rounded,
+                                          color: Colors.white,
+                                          size: 11,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 16),
+
+                              // Right Profile Details
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // Line 1: Name + Edit Icon
+                                    InkWell(
+                                      onTap: _openEditProfileScreen,
+                                      borderRadius: BorderRadius.circular(4),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            _userName,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 17.5,
+                                              fontWeight: FontWeight.w600,
+                                              letterSpacing: -0.2,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          const Icon(
+                                            Icons.edit_rounded,
+                                            color: Color(0xFFE0F2FE),
+                                            size: 14,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+
+                                    // Line 2: NIK
+                                    Text(
+                                      'NIK: $_userNik',
+                                      style: TextStyle(
+                                        color: Colors.white.withAlpha(195),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+
+                                    // Line 3: Subtle Inline Verification Status
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: const [
+                                        Icon(
+                                          Icons.check_circle_rounded,
+                                          color: Color(0xFF34D399),
+                                          size: 13,
+                                        ),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          'Warga Terverifikasi',
+                                          style: TextStyle(
+                                            color: Color(0xFF34D399),
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 20),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
-                  _buildProfileMenuItem(
-                    icon: Icons.person_outline_rounded,
-                    color: const Color(0xFF0D62F1),
-                    title: 'Data Profil',
-                    subtitle: 'Lihat & perbarui informasi data diri',
-                    onTap: _openEditProfileScreen,
+                  // 1. AKUN
+                  _buildCleanGroupSection(
+                    title: 'AKUN',
                     isDark: isDark,
+                    children: [
+                      _buildCleanGroupItem(
+                        icon: Icons.person_outline_rounded,
+                        title: 'Data Profil',
+                        subtitle: 'Lihat & perbarui informasi diri',
+                        onTap: _openEditProfileScreen,
+                        isDark: isDark,
+                      ),
+                      _buildCleanGroupItem(
+                        icon: Icons.shield_outlined,
+                        title: 'Keamanan & Privasi',
+                        subtitle: 'Password, NIK & keamanan perangkat',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SecurityPrivacyScreen(
+                                isDarkMode: widget.isDarkMode,
+                              ),
+                            ),
+                          );
+                        },
+                        isDark: isDark,
+                        isLast: true,
+                      ),
+                    ],
                   ),
-                  _buildProfileMenuItem(
-                    icon: Icons.receipt_long_rounded,
-                    color: const Color(0xFF10B981),
-                    title: 'Riwayat Layanan',
-                    subtitle: 'Daftar riwayat permohonan layanan publik',
-                    onTap: () => _showMenuDetailModal('Riwayat Layanan'),
+                  const SizedBox(height: 24),
+
+                  // 2. AKTIVITAS
+                  _buildCleanGroupSection(
+                    title: 'AKTIVITAS',
                     isDark: isDark,
+                    children: [
+                      _buildCleanGroupItem(
+                        icon: Icons.receipt_long_rounded,
+                        title: 'Riwayat Layanan',
+                        subtitle: 'Riwayat layanan publik',
+                        onTap: () => _showMenuDetailModal('Riwayat Layanan'),
+                        isDark: isDark,
+                      ),
+                      _buildCleanGroupItem(
+                        icon: Icons.campaign_outlined,
+                        title: 'Riwayat Pengaduan',
+                        subtitle: 'Status laporan warga',
+                        onTap: () => _showMenuDetailModal('Riwayat Pengaduan'),
+                        isDark: isDark,
+                      ),
+                      _buildCleanGroupItem(
+                        icon: Icons.favorite_outline_rounded,
+                        title: 'Favorit',
+                        subtitle: 'Layanan & berita tersimpan',
+                        onTap: () => _showMenuDetailModal('Favorit Saya'),
+                        isDark: isDark,
+                        isLast: true,
+                      ),
+                    ],
                   ),
-                  _buildProfileMenuItem(
-                    icon: Icons.campaign_rounded,
-                    color: const Color(0xFFF59E0B),
-                    title: 'Riwayat Pengaduan',
-                    subtitle: 'Status laporan warga Wadul Bupati',
-                    onTap: () => _showMenuDetailModal('Riwayat Pengaduan'),
+                  const SizedBox(height: 24),
+
+                  // 3. PENGATURAN
+                  _buildCleanGroupSection(
+                    title: 'PENGATURAN',
                     isDark: isDark,
+                    children: [
+                      _buildCleanGroupItem(
+                        icon: Icons.settings_outlined,
+                        title: 'Pengaturan',
+                        subtitle: 'Notifikasi, bahasa & tampilan',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SettingsScreen(
+                                isDarkMode: widget.isDarkMode,
+                                onToggleDarkMode: widget.onToggleDarkMode,
+                              ),
+                            ),
+                          );
+                        },
+                        isDark: isDark,
+                      ),
+                      _buildCleanGroupItem(
+                        icon: Icons.help_outline_rounded,
+                        title: 'Bantuan',
+                        subtitle: 'Pusat bantuan & FAQ',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FaqScreen(
+                                isDarkMode: widget.isDarkMode,
+                              ),
+                            ),
+                          );
+                        },
+                        isDark: isDark,
+                      ),
+                      _buildCleanGroupItem(
+                        icon: Icons.info_outline_rounded,
+                        title: 'Tentang Aplikasi',
+                        subtitle: 'Versi 2.4.0 · Pemkab Bojonegoro',
+                        onTap: () => _showMenuDetailModal('Tentang SuperApp Bojonegoro'),
+                        isDark: isDark,
+                        isLast: true,
+                      ),
+                    ],
                   ),
-                  _buildProfileMenuItem(
-                    icon: Icons.favorite_outline_rounded,
-                    color: const Color(0xFFEC4899),
-                    title: 'Favorit',
-                    subtitle: 'Layanan & berita favorit tersimpan',
-                    onTap: () => _showMenuDetailModal('Favorit Saya'),
+                  const SizedBox(height: 24),
+
+                  // 4. AKSI (Keluar)
+                  _buildCleanGroupSection(
+                    title: 'AKSI',
                     isDark: isDark,
+                    children: [
+                      _buildCleanGroupItem(
+                        icon: Icons.logout_rounded,
+                        title: 'Keluar',
+                        subtitle: '',
+                        onTap: _showLogoutConfirmDialog,
+                        isDark: isDark,
+                        isDestructive: true,
+                        isLast: true,
+                      ),
+                    ],
                   ),
-                  _buildProfileMenuItem(
-                    icon: Icons.shield_outlined,
-                    color: const Color(0xFF10B981),
-                    title: 'Keamanan & Privasi',
-                    subtitle: 'Ubah password, NIK, izin & sesi perangkat',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SecurityPrivacyScreen(
-                            isDarkMode: widget.isDarkMode,
-                          ),
-                        ),
-                      );
-                    },
-                    isDark: isDark,
-                  ),
-                  _buildProfileMenuItem(
-                    icon: Icons.settings_outlined,
-                    color: const Color(0xFF6366F1),
-                    title: 'Pengaturan',
-                    subtitle: 'Mode gelap, notifikasi & bahasa',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SettingsScreen(
-                            isDarkMode: widget.isDarkMode,
-                            onToggleDarkMode: widget.onToggleDarkMode,
-                          ),
-                        ),
-                      );
-                    },
-                    isDark: isDark,
-                  ),
-                  _buildProfileMenuItem(
-                    icon: Icons.help_outline_rounded,
-                    color: const Color(0xFF06B6D4),
-                    title: 'Bantuan',
-                    subtitle: 'Pusat bantuan & FAQ pengguna',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => FaqScreen(
-                            isDarkMode: widget.isDarkMode,
-                          ),
-                        ),
-                      );
-                    },
-                    isDark: isDark,
-                  ),
-                  _buildProfileMenuItem(
-                    icon: Icons.info_outline_rounded,
-                    color: const Color(0xFF8B5CF6),
-                    title: 'Tentang Aplikasi',
-                    subtitle: 'Versi 2.4.0 • Pemkab Bojonegoro',
-                    onTap: () => _showMenuDetailModal('Tentang SuperApp Bojonegoro'),
-                    isDark: isDark,
-                  ),
-                  const SizedBox(height: 8),
-                  _buildProfileMenuItem(
-                    icon: Icons.logout_rounded,
-                    color: const Color(0xFFEF4444),
-                    title: 'Keluar',
-                    subtitle: 'Keluar dari akun SuperApp Bojonegoro',
-                    onTap: _showLogoutConfirmDialog,
-                    isDark: isDark,
-                    isDestructive: true,
-                  ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 44),
                 ],
               ),
             ),
@@ -360,71 +460,124 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildProfileMenuItem({
+  Widget _buildCleanGroupSection({
+    required String title,
+    required List<Widget> children,
+    required bool isDark,
+  }) {
+    final headerTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 6),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: headerTextColor,
+              letterSpacing: 0.8,
+            ),
+          ),
+        ),
+        Column(
+          children: children,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCleanGroupItem({
     required IconData icon,
-    required Color color,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
     required bool isDark,
+    bool isLast = false,
     bool isDestructive = false,
   }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-          width: 1.2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(isDark ? 30 : 8),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(18),
-        child: ListTile(
+    final primaryBlue = isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7);
+    final textMain = isDestructive
+        ? const Color(0xFFEF4444)
+        : (isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A));
+    final textSecondary = isDark ? const Color(0xFF94A3B8) : const Color(0xFF667085);
+    final borderColor = isDark ? const Color(0xFF334155).withAlpha(120) : const Color(0xFFE2E8F0).withAlpha(180);
+    final iconColor = isDestructive ? const Color(0xFFEF4444) : primaryBlue;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        InkWell(
           onTap: onTap,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-          leading: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withAlpha(25),
-              borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: iconColor.withAlpha(isDark ? 30 : 18),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      icon,
+                      color: iconColor,
+                      size: 19,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w600,
+                          color: textMain,
+                          letterSpacing: -0.1,
+                        ),
+                      ),
+                      if (subtitle.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle,
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: textSecondary,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: isDestructive
+                      ? const Color(0xFFEF4444)
+                      : (isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
+                  size: 20,
+                ),
+              ],
             ),
-            child: Icon(icon, color: color, size: 22),
-          ),
-          title: Text(
-            title,
-            style: TextStyle(
-              fontSize: 14.5,
-              fontWeight: FontWeight.bold,
-              color: isDestructive
-                  ? const Color(0xFFEF4444)
-                  : (isDark ? Colors.white : const Color(0xFF0F172A)),
-            ),
-          ),
-          subtitle: Text(
-            subtitle,
-            style: TextStyle(
-              fontSize: 12,
-              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-            ),
-          ),
-          trailing: Icon(
-            Icons.chevron_right_rounded,
-            color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
-            size: 20,
           ),
         ),
-      ),
+        if (!isLast)
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: borderColor,
+            indent: 54,
+          ),
+      ],
     );
   }
 

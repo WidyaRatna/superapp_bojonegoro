@@ -45,7 +45,7 @@ class _PertanianScreenState extends State<PertanianScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Membuka portal $urlStr...'),
-          backgroundColor: const Color(0xFF059669),
+          backgroundColor: const Color(0xFF16834A),
         ),
       );
     }
@@ -80,212 +80,165 @@ class _PertanianScreenState extends State<PertanianScreen> {
     final isDark = widget.isDarkMode;
     final double topPadding = MediaQuery.of(context).padding.top;
 
+    // Color Palette
+    final primaryGreen = isDark ? const Color(0xFF22C55E) : const Color(0xFF16834A);
+    final darkGreen = isDark ? const Color(0xFF0D4726) : const Color(0xFF12663A);
+    final softGreen = isDark ? const Color(0xFF0F2E1E) : const Color(0xFFEAF5EE);
+    final bgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF7F9F8);
+    final cardBgColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final textMain = isDark ? const Color(0xFFF8FAFC) : const Color(0xFF172033);
+    final textSecondary = isDark ? const Color(0xFF94A3B8) : const Color(0xFF667085);
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE3E8E5);
+
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      backgroundColor: bgColor,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Header Bar
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.fromLTRB(16, (topPadding > 0 ? topPadding : 16) + 4, 16, 22),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isDark
-                      ? const [Color(0xFF022C22), Color(0xFF064E3B), Color(0xFF0F172A)]
-                      : const [Color(0xFF047857), Color(0xFF059669), Color(0xFF10B981)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            // 1. Header (Height ~130px, distinctive pattern)
+            Stack(
+              children: [
+                Container(
+                  height: 130 + (topPadding > 0 ? topPadding : 16),
+                  width: double.infinity,
+                  color: darkGreen,
+                  child: CustomPaint(
+                    painter: _HeaderPatternPainter(
+                      color: Colors.white.withAlpha(12),
+                    ),
+                  ),
                 ),
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF059669).withAlpha(50),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 24),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                          const SizedBox(width: 4),
-                          const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Layanan Pertanian',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w900,
+                SafeArea(
+                  bottom: false,
+                  child: Container(
+                    height: 110,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 22),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Text(
+                                    'Layanan Pertanian',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                      letterSpacing: -0.2,
+                                    ),
+                                  ),
+                                  SizedBox(height: 2),
+                                  Text(
+                                    'DKPP Kab. Bojonegoro',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFFD1FAE5),
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (widget.onToggleDarkMode != null)
+                              IconButton(
+                                icon: Icon(
+                                  isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
                                   color: Colors.white,
-                                  letterSpacing: 0.2,
+                                  size: 22,
                                 ),
+                                onPressed: widget.onToggleDarkMode,
+                                tooltip: 'Ganti Tema',
                               ),
-                              Text(
-                                'DKPP Kab. Bojonegoro',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.white70,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      if (widget.onToggleDarkMode != null)
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white.withAlpha(30),
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            icon: Icon(isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
-                            color: Colors.white,
-                            onPressed: widget.onToggleDarkMode,
-                            tooltip: 'Ganti Tema',
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Instansi Info Card (Dinas Ketahanan Pangan dan Pertanian)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-                        width: 1.2,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF059669).withAlpha(isDark ? 20 : 25),
-                          blurRadius: 16,
-                          offset: const Offset(0, 5),
+                          ],
                         ),
                       ],
                     ),
+                  ),
+                ),
+              ],
+            ),
+
+            // Main Content Area
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 2. Informasi Dinas (Profil singkat instansi - Editorial layout)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: cardBgColor,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: borderColor, width: 1),
+                    ),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF059669), Color(0xFF10B981)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(18),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF059669).withAlpha(50),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.agriculture_rounded,
-                            color: Colors.white,
-                            size: 30,
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Icon(
+                            Icons.agriculture_outlined,
+                            color: primaryGreen,
+                            size: 22,
                           ),
                         ),
-                        const SizedBox(width: 14),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'DINAS KETAHANAN PANGAN & PERTANIAN',
+                                'Dinas Ketahanan Pangan & Pertanian',
                                 style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w900,
-                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
-                                  letterSpacing: 0.3,
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: textMain,
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.location_on_rounded,
-                                    size: 13,
-                                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF059669),
-                                  ),
-                                  const SizedBox(width: 3),
-                                  Expanded(
-                                    child: Text(
-                                      'Jl. Ahmad Yani No. 24, Bojonegoro',
+                              const SizedBox(height: 3),
+                              Text(
+                                'Jl. Ahmad Yani No. 24, Bojonegoro',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  color: textSecondary,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              GestureDetector(
+                                onTap: () => _openWebUrl('https://dinpertan.bojonegorokab.go.id/'),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'dinpertan.bojonegorokab.go.id',
                                       style: TextStyle(
                                         fontSize: 11.5,
-                                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
                                         fontWeight: FontWeight.w500,
+                                        color: primaryGreen,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              InkWell(
-                                onTap: () => _openWebUrl('https://dinpertan.bojonegorokab.go.id/'),
-                                borderRadius: BorderRadius.circular(12),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF059669).withAlpha(15),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: const Color(0xFF059669).withAlpha(30),
+                                    const SizedBox(width: 4),
+                                    Icon(
+                                      Icons.arrow_outward_rounded,
+                                      color: primaryGreen,
+                                      size: 12,
                                     ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.language_rounded,
-                                        color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF059669),
-                                        size: 13,
-                                      ),
-                                      const SizedBox(width: 5),
-                                      Text(
-                                        'dinpertan.bojonegorokab.go.id',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF059669),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Icon(
-                                        Icons.arrow_outward_rounded,
-                                        color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF059669),
-                                        size: 11,
-                                      ),
-                                    ],
-                                  ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -297,84 +250,234 @@ class _PertanianScreenState extends State<PertanianScreen> {
 
                   const SizedBox(height: 24),
 
-                  // Section Title
+                  // 3. Featured Service: Pupuk Bersubsidi
                   Text(
-                    'LAYANAN UTAMA PERTANIAN',
+                    'Layanan Utama',
                     style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                      letterSpacing: 0.8,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: textSecondary,
+                      letterSpacing: 0.3,
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 10),
 
-                  // Service Card 1: Pupuk Bersubsidi
-                  _buildMainServiceCard(
-                    isDark: isDark,
-                    title: 'Pupuk Bersubsidi',
-                    badgeText: 'Cek Alokasi & e-RDKK',
-                    badgeColor: const Color(0xFF059669),
-                    icon: Icons.inventory_2_rounded,
-                    description:
-                        'Informasi penerima pupuk bersubsidi, pencarian e-RDKK 2025–2026, syarat penerima & mekanisme penebusan di KPL resmi.',
-                    buttonLabel: 'Buka Pupuk Bersubsidi',
-                    onTap: _openPupukBersubsidi,
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: softGreen,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF166534) : const Color(0xFFC2E7D0),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(9),
+                              decoration: BoxDecoration(
+                                color: primaryGreen,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.inventory_2_outlined,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Pupuk Bersubsidi',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: textMain,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Layanan Utama DKPP',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: primaryGreen,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Informasi e-RDKK 2025–2026, status alokasi penerima pupuk bersubsidi, syarat kelayakan, serta tata cara penebusan resmi di KPL.',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            height: 1.45,
+                            color: textMain.withAlpha(220),
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        InkWell(
+                          onTap: _openPupukBersubsidi,
+                          borderRadius: BorderRadius.circular(8),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Buka layanan',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: primaryGreen,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.arrow_forward_rounded,
+                                size: 16,
+                                color: primaryGreen,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
-                  // Service Card 2: Pengaduan Pertanian
-                  _buildMainServiceCard(
-                    isDark: isDark,
-                    title: 'Pengaduan Pertanian',
-                    badgeText: 'Aspirasi & Laporan DKPP',
-                    badgeColor: const Color(0xFF0284C7),
-                    icon: Icons.chat_rounded,
-                    description:
-                        'Sampaikan aspirasi, keluhan distribusi pupuk, serangan hama tanaman, atau laporan perbaikan irigasi pertanian Bojonegoro.',
-                    buttonLabel: 'Ajukan Pengaduan Pertanian',
+                  // 4. Secondary Service: Pengaduan Pertanian
+                  Text(
+                    'Pengaduan & Aspirasi',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: textSecondary,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  InkWell(
                     onTap: _openPengaduanPertanian,
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Section Info & Fasilitas Pendukung
-                  Text(
-                    'INFORMASI & FITUR TAMBAHAN',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                      letterSpacing: 0.8,
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: cardBgColor,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: borderColor, width: 1),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.chat_bubble_outline_rounded,
+                                color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
+                                size: 20,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'Pengaduan Pertanian',
+                                  style: TextStyle(
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: textMain,
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                Icons.arrow_forward_rounded,
+                                color: textSecondary,
+                                size: 18,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Sampaikan aspirasi, keluhan kendala distribusi pupuk, serangan hama tanaman, atau laporan perbaikan irigasi pertanian Bojonegoro.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              height: 1.4,
+                              color: textSecondary,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 14),
 
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildSecondaryCard(
+                  const SizedBox(height: 28),
+
+                  // 5. Informasi & Fitur Tambahan (List Menu style with dividers)
+                  Text(
+                    'Informasi & Fitur Tambahan',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: textSecondary,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  Container(
+                    decoration: BoxDecoration(
+                      color: cardBgColor,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: borderColor, width: 1),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildListItem(
+                          context: context,
                           isDark: isDark,
                           title: 'Harga Komoditas',
-                          subtitle: 'Pantau harga gabah & beras',
-                          icon: Icons.analytics_rounded,
-                          color: const Color(0xFFD97706),
+                          subtitle: 'Pantau harga gabah & beras di Bojonegoro',
+                          icon: Icons.analytics_outlined,
+                          textMain: textMain,
+                          textSecondary: textSecondary,
                           onTap: () => _openWebUrl('https://disdag-online.bojonegorokab.go.id/trend/tabel'),
                         ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: _buildSecondaryCard(
+                        Divider(height: 1, thickness: 1, color: borderColor),
+                        _buildListItem(
+                          context: context,
                           isDark: isDark,
-                          title: 'Asuransi Tani (AUTP)',
-                          subtitle: 'Klaim gagal panen padi',
-                          icon: Icons.shield_rounded,
-                          color: const Color(0xFF7C3AED),
-                          onTap: () => _openWebUrl('https://autp.pertanian.go.id/'),
+                          title: 'Informasi Pertanian',
+                          subtitle: 'Informasi dan berita pertanian Bojonegoro',
+                          icon: Icons.newspaper_outlined,
+                          textMain: textMain,
+                          textSecondary: textSecondary,
+                          onTap: () => _openWebUrl('https://dinpertan.bojonegorokab.go.id/'),
                         ),
-                      ),
-                    ],
+                        Divider(height: 1, thickness: 1, color: borderColor),
+                        _buildListItem(
+                          context: context,
+                          isDark: isDark,
+                          title: 'Jadwal & Informasi',
+                          subtitle: 'Informasi kegiatan & program DKPP',
+                          icon: Icons.calendar_today_outlined,
+                          textMain: textMain,
+                          textSecondary: textSecondary,
+                          onTap: () => _openWebUrl('https://dinpertan.bojonegorokab.go.id/'),
+                        ),
+                      ],
+                    ),
                   ),
 
                   const SizedBox(height: 24),
@@ -387,184 +490,84 @@ class _PertanianScreenState extends State<PertanianScreen> {
     );
   }
 
-  Widget _buildMainServiceCard({
-    required bool isDark,
-    required String title,
-    required String badgeText,
-    required Color badgeColor,
-    required IconData icon,
-    required String description,
-    required String buttonLabel,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(22),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-            width: 1.2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: badgeColor.withAlpha(isDark ? 20 : 30),
-              blurRadius: 14,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: badgeColor.withAlpha(20),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Icon(icon, color: badgeColor, size: 26),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: badgeColor.withAlpha(20),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          badgeText,
-                          style: TextStyle(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.bold,
-                            color: badgeColor,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 16,
-                  color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              description,
-              style: TextStyle(
-                fontSize: 12.5,
-                height: 1.45,
-                color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: badgeColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  elevation: 0,
-                ),
-                onPressed: onTap,
-                icon: const Icon(Icons.arrow_forward_rounded, size: 16),
-                label: Text(
-                  buttonLabel,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSecondaryCard({
+  Widget _buildListItem({
+    required BuildContext context,
     required bool isDark,
     required String title,
     required String subtitle,
     required IconData icon,
-    required Color color,
+    required Color textMain,
+    required Color textSecondary,
     required VoidCallback onTap,
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(isDark ? 20 : 8),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      borderRadius: BorderRadius.circular(14),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: color.withAlpha(20),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: color, size: 22),
+            Icon(
+              icon,
+              size: 20,
+              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
             ),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF0F172A),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                      color: textMain,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      color: textSecondary,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 2),
-            Text(
-              subtitle,
-              style: TextStyle(
-                fontSize: 11,
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-              ),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 20,
+              color: textSecondary,
             ),
           ],
         ),
       ),
     );
   }
+}
+
+class _HeaderPatternPainter extends CustomPainter {
+  final Color color;
+  _HeaderPatternPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    final path = Path();
+    for (double i = -size.height; i < size.width + size.height; i += 24) {
+      path.moveTo(i, 0);
+      path.lineTo(i + size.height, size.height);
+    }
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

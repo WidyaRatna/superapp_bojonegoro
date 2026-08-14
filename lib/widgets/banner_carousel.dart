@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class BannerCarouselWidget extends StatefulWidget {
@@ -18,21 +19,42 @@ class _BannerCarouselWidgetState extends State<BannerCarouselWidget> {
   int _currentPage = 0;
   Timer? _autoScrollTimer;
 
-  final List<Map<String, String>> _banners = [
+  final List<Map<String, dynamic>> _posters = [
     {
-      'title': 'Bojonegoro\nMaju & Sejahtera',
-      'subtitle': 'Bersama membangun Bojonegoro yang lebih baik',
-      'buttonText': 'Lihat Layanan >',
-    },
-    {
-      'title': 'Festival Budaya\nBojonegoro 2026',
-      'subtitle': 'Saksikan ragam seni & bazar kuliner khas daerah',
-      'buttonText': 'Jadwal Acara >',
-    },
-    {
+      'category': 'LAYANAN PUBLIK',
       'title': 'Layanan Digital\nTerpadu 24 Jam',
       'subtitle': 'Urus dokumen & perizinan langsung dari HP Anda',
-      'buttonText': 'Panduan App >',
+      'cta': 'Buka Layanan →',
+      'icon': Icons.devices_rounded,
+      'gradientColors': [Color(0xFF072738), Color(0xFF0369A1)],
+      'accentColor': Color(0xFF38BDF8),
+    },
+    {
+      'category': 'PENGUMUMAN RESMI',
+      'title': 'Super App Kab. Bojonegoro',
+      'subtitle': 'Integrasi 16+ layanan publik dalam satu aplikasi',
+      'cta': 'Pelajari Selengkapnya →',
+      'icon': Icons.campaign_rounded,
+      'gradientColors': [Color(0xFF064E3B), Color(0xFF0F766E)],
+      'accentColor': Color(0xFF2DD4BF),
+    },
+    {
+      'category': 'PROGRAM UNGGULAN',
+      'title': 'Bojonegoro Berdaya',
+      'subtitle': 'Bantuan tani, beasiswa pelajar & fasilitas UMKM',
+      'cta': 'Cek Program →',
+      'icon': Icons.stars_rounded,
+      'gradientColors': [Color(0xFF1E1B4B), Color(0xFF4338CA)],
+      'accentColor': Color(0xFF818CF8),
+    },
+    {
+      'category': 'AGENDA DAERAH',
+      'title': 'Festival Budaya 2026',
+      'subtitle': 'Pentas seni tradisional & bazar kuliner khas Bojonegoro',
+      'cta': 'Jadwal Kegiatan →',
+      'icon': Icons.festival_rounded,
+      'gradientColors': [Color(0xFF78350F), Color(0xFFB45309)],
+      'accentColor': Color(0xFFFBBF24),
     },
   ];
 
@@ -44,9 +66,9 @@ class _BannerCarouselWidgetState extends State<BannerCarouselWidget> {
 
   void _startAutoScroll() {
     _autoScrollTimer?.cancel();
-    _autoScrollTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (_pageController.hasClients) {
-        int nextPage = (_currentPage + 1) % _banners.length;
+        int nextPage = (_currentPage + 1) % _posters.length;
         _pageController.animateToPage(
           nextPage,
           duration: const Duration(milliseconds: 400),
@@ -65,210 +87,150 @@ class _BannerCarouselWidgetState extends State<BannerCarouselWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
+        // Swipeable PageView Poster Carousel
         SizedBox(
-          height: 180,
-          child: PageView.builder(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                _currentPage = index;
-              });
-            },
-            itemCount: _banners.length,
-            itemBuilder: (context, index) {
-              final banner = _banners[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(22),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFF0066FF),
-                        Color(0xFF0052D4),
-                        Color(0xFF4364F7),
-                      ],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF0D62F1).withAlpha(100),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+          height: 140,
+          child: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(
+              dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+                PointerDeviceKind.trackpad,
+              },
+            ),
+            child: PageView.builder(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentPage = index;
+                });
+              },
+              itemCount: _posters.length,
+              itemBuilder: (context, index) {
+                final poster = _posters[index];
+                final gradientColors = poster['gradientColors'] as List<Color>;
+                final accentColor = poster['accentColor'] as Color;
+                final icon = poster['icon'] as IconData;
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: InkWell(
+                    onTap: widget.onViewServicesTap,
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: gradientColors,
+                        ),
+                        border: Border.all(color: borderColor, width: 1),
                       ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(22),
-                    child: Stack(
-                      children: [
-                        // Decorative Sky Clouds
-                        Positioned(
-                          right: 15,
-                          top: 12,
-                          child: Icon(
-                            Icons.cloud_rounded,
-                            color: Colors.white.withAlpha(45),
-                            size: 44,
-                          ),
-                        ),
-                        Positioned(
-                          right: 90,
-                          top: 8,
-                          child: Icon(
-                            Icons.cloud_rounded,
-                            color: Colors.white.withAlpha(30),
-                            size: 32,
-                          ),
-                        ),
-
-                        // Green Hills / Foliage Landscape Curve at Bottom Right
-                        Positioned(
-                          right: -10,
-                          bottom: -20,
-                          child: Container(
-                            width: 170,
-                            height: 70,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF10B981).withAlpha(180),
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(80),
-                                topRight: Radius.circular(50),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          right: 30,
-                          bottom: -25,
-                          child: Container(
-                            width: 120,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF059669).withAlpha(220),
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(60),
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        // Landmark Silhouettes on Right Side (Tugu Bojonegoro & Oil Rig / Pump)
-                        Positioned(
-                          right: 70,
-                          bottom: 14,
-                          child: Icon(
-                            Icons.account_balance_rounded,
-                            color: Colors.white.withAlpha(200),
-                            size: 75,
-                          ),
-                        ),
-                        Positioned(
-                          right: 10,
-                          bottom: 12,
-                          child: Icon(
-                            Icons.precision_manufacturing_rounded,
-                            color: const Color(0xFF1E293B).withAlpha(220),
-                            size: 65,
-                          ),
-                        ),
-
-                        // Main Text & Button Content
-                        Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    banner['title']!,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w800,
-                                      height: 1.2,
-                                      shadows: [
-                                        Shadow(
-                                          color: Colors.black26,
-                                          blurRadius: 4,
-                                          offset: Offset(0, 2),
-                                        ),
-                                      ],
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Category Tag Badge
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: accentColor.withAlpha(40),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    poster['category'] as String,
+                                    style: TextStyle(
+                                      fontSize: 9.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: accentColor,
+                                      letterSpacing: 0.5,
                                     ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    banner['subtitle']!,
-                                    style: const TextStyle(
-                                      color: Color(0xFFE0F2FE),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              // Interactive Action Pill Button
-                              ElevatedButton(
-                                onPressed: widget.onViewServicesTap,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF0041C4),
-                                  foregroundColor: Colors.white,
-                                  elevation: 4,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 18,
-                                    vertical: 10,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(24),
                                   ),
                                 ),
-                                child: Text(
-                                  banner['buttonText']!,
+                                const SizedBox(height: 6),
+                                // Title
+                                Text(
+                                  poster['title'] as String,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
-                                    fontSize: 13,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    height: 1.2,
+                                    letterSpacing: -0.2,
                                   ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 4),
+                                // Subtitle
+                                Text(
+                                  poster['subtitle'] as String,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 11.5,
+                                    color: Color(0xFFCBD5E1),
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 12),
+                          // Decorative Right Poster Icon Box
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withAlpha(20),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              icon,
+                              color: accentColor,
+                              size: 28,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 12),
-
-        // Indicator Dots (Active Blue, Inactive Grey)
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            _banners.length,
-            (index) => AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              width: _currentPage == index ? 10 : 8,
-              height: _currentPage == index ? 10 : 8,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _currentPage == index
-                    ? const Color(0xFF0D62F1)
-                    : const Color(0xFFCBD5E1),
-              ),
+                );
+              },
             ),
           ),
+        ),
+        const SizedBox(height: 10),
+
+        // Carousel Dot Indicators (● ○ ○ ○)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(_posters.length, (index) {
+            final isActive = _currentPage == index;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              width: isActive ? 16 : 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: isActive
+                    ? (isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7))
+                    : (isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1)),
+                borderRadius: BorderRadius.circular(3),
+              ),
+            );
+          }),
         ),
       ],
     );
