@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/news_model.dart';
 
 class NewsDetailSheet extends StatefulWidget {
@@ -22,6 +23,19 @@ class _NewsDetailSheetState extends State<NewsDetailSheet> {
   void initState() {
     super.initState();
     _likeCount = widget.news.likes;
+  }
+
+  Future<void> _openWebUrl() async {
+    final uri = Uri.parse(widget.news.webUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Tidak dapat membuka ${widget.news.webUrl}')),
+        );
+      }
+    }
   }
 
   void _toggleLike() {
@@ -49,9 +63,9 @@ class _NewsDetailSheetState extends State<NewsDetailSheet> {
 
   void _shareArticle() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Tautan berita disalin ke papan klip!'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text('Tautan disalin: ${widget.news.webUrl}'),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -189,6 +203,31 @@ class _NewsDetailSheetState extends State<NewsDetailSheet> {
                       letterSpacing: 0.2,
                     ),
                   ),
+                  const SizedBox(height: 20),
+
+                  // Button to Open Full Article on Official Web Portal
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: _openWebUrl,
+                      icon: const Icon(Icons.open_in_browser_rounded, color: Color(0xFF0284C7)),
+                      label: const Text(
+                        'Baca Artikel Lengkap di bojonegorokab.go.id ↗',
+                        style: TextStyle(
+                          color: Color(0xFF0284C7),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13.5,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        side: const BorderSide(color: Color(0xFF0284C7), width: 1.5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 24),
 
                   // Author / Publisher Footer Box
@@ -283,3 +322,4 @@ class _NewsDetailSheetState extends State<NewsDetailSheet> {
     );
   }
 }
+

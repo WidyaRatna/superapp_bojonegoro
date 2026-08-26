@@ -526,7 +526,7 @@ class _PariwisataScreenState extends State<PariwisataScreen> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
@@ -1080,7 +1080,7 @@ class TourismDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),

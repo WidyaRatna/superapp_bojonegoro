@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import '../widgets/superapp_header.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class InstansiItem {
@@ -1057,165 +1058,77 @@ class _KontakInstansiScreenState extends State<KontakInstansiScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
-    final double topPadding = MediaQuery.of(context).padding.top;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     final bool isShowingList = _selectedCategory != null || _searchQuery.trim().isNotEmpty;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
       body: Column(
         children: [
-          // Header Bar
-          Stack(
-            children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(16, (topPadding > 0 ? topPadding : 16) + 4, 16, 20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: isDark
-                        ? const [
-                            Color(0xFF0F172A),
-                            Color(0xFF1E1B4B),
-                            Color(0xFF1E293B),
-                          ]
-                        : const [
-                            Color(0xFF1E3A8A),
-                            Color(0xFF1D4ED8),
-                            Color(0xFF2563EB),
-                          ],
-                  ),
-                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(30)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF1D4ED8).withAlpha(70),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 24),
-                              onPressed: () {
-                                if (isShowingList) {
-                                  setState(() {
-                                    _selectedCategory = null;
-                                    _searchController.clear();
-                                    _searchQuery = '';
-                                  });
-                                } else {
-                                  Navigator.pop(context);
-                                }
-                              },
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              _selectedCategory != null ? 'Direktori $_selectedCategory' : 'Layanan Kontak Instansi',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: -0.2,
-                              ),
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            isDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
-                            color: isDark ? Colors.amber : Colors.white,
-                            size: 22,
-                          ),
-                          onPressed: () {
-                            if (widget.onToggleDarkMode != null) {
-                              widget.onToggleDarkMode!();
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Text(
-                        _selectedCategory != null
-                            ? 'Daftar kontak instansi resmi kategori $_selectedCategory'
-                            : 'Pilih kategori instansi pemerintah Kab. Bojonegoro di bawah',
-                        style: TextStyle(
-                          color: Colors.white.withAlpha(220),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+          SuperAppHeader(
+            title: _selectedCategory != null ? 'Direktori $_selectedCategory' : 'Kontak Instansi',
+            subtitle: 'Pemerintah Kabupaten Bojonegoro',
+            isDarkMode: isDark,
+            onToggleDarkMode: widget.onToggleDarkMode,
+            onBackPressed: () {
+              if (isShowingList) {
+                setState(() {
+                  _selectedCategory = null;
+                  _searchController.clear();
+                  _searchQuery = '';
+                });
+              } else {
+                Navigator.pop(context);
+              }
+            },
+          ),
+          const SizedBox(height: 12),
 
-                    // Search Bar Input
-                    Container(
-                      height: 46,
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withAlpha(25),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (val) {
-                          setState(() {
-                            _searchQuery = val;
-                          });
-                        },
-                        style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A), fontSize: 13),
-                        decoration: InputDecoration(
-                          hintText: 'Cari instansi (Dinas, Badan, RSUD, Kecamatan...)...',
-                          hintStyle: const TextStyle(color: Colors.grey, fontSize: 12.5),
-                          prefixIcon: const Icon(Icons.search_rounded, size: 20, color: Color(0xFF2563EB)),
-                          suffixIcon: _searchQuery.isNotEmpty
-                              ? IconButton(
-                                  icon: const Icon(Icons.clear_rounded, size: 18, color: Colors.grey),
-                                  onPressed: () {
-                                    setState(() {
-                                      _searchController.clear();
-                                      _searchQuery = '';
-                                    });
-                                  },
-                                )
-                              : null,
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 11),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Positioned(
-                right: -20,
-                top: 10,
-                child: IgnorePointer(
-                  child: Icon(
-                    Icons.account_balance_rounded,
-                    size: 130,
-                    color: Colors.white.withAlpha(15),
+          // Search Bar Input
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              height: 46,
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: isDark ? Border.all(color: const Color(0xFF334155)) : null,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(25),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
+                ],
+              ),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (val) {
+                  setState(() {
+                    _searchQuery = val;
+                  });
+                },
+                style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A), fontSize: 13),
+                decoration: InputDecoration(
+                  hintText: 'Cari instansi (Dinas, Badan, RSUD, Kecamatan...)...',
+                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 12.5),
+                  prefixIcon: const Icon(Icons.search_rounded, size: 20, color: Color(0xFF2563EB)),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear_rounded, size: 18, color: Colors.grey),
+                          onPressed: () {
+                            setState(() {
+                              _searchController.clear();
+                              _searchQuery = '';
+                            });
+                          },
+                        )
+                      : null,
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 11),
                 ),
               ),
-            ],
+            ),
           ),
 
           // Main View Content

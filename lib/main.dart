@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'views/home_screen.dart';
+import 'views/admin/admin_login_screen.dart';
+import 'views/admin/admin_main_screen.dart';
+import 'views/splash_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,10 +76,20 @@ class _SuperAppBojonegoroState extends State<SuperAppBojonegoro> {
           backgroundColor: Colors.transparent,
         ),
       ),
-      home: HomeScreen(
+      home: SplashScreen(
         isDarkMode: isDarkMode,
         onToggleDarkMode: _toggleTheme,
       ),
+      routes: {
+        '/admin-login': (context) => AdminLoginScreen(
+              isDarkMode: isDarkMode,
+              onToggleDarkMode: _toggleTheme,
+            ),
+        '/admin-dashboard': (context) => AdminMainScreen(
+              isDarkMode: isDarkMode,
+              onToggleDarkMode: _toggleTheme,
+            ),
+      },
     );
   }
 }

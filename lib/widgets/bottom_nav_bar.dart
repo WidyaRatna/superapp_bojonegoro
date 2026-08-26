@@ -16,6 +16,7 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark || isDarkMode;
     return SizedBox(
       height: 84,
       child: Stack(
@@ -26,15 +27,15 @@ class CustomBottomNavBar extends StatelessWidget {
           Container(
             height: 64,
             decoration: BoxDecoration(
-              color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+              color: isDark ? const Color(0xFF1E293B) : Colors.white,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
               ),
-              border: isDarkMode ? const Border(top: BorderSide(color: Color(0xFF334155), width: 1)) : null,
+              border: isDark ? const Border(top: BorderSide(color: Color(0xFF334155), width: 1)) : null,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withAlpha(isDarkMode ? 30 : 15),
+                  color: Colors.black.withAlpha(isDark ? 30 : 15),
                   blurRadius: 12,
                   offset: const Offset(0, -3),
                 ),
@@ -45,6 +46,7 @@ class CustomBottomNavBar extends StatelessWidget {
               children: [
                 // 1. Beranda
                 _buildNavItem(
+                  context: context,
                   index: 0,
                   icon: Icons.home_rounded,
                   label: 'Beranda',
@@ -52,6 +54,7 @@ class CustomBottomNavBar extends StatelessWidget {
 
                 // 2. Layanan
                 _buildNavItem(
+                  context: context,
                   index: 1,
                   icon: Icons.grid_view_rounded,
                   label: 'Layanan',
@@ -62,6 +65,7 @@ class CustomBottomNavBar extends StatelessWidget {
 
                 // 3. Darurat
                 _buildNavItem(
+                  context: context,
                   index: 2,
                   icon: Icons.phone_in_talk_rounded,
                   label: 'Darurat',
@@ -69,6 +73,7 @@ class CustomBottomNavBar extends StatelessWidget {
 
                 // 4. Profil
                 _buildNavItem(
+                  context: context,
                   index: 3,
                   icon: Icons.person_outline_rounded,
                   label: 'Profil',
@@ -96,13 +101,13 @@ class CustomBottomNavBar extends StatelessWidget {
                     ),
                   ],
                   border: Border.all(
-                    color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
                     width: 3,
                   ),
                 ),
                 child: const Center(
                   child: Icon(
-                    Icons.qr_code_scanner_rounded,
+                    Icons.campaign_rounded,
                     color: Colors.white,
                     size: 26,
                   ),
@@ -116,13 +121,15 @@ class CustomBottomNavBar extends StatelessWidget {
   }
 
   Widget _buildNavItem({
+    required BuildContext context,
     required int index,
     required IconData icon,
     required String label,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark || isDarkMode;
     final isSelected = currentIndex == index;
-    final activeColor = isDarkMode ? const Color(0xFF38BDF8) : const Color(0xFF0284C7);
-    final inactiveColor = isDarkMode ? const Color(0xFF64748B) : const Color(0xFF94A3B8);
+    final activeColor = isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7);
+    final inactiveColor = isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8);
     final color = isSelected ? activeColor : inactiveColor;
 
     return InkWell(

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import '../widgets/superapp_header.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PerhubunganScreen extends StatefulWidget {
@@ -79,8 +80,7 @@ class _PerhubunganScreenState extends State<PerhubunganScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
-    final double topPadding = MediaQuery.of(context).padding.top;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     // Color Palette
     final primaryBlue = isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7);
@@ -103,71 +103,23 @@ class _PerhubunganScreenState extends State<PerhubunganScreen> {
 
     return Scaffold(
       backgroundColor: bgColor,
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 1. Subtle Blue Gradient Header
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.fromLTRB(12, (topPadding > 0 ? topPadding : 16) + 4, 16, 20),
-              decoration: BoxDecoration(
-                gradient: headerGradient,
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 22),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text(
-                          'Layanan Perhubungan',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            letterSpacing: -0.2,
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          'Dinas Perhubungan Kabupaten Bojonegoro',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFFE0F2FE),
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (widget.onToggleDarkMode != null)
-                    IconButton(
-                      icon: Icon(
-                        isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                      onPressed: widget.onToggleDarkMode,
-                      tooltip: 'Ganti Tema',
-                    ),
-                ],
-              ),
-            ),
-
-            // Content Area
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+      body: Column(
+        children: [
+          SuperAppHeader(
+            title: 'Layanan Perhubungan',
+            subtitle: 'Dinas Perhubungan Kabupaten Bojonegoro',
+            gradient: headerGradient,
+            isDarkMode: isDark,
+            onToggleDarkMode: widget.onToggleDarkMode,
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                   // 2. Informasi Dinas
                   Container(
                     width: double.infinity,
@@ -471,14 +423,13 @@ class _PerhubunganScreenState extends State<PerhubunganScreen> {
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 24),
                 ],
               ),
             ),
-          ],
+          ),
         ),
-      ),
-    );
-  }
+      ],
+    ),
+  );
+}
 }

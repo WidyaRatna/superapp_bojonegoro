@@ -17,7 +17,7 @@ class NewsSectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || isDarkMode;
     // Show maximum 2 items for a clean compact list
     final displayNews = newsList.take(2).toList();
 

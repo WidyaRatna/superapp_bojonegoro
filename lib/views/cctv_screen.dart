@@ -153,7 +153,7 @@ class _CctvScreenState extends State<CctvScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     final double topPadding = MediaQuery.of(context).padding.top;
 
     final primaryBlue = isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7);
@@ -173,7 +173,6 @@ class _CctvScreenState extends State<CctvScreen> {
             padding: EdgeInsets.fromLTRB(12, (topPadding > 0 ? topPadding : 16) + 4, 16, 20),
             decoration: BoxDecoration(
               color: headerBgColor,
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
             ),
             child: Row(
               children: [

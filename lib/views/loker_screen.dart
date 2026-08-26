@@ -20,6 +20,7 @@ class LokerScreen extends StatefulWidget {
 }
 
 class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStateMixin {
+  bool _localDark = false;
   late TabController _tabController;
 
   // Master State for Job Listings
@@ -55,8 +56,32 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
+    _localDark = widget.isDarkMode;
     _tabController = TabController(length: 2, vsync: this);
     _allLokerList = List.from(initialLokerItems);
+  }
+
+  @override
+  void didUpdateWidget(covariant LokerScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isDarkMode != widget.isDarkMode) {
+      setState(() {
+        _localDark = widget.isDarkMode;
+      });
+    }
+  }
+
+  void _toggleDarkMode() {
+    setState(() {
+      _localDark = !_localDark;
+    });
+    if (widget.onToggleDarkMode != null) {
+      widget.onToggleDarkMode!();
+    }
+  }
+
+  bool _isDarkModeActive(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark || _localDark;
   }
 
   @override
@@ -174,7 +199,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
         context: context,
         builder: (context) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          backgroundColor: widget.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+          backgroundColor: _isDarkModeActive(context) ? const Color(0xFF1E293B) : Colors.white,
           title: Row(
             children: const [
               Icon(Icons.check_circle_rounded, color: Color(0xFF10B981), size: 28),
@@ -184,7 +209,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
           ),
           content: Text(
             'Lowongan pekerjaan telah berhasil divalidasi dan ditayangkan pada daftar Cari Lowongan Bojonegoro.',
-            style: TextStyle(color: widget.isDarkMode ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
+            style: TextStyle(color: _isDarkModeActive(context) ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
           ),
           actions: [
             ElevatedButton(
@@ -193,7 +218,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                 _tabController.animateTo(0); // Switch back to 'Cari Lowongan' tab
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2563EB),
+                backgroundColor: const Color(0xFF059669),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: const Text('Lihat di Daftar Lowongan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -210,8 +235,8 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
       MaterialPageRoute(
         builder: (context) => LokerDetailScreen(
           loker: loker,
-          isDarkMode: widget.isDarkMode,
-          onToggleDarkMode: widget.onToggleDarkMode,
+          isDarkMode: _isDarkModeActive(context),
+          onToggleDarkMode: _toggleDarkMode,
         ),
       ),
     );
@@ -219,38 +244,37 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
+    final isDark = _isDarkModeActive(context);
     final double topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       body: Column(
         children: [
-          // Premium Ocean Sapphire Header Bar
+          // Premium Emerald Green Header Bar
           Stack(
             children: [
               Container(
-                padding: EdgeInsets.fromLTRB(16, (topPadding > 0 ? topPadding : 16) + 4, 16, 18),
+                padding: EdgeInsets.fromLTRB(16, (topPadding > 0 ? topPadding : 16) + 4, 16, 16),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: isDark
                         ? const [
-                            Color(0xFF0F172A),
-                            Color(0xFF1E1B4B),
-                            Color(0xFF1E293B),
+                            Color(0xFF064E3B),
+                            Color(0xFF047857),
+                            Color(0xFF059669),
                           ]
                         : const [
-                            Color(0xFF1E3A8A),
-                            Color(0xFF1D4ED8),
-                            Color(0xFF2563EB),
+                            Color(0xFF047857),
+                            Color(0xFF059669),
+                            Color(0xFF10B981),
                           ],
                   ),
-                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(30)),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF1D4ED8).withAlpha(70),
+                      color: const Color(0xFF059669).withAlpha(70),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),
@@ -280,15 +304,14 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                             ),
                           ],
                         ),
-                        if (widget.onToggleDarkMode != null)
-                          IconButton(
-                            icon: Icon(
-                              isDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
-                              color: isDark ? Colors.amber : Colors.white,
-                              size: 20,
-                            ),
-                            onPressed: widget.onToggleDarkMode,
+                        IconButton(
+                          icon: Icon(
+                            isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                            color: isDark ? Colors.amber : Colors.white,
+                            size: 20,
                           ),
+                          onPressed: _toggleDarkMode,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 4),
@@ -303,51 +326,60 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
 
-                    // Dual Action Flow Glassmorphic Tab Switcher
+                    // Clean Segmented Control inside Green Header
                     Container(
-                      height: 48,
-                      padding: const EdgeInsets.all(4),
+                      height: 40,
+                      padding: const EdgeInsets.all(3),
                       decoration: BoxDecoration(
-                        color: Colors.black.withAlpha(45),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.white.withAlpha(35)),
+                        color: isDark
+                            ? const Color(0xFF042F2E).withAlpha(180)
+                            : const Color(0xFF064E3B).withAlpha(120),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withAlpha(40),
+                          width: 1.0,
+                        ),
                       ),
                       child: TabBar(
                         controller: _tabController,
+                        dividerColor: Colors.transparent,
                         indicator: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(9),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withAlpha(40),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
+                              color: Colors.black.withAlpha(25),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
                             ),
                           ],
                         ),
                         indicatorSize: TabBarIndicatorSize.tab,
-                        labelColor: const Color(0xFF1D4ED8),
+                        labelColor: const Color(0xFF047857),
                         unselectedLabelColor: Colors.white,
-                        labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5),
+                        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12.5),
                         tabs: const [
                           Tab(
+                            height: 34,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.search_rounded, size: 18),
-                                SizedBox(width: 6),
+                                Icon(Icons.search_rounded, size: 15),
+                                SizedBox(width: 5),
                                 Text('Cari Lowongan'),
                               ],
                             ),
                           ),
                           Tab(
+                            height: 34,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.add_circle_outline_rounded, size: 18),
-                                SizedBox(width: 6),
+                                Icon(Icons.add_circle_outline_rounded, size: 15),
+                                SizedBox(width: 5),
                                 Text('Input Lowongan'),
                               ],
                             ),
@@ -361,10 +393,12 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
               Positioned(
                 right: -20,
                 top: 10,
-                child: Icon(
-                  Icons.work_rounded,
-                  size: 130,
-                  color: Colors.white.withAlpha(15),
+                child: IgnorePointer(
+                  child: Icon(
+                    Icons.work_rounded,
+                    size: 130,
+                    color: Colors.white.withAlpha(15),
+                  ),
                 ),
               ),
             ],
@@ -414,12 +448,12 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                         });
                       },
                       style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A), fontSize: 13),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Cari pekerjaan (admin, kasir, teknisi...)...',
-                        hintStyle: TextStyle(color: Colors.grey, fontSize: 12.5),
-                        prefixIcon: Icon(Icons.search_rounded, size: 20, color: Color(0xFF2563EB)),
+                        hintStyle: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), fontSize: 12.5),
+                        prefixIcon: const Icon(Icons.search_rounded, size: 20, color: Color(0xFF059669)),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 10),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 10),
                       ),
                     ),
                   ),
@@ -441,7 +475,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.location_on_rounded, size: 18, color: Color(0xFF2563EB)),
+                  const Icon(Icons.location_on_rounded, size: 18, color: Color(0xFF059669)),
                   const SizedBox(width: 8),
                   Expanded(
                     child: DropdownButtonHideUnderline(
@@ -498,8 +532,14 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                     child: ChoiceChip(
                       label: Text(cat),
                       selected: isSelected,
-                      selectedColor: const Color(0xFF2563EB),
+                      selectedColor: const Color(0xFF059669),
                       backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                      side: BorderSide(
+                        color: isSelected
+                            ? const Color(0xFF059669)
+                            : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                        width: 1.0,
+                      ),
                       labelStyle: TextStyle(
                         color: isSelected ? Colors.white : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
                         fontSize: 12,
@@ -561,16 +601,16 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                     padding: const EdgeInsets.only(bottom: 12),
                     child: InkWell(
                       onTap: () => _openLokerDetail(item),
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(16),
                       child: Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9)),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0), width: 1.0),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withAlpha(8),
+                              color: Colors.black.withAlpha(isDark ? 25 : 6),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -605,13 +645,21 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                       decoration: BoxDecoration(
-                                        color: isAparat ? const Color(0xFF2563EB).withAlpha(25) : const Color(0xFF0D9488).withAlpha(25),
+                                        color: isAparat
+                                            ? const Color(0xFF059669).withAlpha(isDark ? 35 : 15)
+                                            : const Color(0xFF0284C7).withAlpha(isDark ? 35 : 15),
                                         borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(
+                                          color: isAparat
+                                              ? const Color(0xFF059669).withAlpha(30)
+                                              : const Color(0xFF0284C7).withAlpha(30),
+                                          width: 1.0,
+                                        ),
                                       ),
                                       child: Text(
                                         item.postedByRole,
                                         style: TextStyle(
-                                          color: isAparat ? const Color(0xFF2563EB) : const Color(0xFF0D9488),
+                                          color: isAparat ? const Color(0xFF059669) : const Color(0xFF0284C7),
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -659,7 +707,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                             Text(
                               item.companyName,
                               style: const TextStyle(
-                                color: Color(0xFF2563EB),
+                                color: Color(0xFF059669),
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -718,7 +766,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF2563EB),
+                  color: Color(0xFF059669),
                 ),
               ),
               const SizedBox(height: 4),
@@ -729,7 +777,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
               const SizedBox(height: 18),
 
               // Role Selection
-              _buildFormLabel('Status Pemasang Lowongan'),
+              _buildFormLabel('Status Pemasang Lowongan', isDark),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
@@ -755,7 +803,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
               const SizedBox(height: 14),
 
               // Title Input
-              _buildFormLabel('Judul Pekerjaan / Posisi *'),
+              _buildFormLabel('Judul Pekerjaan / Posisi *', isDark),
               _buildTextField(
                 controller: _titleController,
                 hint: 'Misal: Staff Administrasi Desa, Kasir Toko, Operator Pabrik',
@@ -765,7 +813,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
               const SizedBox(height: 14),
 
               // Company / Instansi Name
-              _buildFormLabel('Nama Perusahaan / Instansi / Usaha *'),
+              _buildFormLabel('Nama Perusahaan / Instansi / Usaha *', isDark),
               _buildTextField(
                 controller: _companyController,
                 hint: 'Misal: Kantor Desa Balenrejo, Toko Sembako Jaya',
@@ -775,7 +823,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
               const SizedBox(height: 14),
 
               // Upload Poster / Brosur Image
-              _buildFormLabel('Upload Gambar Poster / Brosur Lowongan (Opsional)'),
+              _buildFormLabel('Upload Gambar Poster / Brosur Lowongan (Opsional)', isDark),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(14),
@@ -821,11 +869,11 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                         ],
                       ),
                     ] else ...[
-                      const Icon(Icons.add_photo_alternate_rounded, size: 40, color: Color(0xFF2563EB)),
+                      const Icon(Icons.add_photo_alternate_rounded, size: 40, color: Color(0xFF059669)),
                       const SizedBox(height: 6),
-                      const Text(
+                      Text(
                         'Pilih gambar poster / brosur dari galeri atau kamera',
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                        style: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), fontSize: 12),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 10),
@@ -837,17 +885,17 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                             icon: const Icon(Icons.photo_library_rounded, size: 16, color: Colors.white),
                             label: const Text('Galeri', style: TextStyle(color: Colors.white, fontSize: 12)),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF2563EB),
+                              backgroundColor: const Color(0xFF059669),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             ),
                           ),
                           const SizedBox(width: 10),
                           OutlinedButton.icon(
                             onPressed: () => _pickPosterImage(ImageSource.camera),
-                            icon: const Icon(Icons.camera_alt_rounded, size: 16, color: Color(0xFF2563EB)),
-                            label: const Text('Kamera', style: TextStyle(color: Color(0xFF2563EB), fontSize: 12)),
+                            icon: const Icon(Icons.camera_alt_rounded, size: 16, color: Color(0xFF059669)),
+                            label: const Text('Kamera', style: TextStyle(color: Color(0xFF059669), fontSize: 12)),
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Color(0xFF2563EB)),
+                              side: const BorderSide(color: Color(0xFF059669)),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             ),
                           ),
@@ -866,7 +914,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildFormLabel('Kategori *'),
+                        _buildFormLabel('Kategori *', isDark),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           decoration: BoxDecoration(
@@ -894,7 +942,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildFormLabel('Tipe Pekerjaan *'),
+                        _buildFormLabel('Tipe Pekerjaan *', isDark),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           decoration: BoxDecoration(
@@ -922,7 +970,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
               const SizedBox(height: 14),
 
               // Location Kecamatan
-              _buildFormLabel('Lokasi Kecamatan *'),
+              _buildFormLabel('Lokasi Kecamatan *', isDark),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
@@ -945,7 +993,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
               const SizedBox(height: 14),
 
               // Custom Full Address (Ketik Sendiri)
-              _buildFormLabel('Alamat Lengkap (Ketik Sendiri) *'),
+              _buildFormLabel('Alamat Lengkap (Ketik Sendiri) *', isDark),
               _buildTextField(
                 controller: _addressController,
                 hint: 'Misal: Jl. Raya Balen No. 45, Desa Balenrejo, RT 03/RW 01',
@@ -956,7 +1004,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
               const SizedBox(height: 14),
 
               // Salary Range
-              _buildFormLabel('Estimasi Gaji / Upah'),
+              _buildFormLabel('Estimasi Gaji / Upah', isDark),
               _buildTextField(
                 controller: _salaryController,
                 hint: 'Misal: Rp 2.500.000 / bulan atau UMK Bojonegoro',
@@ -965,7 +1013,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
               const SizedBox(height: 14),
 
               // Description
-              _buildFormLabel('Deskripsi Pekerjaan *'),
+              _buildFormLabel('Deskripsi Pekerjaan *', isDark),
               _buildTextField(
                 controller: _descController,
                 hint: 'Jelaskan tugas utama, jam kerja, dan rincian pekerjaan...',
@@ -976,7 +1024,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
               const SizedBox(height: 14),
 
               // Requirements
-              _buildFormLabel('Persyaratan & Kualifikasi (Satu per baris) *'),
+              _buildFormLabel('Persyaratan & Kualifikasi (Satu per baris) *', isDark),
               _buildTextField(
                 controller: _reqController,
                 hint: 'Pendidikan minimal SMA/SMK\nMenguasai Komputer\nSehat Jasmani & Rohani',
@@ -989,12 +1037,12 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
               // Contact Person & Phone Info
               const Text(
                 'Kontak & Penanggung Jawab Lowongan',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF059669)),
               ),
               const SizedBox(height: 8),
 
               // Contact Name Input
-              _buildFormLabel('Nama Penanggung Jawab / HRD *'),
+              _buildFormLabel('Nama Penanggung Jawab / HRD *', isDark),
               _buildTextField(
                 controller: _contactNameController,
                 hint: 'Misal: Bpk. Supardi (Sekdes) / Ibu Ani (HRD)',
@@ -1010,7 +1058,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildFormLabel('No. Penanggung Jawab *'),
+                        _buildFormLabel('No. Penanggung Jawab *', isDark),
                         _buildTextField(
                           controller: _phoneController,
                           hint: '081234567890',
@@ -1026,7 +1074,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildFormLabel('No. WhatsApp *'),
+                        _buildFormLabel('No. WhatsApp *', isDark),
                         _buildTextField(
                           controller: _waController,
                           hint: '081234567890',
@@ -1044,12 +1092,12 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
               // Social Media & Links Header
               const Text(
                 'Media Sosial & Kontak Tambahan (Opsional)',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF059669)),
               ),
               const SizedBox(height: 8),
 
               // Instagram Handle Input
-              _buildFormLabel('Instagram (Username / Handle)'),
+              _buildFormLabel('Instagram (Username / Handle)', isDark),
               _buildTextField(
                 controller: _igController,
                 hint: 'Misal: @kantor_desabalenrejo atau @perusahaan_id',
@@ -1058,7 +1106,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
               const SizedBox(height: 10),
 
               // Email HRD Input
-              _buildFormLabel('Email Perusahaan / HRD'),
+              _buildFormLabel('Email Perusahaan / HRD', isDark),
               _buildTextField(
                 controller: _emailController,
                 hint: 'Misal: hrd@perusahaan.co.id',
@@ -1068,7 +1116,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
               const SizedBox(height: 10),
 
               // Website URL Input
-              _buildFormLabel('Website / Link Media Sosial Lain'),
+              _buildFormLabel('Website / Link Media Sosial Lain', isDark),
               _buildTextField(
                 controller: _webController,
                 hint: 'Misal: www.perusahaan.co.id',
@@ -1089,7 +1137,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2563EB),
+                    backgroundColor: const Color(0xFF059669),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     elevation: 4,
                   ),
@@ -1102,12 +1150,16 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildFormLabel(String label) {
+  Widget _buildFormLabel(String label, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(
         label,
-        style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          fontSize: 12.5,
+          fontWeight: FontWeight.bold,
+          color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF1E293B),
+        ),
       ),
     );
   }
@@ -1128,7 +1180,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
       style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A), fontSize: 13),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
+        hintStyle: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), fontSize: 12),
         filled: true,
         fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
@@ -1147,7 +1199,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: const Color(0xFF2563EB)),
+          Icon(icon, size: 12, color: const Color(0xFF059669)),
           const SizedBox(width: 4),
           Text(
             text,

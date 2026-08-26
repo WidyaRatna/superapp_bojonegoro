@@ -148,12 +148,13 @@ final List<ServiceCategory> sampleServices = [
     id: 'sosial',
     title: 'Sosial',
     icon: Icons.volunteer_activism_rounded,
-    color: const Color(0xFF7C3AED), // Violet
+    color: const Color(0xFF0D62F1), // Royal Blue for SuperApp identity
     subServices: [
-      'Cek Bansos PKH & BPNT',
-      'Pendaftaran DTKS Kemensos',
-      'Bantuan Penyandang Disabilitas',
-      'Layanan Rumah Singgah Sosial',
+      'Permohonan Surat Rumah Singgah',
+      'Masukan, Kritik dan Saran',
+      'Bantuan Sosial Terpadu',
+      'Persyaratan Pelayanan Publik',
+      'Berita Terkini',
     ],
   ),
   ServiceCategory(
@@ -176,17 +177,6 @@ final List<ServiceCategory> sampleServices = [
       'Berita Terkini Bojonegoro',
       'Pengumuman Resmi Pemkab',
       'Majalah & Warta Daerah',
-    ],
-  ),
-  ServiceCategory(
-    id: 'pengadaan',
-    title: 'Pengadaan',
-    icon: Icons.shopping_cart_rounded,
-    color: const Color(0xFF4F46E5), // Indigo
-    subServices: [
-      'Layanan LPSE Bojonegoro',
-      'Katalog Rencana Pengadaan (SiRUP)',
-      'Info Lelang & Tender Publik',
     ],
   ),
   ServiceCategory(

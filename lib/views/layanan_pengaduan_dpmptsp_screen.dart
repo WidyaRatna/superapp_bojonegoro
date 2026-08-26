@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import '../widgets/superapp_header.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LayananPengaduanDpmptspScreen extends StatefulWidget {
@@ -124,10 +125,11 @@ class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspS
   }
 
   List<_KanalOption> _getKanalOptions() {
+    const primaryColor = Color(0xFF0D62F1);
     return [
       _KanalOption(
         icon: Icons.language_rounded,
-        iconBgColor: const Color(0xFF0D62F1),
+        iconBgColor: primaryColor,
         title: 'Website SP4N-LAPOR!',
         subtitle: 'Lapor keluhan publik secara resmi nasional via portal lapor.go.id.',
         buttonText: 'Buka Portal SP4N-LAPOR!',
@@ -137,7 +139,7 @@ class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspS
       ),
       _KanalOption(
         icon: Icons.public_rounded,
-        iconBgColor: const Color(0xFF8B5CF6),
+        iconBgColor: primaryColor,
         title: 'Website Buku Tamu DPMPTSP',
         subtitle: 'Akses portal pengaduan langsung DPMPTSP Kabupaten Bojonegoro.',
         buttonText: 'Kunjungi Website DPMPTSP',
@@ -147,7 +149,7 @@ class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspS
       ),
       _KanalOption(
         icon: Icons.chat_rounded,
-        iconBgColor: const Color(0xFF22C55E),
+        iconBgColor: primaryColor,
         title: 'Hotline WhatsApp Pengaduan',
         subtitle: 'Hubungi petugas siaga pengaduan ke +62 822 3309 9988.',
         buttonText: 'Chat WhatsApp Petugas',
@@ -157,7 +159,7 @@ class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspS
       ),
       _KanalOption(
         icon: Icons.email_rounded,
-        iconBgColor: const Color(0xFFEF4444),
+        iconBgColor: primaryColor,
         title: 'Email Pengaduan Resmi',
         subtitle: 'Kirim dokumen & berkas keluhan ke dpmptsp.kabbjn@gmail.com.',
         buttonText: 'Kirim Surat Email',
@@ -167,7 +169,7 @@ class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspS
       ),
       _KanalOption(
         icon: Icons.location_on_rounded,
-        iconBgColor: const Color(0xFF10B981),
+        iconBgColor: primaryColor,
         title: 'Media Langsung / Tatap Muka',
         subtitle: 'Datang langsung ke kantor DPMPTSP (MPP Jl. Veteran No. 227).',
         buttonText: 'Petunjuk Lokasi Google Maps',
@@ -177,7 +179,7 @@ class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspS
       ),
       _KanalOption(
         icon: Icons.mark_unread_chat_alt_rounded,
-        iconBgColor: const Color(0xFFF59E0B),
+        iconBgColor: primaryColor,
         title: 'Kotak Pengaduan / Surat',
         subtitle: 'Kirim surat resmi ke Mal Pelayanan Publik (MPP) Lt. 1 & 2.',
         buttonText: 'Hubungi Telepon MPP',
@@ -185,237 +187,387 @@ class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspS
         tag: 'SURAT FISIK',
         badgeText: 'Kanal #6',
       ),
+      _KanalOption(
+        icon: Icons.camera_alt_rounded,
+        iconBgColor: primaryColor,
+        title: 'Instagram Resmi DPMPTSP',
+        subtitle: 'Pengaduan & informasi layanan melalui DM Instagram DPMPTSP.',
+        buttonText: 'Kunjungi Instagram DPMPTSP',
+        onTap: () => _openWebUrl('https://www.instagram.com/dpmptspbojonegoro/'),
+        tag: 'MEDIA SOSIAL',
+        badgeText: 'Kanal #7',
+      ),
+      _KanalOption(
+        icon: Icons.alternate_email_rounded,
+        iconBgColor: primaryColor,
+        title: 'Twitter / X DPMPTSP',
+        subtitle: 'Pengaduan & masukan publik melalui akun Twitter/X resmi.',
+        buttonText: 'Kunjungi Twitter / X',
+        onTap: () => _openWebUrl('https://twitter.com/dpmptspbjn'),
+        tag: 'MEDIA SOSIAL',
+        badgeText: 'Kanal #8',
+      ),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
+    final channels = _getKanalOptions();
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFF0D62F1),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Layanan Pengaduan DPMPTSP',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              'Kabupaten Bojonegoro',
-              style: TextStyle(fontSize: 11, color: Colors.white70),
-            ),
-          ],
-        ),
-        actions: [
-          if (widget.onToggleDarkMode != null)
-            IconButton(
-              icon: Icon(isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
-              onPressed: widget.onToggleDarkMode,
-              tooltip: 'Ganti Tema',
-            ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Schedule Card (Di bawah AppBar)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E293B) : const Color(0xFF0D62F1).withAlpha(15),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isDark ? const Color(0xFF334155) : const Color(0xFF0D62F1).withAlpha(40),
-                ),
-              ),
-              child: Row(
+      body: Column(
+        children: [
+          SuperAppHeader(
+            title: 'Layanan Pengaduan DPMPTSP',
+            subtitle: 'Kabupaten Bojonegoro',
+            isDarkMode: isDark,
+            onToggleDarkMode: widget.onToggleDarkMode,
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.access_time_filled_rounded, color: Color(0xFF10B981), size: 20),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Jadwal Tatap Muka: Senin - Jumat (08.00 - 15.00 WIB)',
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  // SECTION 1: Jadwal & SOP
+                  Text(
+                    'Jadwal & SOP Pengaduan',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Informasi operasional & alur mekanisme pelayanan pengaduan:',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Jadwal Tatap Muka (Information Bar)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFEFF6FF),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF334155) : const Color(0xFFBFDBFE),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.access_time_rounded, color: Color(0xFF0D62F1), size: 18),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Jadwal Tatap Muka: Senin - Jumat (08.00 - 15.00 WIB)',
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF1E3A8A),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Alur Mekanisme & SOP (Menu Card with Kependudukan Style)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                        width: 1.0,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF0D62F1).withAlpha(isDark ? 30 : 12),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(16),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SopPengaduanDpmptspScreen(isDarkMode: isDark),
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(16),
+                        child: Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF0D62F1).withAlpha(isDark ? 40 : 18),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: const Color(0xFF0D62F1).withAlpha(30), width: 1),
+                                ),
+                                child: const Icon(Icons.account_tree_rounded, color: Color(0xFF0D62F1), size: 24),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF0D62F1).withAlpha(isDark ? 35 : 15),
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(color: const Color(0xFF0D62F1).withAlpha(30), width: 1),
+                                      ),
+                                      child: const Text(
+                                        'STANDAR OPERASIONAL',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF0D62F1),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      'Alur Mekanisme & SOP Pengaduan',
+                                      style: TextStyle(
+                                        fontSize: 14.5,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      'Lihat bagan alur & prosedur resmi penanganan keluhan',
+                                      style: TextStyle(
+                                        fontSize: 11.5,
+                                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFF0D62F1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.arrow_forward_rounded,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
+                  const SizedBox(height: 22),
+
+                  // SECTION 2: PILIH KANAL PENGADUAN
+                  Text(
+                    'Pilih Kanal Pengaduan',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Silakan pilih 8 metode pengaduan publik DPMPTSP di bawah ini:',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // 8 Compact Service Cards following Kependudukan pattern
+                  for (int i = 0; i < channels.length; i++) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _buildKanalCard(
+                        option: channels[i],
+                        isDark: isDark,
+                      ),
+                    ),
+                  ],
+
+                  const SizedBox(height: 10),
+
+                  // SECTION 3: INFORMASI & KETENTUAN
+                  _buildInformasiKetentuanBox(isDark),
+
+                  const SizedBox(height: 12),
+
+                  // Commitment Banner
+                  _buildCommitmentBanner(isDark),
+
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+          ),
+        ],
+      ),
+    );
+  }
 
-            // 1. SOP Banner Button (Sebelum Memilih Metode Pengaduan)
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SopPengaduanDpmptspScreen(isDarkMode: isDark),
-                  ),
-                );
-              },
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isDark
-                        ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
-                        : [const Color(0xFFEFF6FF), const Color(0xFFDBEAFE)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isDark ? const Color(0xFF334155) : const Color(0xFF93C5FD),
-                    width: 1.5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF0D62F1).withAlpha(15),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0D62F1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(Icons.account_tree_rounded, color: Colors.white, size: 22),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'ALUR MEKANISME & SOP PENGADUAN',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w900,
-                              color: isDark ? Colors.white : const Color(0xFF0F172A),
-                              letterSpacing: 0.3,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Lihat bagan alur & prosedur resmi penanganan keluhan',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF0D62F1), size: 16),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
+  // Compact Kependudukan-Style Service Card
+  Widget _buildKanalCard({
+    required _KanalOption option,
+    required bool isDark,
+  }) {
+    const primaryColor = Color(0xFF0D62F1);
 
-            // 2. Section Title: Pilih Kanal Pengaduan
-            Row(
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+          width: 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withAlpha(isDark ? 30 : 12),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: option.onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Left Icon Container
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withAlpha(isDark ? 40 : 18),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: primaryColor.withAlpha(30), width: 1),
+                  ),
+                  child: Icon(option.icon, color: primaryColor, size: 24),
+                ),
+                const SizedBox(width: 12),
+                // Center Content Column
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Badge Label: Nomor & Kategori Kanal
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: primaryColor.withAlpha(isDark ? 35 : 15),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: primaryColor.withAlpha(30), width: 1),
+                        ),
+                        child: Text(
+                          '${option.badgeText} • ${option.tag}',
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      // Title
+                      Text(
+                        option.title,
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      // Subtitle
+                      Text(
+                        option.subtitle,
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Right Action: Circular Arrow Button
                 Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0D62F1).withAlpha(25),
+                  decoration: const BoxDecoration(
+                    color: primaryColor,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.touch_app_rounded, color: Color(0xFF0D62F1), size: 20),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'PILIH KANAL PENGADUAN',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      letterSpacing: 0.5,
-                    ),
+                  child: const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Colors.white,
+                    size: 16,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-
-            // 3. Vertical Column of Channels (Memanjang ke Bawah)
-            _buildKanalGrid(isDark),
-
-            const SizedBox(height: 20),
-
-            // 4. Official Info & Conditions Box
-            _buildInformasiKetentuanBox(isDark),
-
-            const SizedBox(height: 14),
-
-            // 5. Commitment & Integrity Banner
-            _buildCommitmentBanner(isDark),
-
-            const SizedBox(height: 24),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  // Vertical List of Channels (Memanjang ke Bawah)
-  Widget _buildKanalGrid(bool isDark) {
-    final channels = _getKanalOptions();
+  // Official Notice Box
+  Widget _buildInformasiKetentuanBox(bool isDark) {
+    const primaryColor = Color(0xFF0D62F1);
 
-    return Column(
-      children: channels.map((opt) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: _buildChannelOptionCard(
-            option: opt,
-            isDark: isDark,
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildChannelOptionCard({
-    required _KanalOption option,
-    required bool isDark,
-  }) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-          width: 1.5,
+          width: 1.0,
         ),
         boxShadow: [
           BoxShadow(
-            color: option.iconBgColor.withAlpha(20),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: primaryColor.withAlpha(isDark ? 30 : 12),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -425,129 +577,26 @@ class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspS
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: option.iconBgColor.withAlpha(25),
-                  borderRadius: BorderRadius.circular(14),
+                  color: primaryColor.withAlpha(isDark ? 40 : 18),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: primaryColor.withAlpha(30), width: 1),
                 ),
-                child: Icon(option.icon, color: option.iconBgColor, size: 24),
+                child: const Icon(Icons.info_outline_rounded, color: primaryColor, size: 18),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: option.iconBgColor.withAlpha(20),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            option.badgeText,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: option.iconBgColor,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          '• ${option.tag}',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      option.title,
-                      style: TextStyle(
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Text(
-            option.subtitle,
-            style: TextStyle(
-              fontSize: 12,
-              height: 1.4,
-              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: option.iconBgColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 11),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                elevation: 0,
-              ),
-              onPressed: option.onTap,
-              icon: const Icon(Icons.arrow_forward_rounded, size: 16),
-              label: Text(
-                option.buttonText,
-                style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-
-
-  // Official Notice Box
-  Widget _buildInformasiKetentuanBox(bool isDark) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.info_outline_rounded, color: Color(0xFF0D62F1), size: 20),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Text(
                 'Informasi & Ketentuan Pengaduan',
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 14.5,
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             'Melalui pengaduan ini, pengguna jasa dapat menyampaikan keluhan maupun komentar terhadap fasilitas gedung, pelayanan, pelanggaran kode etik, serta hal-hal yang terkait dengan pelaksanaan prosedur pelayanan di Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kabupaten Bojonegoro. Pengaduan ini disampaikan secara langsung atau melalui email dengan mengisi formulir pengaduan secara lengkap, agar petugas kami dapat menindaklanjuti pengaduan yang telah disampaikan. Apabila data yang disampaikan tidak benar, pengaduan tidak akan diproses lebih lanjut.',
             style: TextStyle(
@@ -563,34 +612,31 @@ class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspS
 
   // Commitment Motto Banner
   Widget _buildCommitmentBanner(bool isDark) {
+    const primaryColor = Color(0xFF0D62F1);
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: isDark
-              ? [const Color(0xFF1E3A8A).withAlpha(140), const Color(0xFF1E293B)]
-              : [const Color(0xFFEFF6FF), const Color(0xFFDBEAFE)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(18),
+        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFEFF6FF),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF0D62F1).withAlpha(60),
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFBFDBFE),
+          width: 1.0,
         ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.verified_user_rounded, color: Color(0xFF0D62F1), size: 24),
-          const SizedBox(width: 12),
+          const Icon(Icons.verified_user_outlined, color: primaryColor, size: 20),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Pengaduan anda akan membantu Kami meningkatkan kualitas pelayanan dan menegakkan integritas pegawai',
+              'Pengaduan Anda akan membantu kami meningkatkan kualitas pelayanan dan menegakkan integritas pegawai.',
               style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF1E40AF),
-                height: 1.35,
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+                color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF1E3A8A),
+                height: 1.4,
               ),
             ),
           ),
@@ -668,7 +714,7 @@ class _SopPengaduanDpmptspScreenState extends State<SopPengaduanDpmptspScreen>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),

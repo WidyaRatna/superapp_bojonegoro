@@ -197,7 +197,7 @@ class _InformasiPanganScreenState extends State<InformasiPanganScreen> {
   int get _stableCount => _foodPriceItems.where((i) => i.trend == 'stable').length;
 
   void _showItemDetailModal(FoodPriceItem item) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -345,7 +345,7 @@ class _InformasiPanganScreenState extends State<InformasiPanganScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     final double topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
@@ -371,7 +371,6 @@ class _InformasiPanganScreenState extends State<InformasiPanganScreen> {
                         Color(0xFF0F766E),
                       ],
               ),
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
               boxShadow: [
                 BoxShadow(
                   color: const Color(0xFF0D9488).withAlpha(60),

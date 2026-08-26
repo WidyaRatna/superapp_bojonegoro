@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'bojonegoro_logo.dart';
 import '../views/profile_screen.dart';
+import '../services/notification_service.dart';
 
 /// Primary Wave Clipper for Top Header bottom edge (Smooth & Organic)
 class HeaderWaveClipper extends CustomClipper<Path> {
@@ -68,6 +69,7 @@ class TopHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final double topPadding = MediaQuery.of(context).padding.top;
     final double headerHeight = 215 + (topPadding > 0 ? topPadding : 16);
+    final bool effectiveDark = Theme.of(context).brightness == Brightness.dark || isDarkMode;
 
     return ClipPath(
       clipper: HeaderWaveClipper(),
@@ -162,8 +164,8 @@ class TopHeaderWidget extends StatelessWidget {
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
-                              isDarkMode ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
-                              color: isDarkMode ? Colors.amber : Colors.white,
+                              effectiveDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
+                              color: effectiveDark ? Colors.amber : Colors.white,
                               size: 19,
                             ),
                           ),
@@ -171,51 +173,58 @@ class TopHeaderWidget extends StatelessWidget {
                         const SizedBox(width: 8),
 
                         // Notification Bell
-                        Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            InkWell(
-                              onTap: onNotificationTap,
-                              borderRadius: BorderRadius.circular(20),
-                              child: Container(
-                                padding: const EdgeInsets.all(7),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withAlpha(25),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.notifications_none_rounded,
-                                  color: Colors.white,
-                                  size: 19,
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              right: 2,
-                              top: 2,
-                              child: Container(
-                                padding: const EdgeInsets.all(3),
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFEF4444),
-                                  shape: BoxShape.circle,
-                                ),
-                                constraints: const BoxConstraints(
-                                  minWidth: 14,
-                                  minHeight: 14,
-                                ),
-                                child: const Center(
-                                  child: Text(
-                                    '3',
-                                    style: TextStyle(
+                        AnimatedBuilder(
+                          animation: NotificationService.instance,
+                          builder: (context, child) {
+                            final unreadCount = NotificationService.instance.unreadCount;
+                            return Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                InkWell(
+                                  onTap: onNotificationTap,
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(7),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withAlpha(25),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.notifications_none_rounded,
                                       color: Colors.white,
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.bold,
+                                      size: 19,
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ],
+                                if (unreadCount > 0)
+                                  Positioned(
+                                    right: 2,
+                                    top: 2,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(3),
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFEF4444),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 14,
+                                        minHeight: 14,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          '$unreadCount',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          },
                         ),
                         const SizedBox(width: 8),
 
@@ -246,9 +255,9 @@ class TopHeaderWidget extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                        color: effectiveDark ? const Color(0xFF1E293B) : Colors.white,
                         borderRadius: BorderRadius.circular(14),
-                        border: isDarkMode ? Border.all(color: const Color(0xFF334155), width: 1) : null,
+                        border: effectiveDark ? Border.all(color: const Color(0xFF334155), width: 1) : null,
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withAlpha(25),
@@ -261,26 +270,26 @@ class TopHeaderWidget extends StatelessWidget {
                         controller: searchController,
                         onChanged: onSearchChanged,
                         style: TextStyle(
-                          color: isDarkMode ? Colors.white : const Color(0xFF0F172A),
+                          color: effectiveDark ? Colors.white : const Color(0xFF0F172A),
                           fontSize: 13.5,
                         ),
                         textAlignVertical: TextAlignVertical.center,
                         decoration: InputDecoration(
                           hintText: 'Cari layanan, informasi, berita...',
                           hintStyle: TextStyle(
-                            color: isDarkMode ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                            color: effectiveDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
                             fontSize: 13,
                           ),
                           prefixIcon: Icon(
                             Icons.search_rounded,
-                            color: isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                            color: effectiveDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                             size: 19,
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              Icons.qr_code_scanner_rounded,
-                              color: isDarkMode ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
-                              size: 19,
+                              Icons.campaign_rounded,
+                              color: effectiveDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
+                              size: 21,
                             ),
                             onPressed: onQrTap,
                           ),

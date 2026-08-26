@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import '../widgets/superapp_header.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'simpatdu_image_data.dart';
 import 'bphtb_image_data.dart';
@@ -310,7 +311,7 @@ class _PajakScreenState extends State<PajakScreen> {
 
   // ignore: unused_element
   void _showDetailModal(PajakItem item) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     showModalBottomSheet(
       context: context,
@@ -528,104 +529,38 @@ class _PajakScreenState extends State<PajakScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     final filtered = _filteredItems;
+
+    final pajakGradient = isDark
+        ? const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+          )
+        : const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF0D62F1), Color(0xFF0A47B8)],
+          );
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Pajak & Retribusi Daerah',
-              style: TextStyle(
-                fontSize: 16, 
-                fontWeight: FontWeight.w900,
-                color: Colors.white,
-                letterSpacing: 0.2,
-              ),
-            ),
-            Text(
-              'BAPENDA Kab. Bojonegoro',
-              style: TextStyle(
-                fontSize: 12, 
-                color: Colors.white70,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          if (widget.onToggleDarkMode != null)
-            Container(
-              margin: const EdgeInsets.only(right: 12),
-              decoration: BoxDecoration(
-                color: Colors.white.withAlpha(30),
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                icon: Icon(isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
-                color: Colors.white,
-                onPressed: widget.onToggleDarkMode,
-                tooltip: 'Ganti Tema',
-              ),
-            ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: EdgeInsets.zero,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Modern Header Background (Compact header bar)
-            Stack(
-              children: [
-                Container(
-                  height: MediaQuery.of(context).padding.top + kToolbarHeight + 14,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: isDark
-                          ? [const Color(0xFF0F172A), const Color(0xFF1E293B)]
-                          : [const Color(0xFF0D62F1), const Color(0xFF0A47B8)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(28),
-                      bottomRight: Radius.circular(28),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF0D62F1).withAlpha(isDark ? 20 : 35),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                ),
-                // Decorative Circle in Header
-                Positioned(
-                  right: -20,
-                  top: -20,
-                  child: Container(
-                    width: 130,
-                    height: 130,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withAlpha(isDark ? 5 : 12),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+      body: Column(
+        children: [
+          SuperAppHeader(
+            title: 'Pajak & Retribusi Daerah',
+            subtitle: 'BAPENDA Kabupaten Bojonegoro',
+            gradient: pajakGradient,
+            isDarkMode: isDark,
+            onToggleDarkMode: widget.onToggleDarkMode,
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
 
             const SizedBox(height: 14),
 
@@ -1089,6 +1024,9 @@ class _PajakScreenState extends State<PajakScreen> {
           ],
         ),
       ),
+    ),
+  ],
+),
     );
   }
 

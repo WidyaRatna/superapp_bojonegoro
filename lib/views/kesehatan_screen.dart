@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/superapp_header.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class KesehatanScreen extends StatefulWidget {
@@ -80,109 +81,35 @@ class _KesehatanScreenState extends State<KesehatanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
-    final double topPadding = MediaQuery.of(context).padding.top;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
+
+    final kesehatanGradient = isDark
+        ? const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF4C0519), Color(0xFF881337)],
+          )
+        : const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF991B1B), Color(0xFFDC2626)],
+          );
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            // Top Red/Coral Gradient Header Bar
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 24),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: isDark
-                      ? const [Color(0xFF0F172A), Color(0xFF1E1B4B), Color(0xFF4C0519)]
-                      : const [Color(0xFF0F2B66), Color(0xFF1E3A8A), Color(0xFF991B1B)],
-                ),
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF0F2B66).withAlpha(60),
-                    blurRadius: 18,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      const Text(
-                        'Layanan Kesehatan',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          isDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
-                          color: isDark ? Colors.amber : Colors.white,
-                        ),
-                        onPressed: widget.onToggleDarkMode,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(35),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.medical_services_rounded, color: Colors.white, size: 36),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              'Layanan Kesehatan Masyarakat',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'RSUD Bojonegoro, Ambulans Darurat & Stok Darah PMI',
-                              style: TextStyle(
-                                color: Color(0xFFFEE2E2),
-                                fontSize: 12,
-                                height: 1.3,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // 3 Main Service Feature Cards (Antrean RSUD, Ambulans, Stok Darah PMI)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      body: Column(
+        children: [
+          SuperAppHeader(
+            title: 'Layanan Kesehatan',
+            subtitle: 'Dinas Kesehatan & RSUD Kabupaten Bojonegoro',
+            gradient: kesehatanGradient,
+            isDarkMode: isDark,
+            onToggleDarkMode: widget.onToggleDarkMode,
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -202,165 +129,165 @@ class _KesehatanScreenState extends State<KesehatanScreen> {
                       color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                     ),
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 14),
 
-                  // ITEM 1: Antrean Online RSUD
+                  // ITEM 1: Antrean Online RSUD (Blue accent)
                   _buildHealthCard(
                     icon: Icons.assignment_ind_rounded,
-                    color: const Color(0xFF0D62F1),
+                    accentColor: const Color(0xFF0D62F1),
                     badgeText: 'RSUD di Kab. Bojonegoro',
                     title: 'Antrean Online RSUD',
                     subtitle: 'Pendaftaran nomor antrean poliklinik RSUD via WhatsApp (+62 821-6005-0066).',
                     onTap: _openAntreanRSUD,
                     isDark: isDark,
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
 
-                  // ITEM 2: Layanan Ambulans Darurat
+                  // ITEM 2: Layanan Ambulans Darurat (Soft emergency red accent)
                   _buildHealthCard(
                     icon: Icons.airport_shuttle_rounded,
-                    color: const Color(0xFFDC2626),
+                    accentColor: const Color(0xFFDC2626),
                     badgeText: 'Aplikasi: Emergency Button Bojonegoro',
                     title: 'Layanan Ambulans Darurat',
                     subtitle: 'Telepon: 081132277119 • Panggilan darurat & penjemputan medis 24 Jam.',
                     onTap: _openAmbulansDarurat,
                     isDark: isDark,
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
 
-                  // ITEM 3: Stok Darah PMI Bojonegoro
+                  // ITEM 3: Stok Darah PMI Bojonegoro (Soft rose blood accent)
                   _buildHealthCard(
                     icon: Icons.bloodtype_rounded,
-                    color: const Color(0xFFE11D48),
+                    accentColor: const Color(0xFFE11D48),
                     badgeText: 'Update Live PMI Kab. Bojonegoro',
                     title: 'Stok Darah PMI Bojonegoro',
-                    subtitle: 'Cek persediaan darah',
+                    subtitle: 'Cek persediaan darah realtime di UTD PMI Kabupaten Bojonegoro.',
                     onTap: _openStokDarahPMI,
                     isDark: isDark,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildHealthCard({
     required IconData icon,
-    required Color color,
+    required Color accentColor,
     required String badgeText,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
     required bool isDark,
   }) {
+    final effectiveAccent = isDark
+        ? (accentColor == const Color(0xFF0D62F1)
+            ? const Color(0xFF60A5FA)
+            : accentColor == const Color(0xFFDC2626)
+                ? const Color(0xFFF87171)
+                : const Color(0xFFFB7185))
+        : accentColor;
+
     return Container(
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-          width: 1.2,
+          width: 1.0,
         ),
         boxShadow: [
           BoxShadow(
-            color: color.withAlpha(isDark ? 40 : 15),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: Colors.black.withAlpha(isDark ? 30 : 8),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(14),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Soft Pastel Icon Container
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [color.withAlpha(35), color.withAlpha(15)],
+                    color: effectiveAccent.withAlpha(isDark ? 40 : 18),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: effectiveAccent.withAlpha(30),
+                      width: 1.0,
                     ),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: color.withAlpha(35), width: 1),
                   ),
-                  child: Icon(icon, color: color, size: 30),
+                  child: Icon(icon, color: effectiveAccent, size: 24),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
+                // Center Column
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Subtle Badge Label
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [color.withAlpha(30), color.withAlpha(15)],
+                          color: effectiveAccent.withAlpha(isDark ? 35 : 15),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: effectiveAccent.withAlpha(30),
+                            width: 1.0,
                           ),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: color.withAlpha(40), width: 1),
                         ),
                         child: Text(
                           badgeText,
                           style: TextStyle(
-                            fontSize: 10.5,
+                            fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: color,
+                            color: effectiveAccent,
                           ),
                         ),
                       ),
                       const SizedBox(height: 6),
+                      // Title (Navy / Dark Neutral)
                       Text(
                         title,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14.5,
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 3),
+                      // Subtitle (Gray Neutral)
                       Text(
                         subtitle,
-                        textAlign: TextAlign.justify,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 11.5,
                           color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                          height: 1.3,
+                          height: 1.35,
                         ),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(width: 8),
+                // Circular Arrow Action Button (Blue Action Color)
                 Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [color.withAlpha(210), color],
-                    ),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF0D62F1),
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withAlpha(50),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
                   ),
                   child: const Icon(
                     Icons.arrow_forward_rounded,
@@ -451,7 +378,7 @@ class _AntreanRSUDScreenState extends State<AntreanRSUDScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),

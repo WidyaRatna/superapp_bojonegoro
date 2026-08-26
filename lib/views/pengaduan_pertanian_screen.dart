@@ -55,7 +55,7 @@ class _PengaduanPertanianScreenState extends State<PengaduanPertanianScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     final double topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
@@ -77,7 +77,6 @@ class _PengaduanPertanianScreenState extends State<PengaduanPertanianScreen> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFF059669).withAlpha(50),

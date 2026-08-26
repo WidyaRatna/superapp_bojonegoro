@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/loker_model.dart';
 
-class LokerDetailScreen extends StatelessWidget {
+class LokerDetailScreen extends StatefulWidget {
   final LokerItem loker;
   final bool isDarkMode;
   final VoidCallback? onToggleDarkMode;
@@ -15,6 +15,42 @@ class LokerDetailScreen extends StatelessWidget {
     required this.isDarkMode,
     this.onToggleDarkMode,
   });
+
+  @override
+  State<LokerDetailScreen> createState() => _LokerDetailScreenState();
+}
+
+class _LokerDetailScreenState extends State<LokerDetailScreen> {
+  bool _localDark = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _localDark = widget.isDarkMode;
+  }
+
+  @override
+  void didUpdateWidget(covariant LokerDetailScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isDarkMode != widget.isDarkMode) {
+      setState(() {
+        _localDark = widget.isDarkMode;
+      });
+    }
+  }
+
+  void _toggleDarkMode() {
+    setState(() {
+      _localDark = !_localDark;
+    });
+    if (widget.onToggleDarkMode != null) {
+      widget.onToggleDarkMode!();
+    }
+  }
+
+  bool _isDarkModeActive(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark || _localDark;
+  }
 
   Future<void> _makePhoneCall(BuildContext context, String phoneNumber) async {
     final cleanPhone = phoneNumber.replaceAll(RegExp(r'[^0-9+]'), '');
@@ -136,12 +172,12 @@ class LokerDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = isDarkMode;
+    final isDark = _isDarkModeActive(context);
     final double topPadding = MediaQuery.of(context).padding.top;
-    final isAparat = loker.postedByRole.contains('Aparat');
+    final isAparat = widget.loker.postedByRole.contains('Aparat');
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       body: Column(
         children: [
           // Premium Ocean Sapphire Header Bar
@@ -155,20 +191,19 @@ class LokerDetailScreen extends StatelessWidget {
                     end: Alignment.bottomRight,
                     colors: isDark
                         ? const [
-                            Color(0xFF0F172A),
-                            Color(0xFF1E1B4B),
-                            Color(0xFF1E293B),
+                            Color(0xFF064E3B),
+                            Color(0xFF047857),
+                            Color(0xFF059669),
                           ]
                         : const [
-                            Color(0xFF1E3A8A),
-                            Color(0xFF1D4ED8),
-                            Color(0xFF2563EB),
+                            Color(0xFF047857),
+                            Color(0xFF059669),
+                            Color(0xFF10B981),
                           ],
                   ),
-                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(26)),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF1D4ED8).withAlpha(70),
+                      color: const Color(0xFF059669).withAlpha(70),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),
@@ -195,25 +230,26 @@ class LokerDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    if (onToggleDarkMode != null)
-                      IconButton(
-                        icon: Icon(
-                          isDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
-                          color: isDark ? Colors.amber : Colors.white,
-                          size: 20,
-                        ),
-                        onPressed: onToggleDarkMode,
+                    IconButton(
+                      icon: Icon(
+                        isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                        color: isDark ? Colors.amber : Colors.white,
+                        size: 20,
                       ),
+                      onPressed: _toggleDarkMode,
+                    ),
                   ],
                 ),
               ),
               Positioned(
                 right: -15,
                 top: 5,
-                child: Icon(
-                  Icons.work_rounded,
-                  size: 110,
-                  color: Colors.white.withAlpha(15),
+                child: IgnorePointer(
+                  child: Icon(
+                    Icons.work_rounded,
+                    size: 110,
+                    color: Colors.white.withAlpha(15),
+                  ),
                 ),
               ),
             ],
@@ -228,7 +264,7 @@ class LokerDetailScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Poster Image Banner (If available)
-                  if (loker.posterImagePath.isNotEmpty) ...[
+                  if (widget.loker.posterImagePath.isNotEmpty) ...[
                     ClipRRect(
                       borderRadius: BorderRadius.circular(18),
                       child: Container(
@@ -236,7 +272,7 @@ class LokerDetailScreen extends StatelessWidget {
                         width: double.infinity,
                         color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
                         child: Image.file(
-                          File(loker.posterImagePath),
+                          File(widget.loker.posterImagePath),
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return const Center(
@@ -255,13 +291,21 @@ class LokerDetailScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: isAparat ? const Color(0xFF2563EB).withAlpha(25) : const Color(0xFF0D9488).withAlpha(25),
-                          borderRadius: BorderRadius.circular(8),
+                          color: isAparat
+                              ? const Color(0xFF059669).withAlpha(isDark ? 35 : 15)
+                              : const Color(0xFF0284C7).withAlpha(isDark ? 35 : 15),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: isAparat
+                                ? const Color(0xFF059669).withAlpha(30)
+                                : const Color(0xFF0284C7).withAlpha(30),
+                            width: 1.0,
+                          ),
                         ),
                         child: Text(
-                          loker.postedByRole,
+                          widget.loker.postedByRole,
                           style: TextStyle(
-                            color: isAparat ? const Color(0xFF2563EB) : const Color(0xFF0D9488),
+                            color: isAparat ? const Color(0xFF059669) : const Color(0xFF0284C7),
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
                           ),
@@ -275,7 +319,7 @@ class LokerDetailScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          loker.jobType,
+                          widget.loker.jobType,
                           style: TextStyle(
                             color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                             fontSize: 11,
@@ -285,7 +329,7 @@ class LokerDetailScreen extends StatelessWidget {
                       ),
                       const Spacer(),
                       Text(
-                        loker.postedDate,
+                        widget.loker.postedDate,
                         style: const TextStyle(color: Colors.grey, fontSize: 12),
                       ),
                     ],
@@ -294,7 +338,7 @@ class LokerDetailScreen extends StatelessWidget {
 
                   // Job Title & Company Name
                   Text(
-                    loker.title,
+                    widget.loker.title,
                     style: TextStyle(
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                       fontSize: 22,
@@ -304,9 +348,9 @@ class LokerDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    loker.companyName,
+                    widget.loker.companyName,
                     style: const TextStyle(
-                      color: Color(0xFF2563EB),
+                      color: Color(0xFF059669),
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
@@ -335,7 +379,7 @@ class LokerDetailScreen extends StatelessWidget {
                             Expanded(
                               child: _buildInfoItem(
                                 Icons.location_on_rounded,
-                                loker.locationKecamatan,
+                                widget.loker.locationKecamatan,
                                 isDark,
                               ),
                             ),
@@ -343,22 +387,22 @@ class LokerDetailScreen extends StatelessWidget {
                             Expanded(
                               child: _buildInfoItem(
                                 Icons.payments_rounded,
-                                loker.salaryRange,
+                                widget.loker.salaryRange,
                                 isDark,
                               ),
                             ),
                           ],
                         ),
-                        if (loker.fullAddress.isNotEmpty) ...[
+                        if (widget.loker.fullAddress.isNotEmpty) ...[
                           const Divider(height: 20),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(Icons.home_work_rounded, size: 18, color: Color(0xFF2563EB)),
+                              const Icon(Icons.home_work_rounded, size: 18, color: Color(0xFF059669)),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  loker.fullAddress,
+                                  widget.loker.fullAddress,
                                   style: TextStyle(
                                     color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                                     fontSize: 13,
@@ -369,16 +413,16 @@ class LokerDetailScreen extends StatelessWidget {
                             ],
                           ),
                         ],
-                        if (loker.contactName.isNotEmpty) ...[
+                        if (widget.loker.contactName.isNotEmpty) ...[
                           const Divider(height: 20),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const Icon(Icons.person_pin_rounded, size: 18, color: Color(0xFF2563EB)),
+                              const Icon(Icons.person_pin_rounded, size: 18, color: Color(0xFF059669)),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'Penanggung Jawab: ${loker.contactName}',
+                                  'Penanggung Jawab: ${widget.loker.contactName}',
                                   style: TextStyle(
                                     color: isDark ? Colors.white : const Color(0xFF0F172A),
                                     fontSize: 13,
@@ -405,7 +449,7 @@ class LokerDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    loker.description,
+                    widget.loker.description,
                     style: TextStyle(
                       color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                       fontSize: 13.5,
@@ -424,13 +468,13 @@ class LokerDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  ...loker.requirements.map(
+                  ...widget.loker.requirements.map(
                     (req) => Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.check_circle_outline_rounded, size: 18, color: Color(0xFF2563EB)),
+                          const Icon(Icons.check_circle_outline_rounded, size: 18, color: Color(0xFF059669)),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
@@ -447,7 +491,7 @@ class LokerDetailScreen extends StatelessWidget {
                   ),
 
                   // Social Media & Links Section (If provided)
-                  if (loker.instagram.isNotEmpty || loker.email.isNotEmpty || loker.website.isNotEmpty) ...[
+                  if (widget.loker.instagram.isNotEmpty || widget.loker.email.isNotEmpty || widget.loker.website.isNotEmpty) ...[
                     const SizedBox(height: 20),
                     Text(
                       'Media Sosial & Kontak Resmi',
@@ -462,23 +506,23 @@ class LokerDetailScreen extends StatelessWidget {
                       spacing: 10,
                       runSpacing: 10,
                       children: [
-                        if (loker.instagram.isNotEmpty)
+                        if (widget.loker.instagram.isNotEmpty)
                           ActionChip(
                             avatar: const Icon(Icons.camera_alt_rounded, size: 18, color: Color(0xFFE1306C)),
-                            label: Text(loker.instagram),
-                            onPressed: () => _openInstagram(context, loker.instagram),
+                            label: Text(widget.loker.instagram),
+                            onPressed: () => _openInstagram(context, widget.loker.instagram),
                           ),
-                        if (loker.email.isNotEmpty)
+                        if (widget.loker.email.isNotEmpty)
                           ActionChip(
-                            avatar: const Icon(Icons.email_rounded, size: 18, color: Color(0xFF2563EB)),
-                            label: Text(loker.email),
-                            onPressed: () => _openEmail(context, loker.email, loker.title),
+                            avatar: const Icon(Icons.email_rounded, size: 18, color: Color(0xFF059669)),
+                            label: Text(widget.loker.email),
+                            onPressed: () => _openEmail(context, widget.loker.email, widget.loker.title),
                           ),
-                        if (loker.website.isNotEmpty)
+                        if (widget.loker.website.isNotEmpty)
                           ActionChip(
                             avatar: const Icon(Icons.language_rounded, size: 18, color: Color(0xFF0D9488)),
-                            label: Text(loker.website),
-                            onPressed: () => _openWebsite(loker.website),
+                            label: Text(widget.loker.website),
+                            onPressed: () => _openWebsite(widget.loker.website),
                           ),
                       ],
                     ),
@@ -508,11 +552,11 @@ class LokerDetailScreen extends StatelessWidget {
                   child: SizedBox(
                     height: 50,
                     child: OutlinedButton.icon(
-                      onPressed: () => _makePhoneCall(context, loker.contactPhone),
-                      icon: const Icon(Icons.phone_rounded, color: Color(0xFF2563EB)),
-                      label: const Text('Telepon', style: TextStyle(color: Color(0xFF2563EB), fontWeight: FontWeight.bold, fontSize: 14.5)),
+                      onPressed: () => _makePhoneCall(context, widget.loker.contactPhone),
+                      icon: const Icon(Icons.phone_rounded, color: Color(0xFF059669)),
+                      label: const Text('Telepon', style: TextStyle(color: Color(0xFF059669), fontWeight: FontWeight.bold, fontSize: 14.5)),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF2563EB), width: 1.5),
+                        side: const BorderSide(color: Color(0xFF059669), width: 1.5),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
                     ),
@@ -523,7 +567,7 @@ class LokerDetailScreen extends StatelessWidget {
                   child: SizedBox(
                     height: 50,
                     child: ElevatedButton.icon(
-                      onPressed: () => _openWhatsApp(context, loker.contactWhatsapp, loker.title),
+                      onPressed: () => _openWhatsApp(context, widget.loker.contactWhatsapp, widget.loker.title),
                       icon: const Icon(Icons.chat_rounded, color: Colors.white),
                       label: const Text('WhatsApp', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.5)),
                       style: ElevatedButton.styleFrom(

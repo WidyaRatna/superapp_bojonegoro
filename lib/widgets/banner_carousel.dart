@@ -26,6 +26,7 @@ class _BannerCarouselWidgetState extends State<BannerCarouselWidget> {
       'subtitle': 'Urus dokumen & perizinan langsung dari HP Anda',
       'cta': 'Buka Layanan →',
       'icon': Icons.devices_rounded,
+      'image': 'assets/images/bojonegoro_gate.jpg',
       'gradientColors': [Color(0xFF072738), Color(0xFF0369A1)],
       'accentColor': Color(0xFF38BDF8),
     },
@@ -35,6 +36,7 @@ class _BannerCarouselWidgetState extends State<BannerCarouselWidget> {
       'subtitle': 'Integrasi 16+ layanan publik dalam satu aplikasi',
       'cta': 'Pelajari Selengkapnya →',
       'icon': Icons.campaign_rounded,
+      'image': 'assets/images/bupati_wakil.png',
       'gradientColors': [Color(0xFF064E3B), Color(0xFF0F766E)],
       'accentColor': Color(0xFF2DD4BF),
     },
@@ -44,6 +46,7 @@ class _BannerCarouselWidgetState extends State<BannerCarouselWidget> {
       'subtitle': 'Bantuan tani, beasiswa pelajar & fasilitas UMKM',
       'cta': 'Cek Program →',
       'icon': Icons.stars_rounded,
+      'image': 'assets/images/brosur_beasiswa.png',
       'gradientColors': [Color(0xFF1E1B4B), Color(0xFF4338CA)],
       'accentColor': Color(0xFF818CF8),
     },
@@ -53,6 +56,7 @@ class _BannerCarouselWidgetState extends State<BannerCarouselWidget> {
       'subtitle': 'Pentas seni tradisional & bazar kuliner khas Bojonegoro',
       'cta': 'Jadwal Kegiatan →',
       'icon': Icons.festival_rounded,
+      'image': 'assets/images/Khayangan_Api.jpg',
       'gradientColors': [Color(0xFF78350F), Color(0xFFB45309)],
       'accentColor': Color(0xFFFBBF24),
     },
@@ -117,92 +121,133 @@ class _BannerCarouselWidgetState extends State<BannerCarouselWidget> {
                 final gradientColors = poster['gradientColors'] as List<Color>;
                 final accentColor = poster['accentColor'] as Color;
                 final icon = poster['icon'] as IconData;
+                final imagePath = poster['image'] as String;
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: InkWell(
-                    onTap: widget.onViewServicesTap,
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: gradientColors,
-                        ),
-                        border: Border.all(color: borderColor, width: 1),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // Category Tag Badge
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: borderColor, width: 1),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: widget.onViewServicesTap,
+                          child: Stack(
+                            children: [
+                              // Full background photo
+                              Positioned.fill(
+                                child: Image.asset(
+                                  imagePath,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: gradientColors,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              // Dark transparent gradient overlay for text readability
+                              Positioned.fill(
+                                child: Container(
                                   decoration: BoxDecoration(
-                                    color: accentColor.withAlpha(40),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    poster['category'] as String,
-                                    style: TextStyle(
-                                      fontSize: 9.5,
-                                      fontWeight: FontWeight.w700,
-                                      color: accentColor,
-                                      letterSpacing: 0.5,
+                                    gradient: LinearGradient(
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                      colors: [
+                                        Colors.black.withAlpha(210),
+                                        Colors.black.withAlpha(110),
+                                      ],
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 6),
-                                // Title
-                                Text(
-                                  poster['title'] as String,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    height: 1.2,
-                                    letterSpacing: -0.2,
-                                  ),
+                              ),
+                              // Content layout
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          // Category Tag Badge
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: accentColor.withAlpha(50),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              poster['category'] as String,
+                                              style: TextStyle(
+                                                fontSize: 9.5,
+                                                fontWeight: FontWeight.w700,
+                                                color: accentColor,
+                                                letterSpacing: 0.5,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          // Title
+                                          Text(
+                                            poster['title'] as String,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                              height: 1.2,
+                                              letterSpacing: -0.2,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          // Subtitle
+                                          Text(
+                                            poster['subtitle'] as String,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 11.5,
+                                              color: Color(0xFFE2E8F0),
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    // Decorative Right Poster Icon Box
+                                    Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withAlpha(25),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Icon(
+                                        icon,
+                                        color: accentColor,
+                                        size: 28,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 4),
-                                // Subtitle
-                                Text(
-                                  poster['subtitle'] as String,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 11.5,
-                                    color: Color(0xFFCBD5E1),
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 12),
-                          // Decorative Right Poster Icon Box
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withAlpha(20),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              icon,
-                              color: accentColor,
-                              size: 28,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),

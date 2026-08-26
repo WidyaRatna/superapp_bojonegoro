@@ -78,7 +78,7 @@ class _SecurityPrivacyScreenState extends State<SecurityPrivacyScreen> {
   // ==================== KEAMANAN DIALOGS & MODALS ====================
 
   void _showChangePasswordModal() {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     final oldPasswordController = TextEditingController();
     final newPasswordController = TextEditingController();
     final confirmPasswordController = TextEditingController();
@@ -362,7 +362,7 @@ class _SecurityPrivacyScreenState extends State<SecurityPrivacyScreen> {
   }
 
   void _showDevicesModal() {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     showModalBottomSheet(
       context: context,
@@ -575,7 +575,7 @@ class _SecurityPrivacyScreenState extends State<SecurityPrivacyScreen> {
   }
 
   void _showChangeEmailDialog() {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     final emailController = TextEditingController(text: _userEmail);
 
     showDialog(
@@ -663,7 +663,7 @@ class _SecurityPrivacyScreenState extends State<SecurityPrivacyScreen> {
   }
 
   void _showChangePhoneDialog() {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     final phoneController = TextEditingController(text: _userPhone);
 
     showDialog(
@@ -753,7 +753,7 @@ class _SecurityPrivacyScreenState extends State<SecurityPrivacyScreen> {
   // ==================== PRIVASI DIALOGS & MODALS ====================
 
   void _showProfileStatusSelector() {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     showModalBottomSheet(
       context: context,
@@ -841,7 +841,7 @@ class _SecurityPrivacyScreenState extends State<SecurityPrivacyScreen> {
   }
 
   void _showReportPrivacySelector() {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     showModalBottomSheet(
       context: context,
@@ -894,7 +894,7 @@ class _SecurityPrivacyScreenState extends State<SecurityPrivacyScreen> {
 
   Widget _buildReportOption(BuildContext sheetCtx, String key, String label, String sub, IconData icon, Color color) {
     final bool isSelected = _reportPrivacyDefault == key;
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
@@ -924,7 +924,7 @@ class _SecurityPrivacyScreenState extends State<SecurityPrivacyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),

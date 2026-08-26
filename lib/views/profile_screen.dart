@@ -5,6 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'settings_screen.dart';
 import 'security_privacy_screen.dart';
 import 'faq_screen.dart';
+import '../services/auth_service.dart';
+import 'welcome_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -47,10 +49,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _loadProfileData() {
-    _userName = UserProfileData.name;
-    _userNik = UserProfileData.nik;
-    _userEmail = UserProfileData.email;
-    _userPhone = UserProfileData.phone;
+    final auth = AuthService();
+    if (auth.isLoggedIn && auth.currentUser != null) {
+      _userName = auth.currentUser!.name;
+      _userNik = auth.currentUser!.nik;
+      _userEmail = auth.currentUser!.email;
+      _userPhone = auth.currentUser!.phone;
+    } else if (auth.isGuest) {
+      _userName = 'Pengguna Tamu';
+      _userNik = 'Belum Login';
+      _userEmail = 'Akses Publik / Non-Login';
+      _userPhone = '-';
+    } else {
+      _userName = UserProfileData.name;
+      _userNik = UserProfileData.nik;
+      _userEmail = UserProfileData.email;
+      _userPhone = UserProfileData.phone;
+    }
     _userAddress = UserProfileData.address;
     _avatarType = UserProfileData.avatarType;
     _avatarImagePath = UserProfileData.avatarImagePath;
@@ -100,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     final double topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
@@ -582,7 +597,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showMenuDetailModal(String title) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     showModalBottomSheet(
       context: context,
       backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
@@ -640,7 +655,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showLogoutConfirmDialog() {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
+    final auth = AuthService();
+
+    if (auth.isGuest) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WelcomeScreen(
+            isDarkMode: widget.isDarkMode,
+            onToggleDarkMode: widget.onToggleDarkMode,
+          ),
+        ),
+        (route) => false,
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (dialogCtx) => AlertDialog(
@@ -666,10 +697,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             onPressed: () {
               Navigator.pop(dialogCtx);
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Anda berhasil keluar dari akun.')),
-              );
+              
+              // Perform AuthService logout
+              AuthService().logout();
+
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Anda telah berhasil keluar dari akun.'),
+                    backgroundColor: Color(0xFFEF4444),
+                  ),
+                );
+
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => WelcomeScreen(
+                      isDarkMode: widget.isDarkMode,
+                      onToggleDarkMode: widget.onToggleDarkMode,
+                    ),
+                  ),
+                  (route) => false,
+                );
+              }
             },
             child: const Text('Keluar Akun', style: TextStyle(color: Colors.white)),
           ),
@@ -848,7 +898,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   // ==============================================================
 
   void _showAvatarSourcePicker() {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     showModalBottomSheet(
       context: context,
       backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
@@ -1043,7 +1093,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),

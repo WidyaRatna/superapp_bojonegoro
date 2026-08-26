@@ -17,6 +17,7 @@ class PopularServicesWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark || isDarkMode;
     // Ensure only 4 items are displayed on home grid
     final displayServices = services.take(4).toList();
 
@@ -32,7 +33,7 @@ class PopularServicesWidget extends StatelessWidget {
               Text(
                 'Layanan Populer',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : const Color(0xFF0F172A),
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   letterSpacing: -0.2,
@@ -49,7 +50,7 @@ class PopularServicesWidget extends StatelessWidget {
                       Text(
                         'Semua layanan',
                         style: TextStyle(
-                          color: isDarkMode ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
+                          color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
@@ -58,7 +59,7 @@ class PopularServicesWidget extends StatelessWidget {
                       Icon(
                         Icons.arrow_forward_rounded,
                         size: 14,
-                        color: isDarkMode ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
+                        color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
                       ),
                     ],
                   ),
@@ -87,10 +88,10 @@ class PopularServicesWidget extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: isDarkMode ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                      color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                       width: 1,
                     ),
                   ),
@@ -101,7 +102,7 @@ class PopularServicesWidget extends StatelessWidget {
                         width: 38,
                         height: 38,
                         decoration: BoxDecoration(
-                          color: service.color.withAlpha(isDarkMode ? 35 : 20),
+                          color: service.color.withAlpha(isDark ? 35 : 20),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Center(
@@ -120,7 +121,7 @@ class PopularServicesWidget extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: isDarkMode ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
+                            color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                             height: 1.2,

@@ -25,6 +25,11 @@ import 'layanan_pengaduan_dpmptsp_screen.dart';
 import 'pajak_screen.dart';
 import 'pertanian_screen.dart';
 import 'perhubungan_screen.dart';
+import 'news_screen.dart';
+import 'layanan_sosial_screen.dart';
+import 'notification_screen.dart';
+import '../widgets/auth_guard.dart';
+
 
 
 
@@ -295,42 +300,89 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _openNewsScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NewsScreen(
+          isDarkMode: widget.isDarkMode,
+          onToggleDarkMode: widget.onToggleDarkMode,
+        ),
+      ),
+    );
+  }
+
+  void _openLayananSosialScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LayananSosialScreen(
+          isDarkMode: widget.isDarkMode,
+          onToggleDarkMode: widget.onToggleDarkMode,
+        ),
+      ),
+    );
+  }
+
   void _handleServiceTap(ServiceCategory category) {
     if (category.id == 'lainnya') {
       _openAllServicesScreen();
-    } else if (category.id == 'pendidikan') {
-      _openPendidikanScreen();
-    } else if (category.id == 'kesehatan') {
-      _openKesehatanScreen();
-    } else if (category.id == 'kependudukan') {
-      _openKependudukanScreen();
-    } else if (category.id == 'pariwisata') {
-      _openPariwisataScreen();
-    } else if (category.id == 'pertanian' || category.title.toLowerCase().contains('pertanian') || category.title.toLowerCase().contains('tani')) {
-      _openPertanianScreen();
-    } else if (category.id == 'perhubungan' || category.title.toLowerCase().contains('perhubungan')) {
-      _openPerhubunganScreen();
-    } else if (category.id == 'cctv' || category.title.toLowerCase().contains('cctv')) {
-      _openCctvScreen();
-    } else if (category.id == 'perpajakan' || category.id == 'pajak' || category.title.toLowerCase().contains('pajak')) {
-      _openPajakScreen();
-    } else if (category.id == 'pengaduan' || category.id == 'lapor' || category.title.toLowerCase().contains('pengaduan')) {
-      _openLayananPengaduanDpmptspScreen();
-    } else if (category.id == 'umkm' || category.id == 'pangan' || category.title.toLowerCase().contains('pangan')) {
-      _openInformasiPanganScreen();
-    } else if (category.id == 'tenaga_kerja' || category.id == 'loker' || category.title.toLowerCase().contains('lowongan') || category.title.toLowerCase().contains('pekerjaan')) {
-      _openLokerScreen();
-    } else if (category.id == 'kontak_instansi' || category.title.toLowerCase().contains('instansi')) {
-      _openKontakInstansiScreen();
-    } else if (category.id == 'kontak_darurat' || category.id == 'darurat') {
-      _showEmergencyContactsModal();
-    } else {
-      _showServiceModal(category);
+      return;
     }
+
+    AuthGuard.requireLogin(
+      context,
+      serviceName: category.title,
+      isDarkMode: widget.isDarkMode,
+      onToggleDarkMode: widget.onToggleDarkMode,
+      onAuthenticated: () {
+        if (category.id == 'sosial' || category.title.toLowerCase().contains('sosial')) {
+          _openLayananSosialScreen();
+        } else if (category.id == 'pendidikan') {
+          _openPendidikanScreen();
+        } else if (category.id == 'kesehatan') {
+          _openKesehatanScreen();
+        } else if (category.id == 'kependudukan') {
+          _openKependudukanScreen();
+        } else if (category.id == 'pariwisata') {
+          _openPariwisataScreen();
+        } else if (category.id == 'pertanian' || category.title.toLowerCase().contains('pertanian') || category.title.toLowerCase().contains('tani')) {
+          _openPertanianScreen();
+        } else if (category.id == 'perhubungan' || category.title.toLowerCase().contains('perhubungan')) {
+          _openPerhubunganScreen();
+        } else if (category.id == 'cctv' || category.title.toLowerCase().contains('cctv')) {
+          _openCctvScreen();
+        } else if (category.id == 'perpajakan' || category.id == 'pajak' || category.title.toLowerCase().contains('pajak')) {
+          _openPajakScreen();
+        } else if (category.id == 'pengaduan' || category.id == 'lapor' || category.title.toLowerCase().contains('pengaduan')) {
+          _openLayananPengaduanDpmptspScreen();
+        } else if (category.id == 'umkm' || category.id == 'pangan' || category.title.toLowerCase().contains('pangan')) {
+          _openInformasiPanganScreen();
+        } else if (category.id == 'tenaga_kerja' || category.id == 'loker' || category.title.toLowerCase().contains('lowongan') || category.title.toLowerCase().contains('pekerjaan')) {
+          _openLokerScreen();
+        } else if (category.id == 'kontak_instansi' || category.title.toLowerCase().contains('instansi')) {
+          _openKontakInstansiScreen();
+        } else if (category.id == 'portal_berita' || category.id == 'berita' || category.title.toLowerCase().contains('berita')) {
+          _openNewsScreen();
+        } else if (category.id == 'kontak_darurat' || category.id == 'darurat') {
+          _showEmergencyContactsModal();
+        } else {
+          _showServiceModal(category);
+        }
+      },
+    );
   }
 
   // Open Service Detail Bottom Sheet
   void _showServiceModal(ServiceCategory category) {
+    if (category.id == 'sosial' || category.title.toLowerCase().contains('sosial')) {
+      _openLayananSosialScreen();
+      return;
+    }
+    if (category.id == 'portal_berita' || category.title.toLowerCase().contains('berita')) {
+      _openNewsScreen();
+      return;
+    }
     if (category.id == 'perhubungan' || category.title.toLowerCase().contains('perhubungan')) {
       _openPerhubunganScreen();
       return;
@@ -343,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _openLayananPengaduanDpmptspScreen();
       return;
     }
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -459,6 +511,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           _openKontakInstansiScreen();
                         } else if (category.id == 'pertanian' || category.title.toLowerCase().contains('pertanian')) {
                           _openPertanianScreen();
+                        } else if (category.id == 'sosial' || category.title.toLowerCase().contains('sosial')) {
+                          _openLayananSosialScreen();
                         } else if (category.id == 'pengaduan') {
                           _handlePengaduanSubServiceTap(subItem);
                         } else {
@@ -492,9 +546,17 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Entrypoint for Laporan Warga button
+  // Entrypoint for Laporan Warga button (Protected Feature - Login Required for Guest)
   void _openLaporanWargaModal() {
-    LaporanWargaService.openLaporanWarga(context, widget.isDarkMode);
+    AuthGuard.requireLogin(
+      context,
+      serviceName: 'Laporan Warga & Wadul Bupati',
+      isDarkMode: widget.isDarkMode,
+      onToggleDarkMode: widget.onToggleDarkMode,
+      onAuthenticated: () {
+        LaporanWargaService.openLaporanWarga(context, widget.isDarkMode);
+      },
+    );
   }
 
   // Telepon Darurat Screen Navigation (Full Screen)
@@ -523,13 +585,26 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Notification Screen Navigation
+  void _openNotificationScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NotificationScreen(
+          isDarkMode: widget.isDarkMode,
+          onToggleDarkMode: widget.onToggleDarkMode,
+        ),
+      ),
+    );
+  }
+
   // Shared Weather Data
   final String _weatherTemp = '25.1°C';
   final String _windSpeed = '5.8 km/h';
   final String _deviceLocation = 'Bojonegoro, Jawa Timur';
 
   bool get _isNightWeather =>
-      widget.isDarkMode || (DateTime.now().hour >= 18 || DateTime.now().hour < 6);
+      Theme.of(context).brightness == Brightness.dark || widget.isDarkMode || (DateTime.now().hour >= 18 || DateTime.now().hour < 6);
   IconData get _weatherIcon =>
       _isNightWeather ? Icons.nights_stay_rounded : Icons.light_mode_rounded;
   Color get _weatherColor =>
@@ -538,7 +613,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Weather Details Dialog Modal with Modern Weather Icons & Dynamic GPS Location
   void _showWeatherDetailsModal() {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -806,7 +881,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
@@ -826,7 +901,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       _searchQuery = value;
                     });
                   },
-                  onNotificationTap: _showEmergencyContactsModal,
+                  onNotificationTap: _openNotificationScreen,
                   onProfileTap: _showProfile,
                   onQrTap: _openLaporanWargaModal,
                   isDarkMode: isDark,
@@ -857,9 +932,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 NewsSectionWidget(
                   newsList: _filteredNews,
                   onNewsTap: _openNewsDetail,
-                  onViewAllNewsTap: () {
-                    // Open full news / category list
-                  },
+                  onViewAllNewsTap: _openNewsScreen,
                   isDarkMode: isDark,
                 ),
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/superapp_header.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // Helper for making phone calls with system dialer app
@@ -67,133 +68,124 @@ class EmergencyScreen extends StatefulWidget {
 class _EmergencyScreenState extends State<EmergencyScreen> {
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
+
+    final emergencyGradient = isDark
+        ? const LinearGradient(
+            colors: [Color(0xFF7F1D1D), Color(0xFF991B1B)],
+          )
+        : const LinearGradient(
+            colors: [Color(0xFF991B1B), Color(0xFFDC2626)],
+          );
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF1F5F9),
-      appBar: AppBar(
-        backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFDC2626),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Layanan Kontak Darurat',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 17),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      body: Column(
+        children: [
+          SuperAppHeader(
+            title: 'Layanan Kontak Darurat',
+            subtitle: 'Kabupaten Bojonegoro • Siaga 24 Jam',
+            gradient: emergencyGradient,
+            isDarkMode: isDark,
+            onToggleDarkMode: widget.onToggleDarkMode,
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 4,
+                        height: 16,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDC2626),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Menu Utama Layanan Darurat',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : const Color(0xFF1E293B),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // CARD MENU 1: SIAGA BRO PSC 119 & AMBULANS (Soft Red)
+                  _buildCategoryMenuCard(
+                    context,
+                    title: 'SIAGA BRO PSC 119 & Ambulans',
+                    categoryLabel: 'Layanan kegawatdaruratan medis 24 Jam (Gratis)',
+                    icon: Icons.airport_shuttle_rounded,
+                    color: const Color(0xFFDC2626),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AmbulansDetailScreen(
+                            isDarkMode: widget.isDarkMode,
+                            onToggleDarkMode: widget.onToggleDarkMode,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // CARD MENU 2: PEMADAM KEBAKARAN (DAMKAR) (Soft Orange)
+                  _buildCategoryMenuCard(
+                    context,
+                    title: 'Pemadam Kebakaran (Damkar)',
+                    categoryLabel: 'Dinas Pemadam Kebakaran & Penyelamatan',
+                    icon: Icons.local_fire_department_rounded,
+                    color: const Color(0xFFEA580C),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DamkarDetailScreen(
+                            isDarkMode: widget.isDarkMode,
+                            onToggleDarkMode: widget.onToggleDarkMode,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // CARD MENU 3: KEPOLISIAN (POLRES BOJONEGORO) (Soft Blue)
+                  _buildCategoryMenuCard(
+                    context,
+                    title: 'Kepolisian (Polres & Polsek)',
+                    categoryLabel: 'Sentra Pelayanan Kepolisian Terpadu (SPKT)',
+                    icon: Icons.local_police_rounded,
+                    color: const Color(0xFF2563EB),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => KepolisianDetailScreen(
+                            isDarkMode: widget.isDarkMode,
+                            onToggleDarkMode: widget.onToggleDarkMode,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
             ),
-            Text(
-              'Kabupaten Bojonegoro • Siaga 24 Jam',
-              style: TextStyle(color: Color(0xFFFCA5A5), fontSize: 11),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              isDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
-              color: isDark ? Colors.amber : Colors.white,
-            ),
-            onPressed: widget.onToggleDarkMode,
           ),
         ],
-      ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 4,
-                  height: 18,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFDC2626),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '3 Menu Utama Layanan Darurat',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
-
-            // CARD MENU 1: SIAGA BRO PSC 119 & AMBULANS
-            _buildCategoryMenuCard(
-              context,
-              title: 'SIAGA BRO PSC 119 & Ambulans',
-              categoryLabel: 'LAYANAN KEGAWATDARURATAN MEDIS 24 JAM (GRATIS)',
-              icon: Icons.airport_shuttle_rounded,
-              color: const Color(0xFFDC2626),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AmbulansDetailScreen(
-                      isDarkMode: widget.isDarkMode,
-                      onToggleDarkMode: widget.onToggleDarkMode,
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 14),
-
-            // CARD MENU 2: PEMADAM KEBAKARAN (DAMKAR)
-            _buildCategoryMenuCard(
-              context,
-              title: 'Pemadam Kebakaran (Damkar)',
-              categoryLabel: 'Dinas Pemadam Kebakaran & Penyelamatan',
-              icon: Icons.local_fire_department_rounded,
-              color: const Color(0xFFEA580C),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DamkarDetailScreen(
-                      isDarkMode: widget.isDarkMode,
-                      onToggleDarkMode: widget.onToggleDarkMode,
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 14),
-
-            // CARD MENU 3: KEPOLISIAN (POLRES BOJONEGORO)
-            _buildCategoryMenuCard(
-              context,
-              title: 'Kepolisian (Polres & Polsek)',
-              categoryLabel: 'Sentra Pelayanan Kepolisian Terpadu (SPKT)',
-              icon: Icons.local_police_rounded,
-              color: const Color(0xFF1E40AF),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => KepolisianDetailScreen(
-                      isDarkMode: widget.isDarkMode,
-                      onToggleDarkMode: widget.onToggleDarkMode,
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 30),
-          ],
-        ),
       ),
     );
   }
@@ -206,80 +198,78 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     required Color color,
     required VoidCallback onTap,
   }) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     return Container(
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? const Color(0xFF334155) : color.withAlpha(60),
-          width: 1.5,
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+          width: 1.0,
         ),
         boxShadow: [
           BoxShadow(
-            color: color.withAlpha(isDark ? 30 : 20),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: Colors.black.withAlpha(isDark ? 25 : 6),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(14),
             child: Row(
               children: [
+                // Soft Pastel Icon Container
                 Container(
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: color.withAlpha(25),
-                    borderRadius: BorderRadius.circular(16),
+                    color: color.withAlpha(isDark ? 35 : 15),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: color.withAlpha(30),
+                      width: 1.0,
+                    ),
                   ),
-                  child: Icon(icon, color: color, size: 30),
+                  child: Icon(icon, color: color, size: 24),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.w700,
-                            color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF1E293B),
-                          ),
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : const Color(0xFF1E293B),
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          categoryLabel,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: color,
-                          ),
+                      const SizedBox(height: 3),
+                      Text(
+                        categoryLabel,
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w500,
+                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                         ),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(width: 8),
+                // Small Right Chevron in Slate Gray
                 Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                  size: 16,
+                  Icons.chevron_right_rounded,
+                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  size: 20,
                 ),
               ],
             ),
@@ -305,7 +295,7 @@ class AmbulansDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
@@ -541,7 +531,7 @@ class DamkarDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),

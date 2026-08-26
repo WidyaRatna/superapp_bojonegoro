@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/superapp_header.dart';
 import '../models/service_model.dart';
 
 class AllServicesScreen extends StatefulWidget {
@@ -43,102 +44,20 @@ class _AllServicesScreenState extends State<AllServicesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
-    final double topPadding = MediaQuery.of(context).padding.top;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     return Scaffold(
       backgroundColor:
           isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
       body: Column(
         children: [
-          // Royal Blue Top Header matching the Main Home Screen Header
-          Container(
-            padding: EdgeInsets.fromLTRB(16, (topPadding > 0 ? topPadding : 16) + 4, 16, 22),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: isDark
-                    ? const [
-                        Color(0xFF030712),
-                        Color(0xFF0B1936),
-                        Color(0xFF0F2B66),
-                      ]
-                    : const [
-                        Color(0xFF0052D4), // Deep royal blue top
-                        Color(0xFF0D62F1), // Vibrant ocean blue center
-                        Color(0xFF1E6CF6), // Soft vibrant blue bottom
-                      ],
-              ),
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(26),
-                bottomRight: Radius.circular(26),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF0D62F1).withAlpha(50),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Top Action Bar: Back Button, Screen Title "Kategori Layanan", Grid Icon
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back_rounded,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          'Kategori Layanan',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: -0.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        if (widget.onToggleDarkMode != null)
-                          IconButton(
-                            icon: Icon(
-                              isDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
-                              color: isDark ? Colors.amber : Colors.white,
-                              size: 20,
-                            ),
-                            onPressed: widget.onToggleDarkMode,
-                          ),
-                        Container(
-                          padding: const EdgeInsets.all(7),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withAlpha(35),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.grid_view_rounded,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
+          SuperAppHeader(
+            title: 'Kategori Layanan',
+            subtitle: 'SuperApp Kabupaten Bojonegoro',
+            isDarkMode: isDark,
+            onToggleDarkMode: widget.onToggleDarkMode,
+          ),
+          const SizedBox(height: 12),
 
                 // Floating Search Bar ("Telusuri kategori layanan..")
                 Padding(
@@ -194,9 +113,6 @@ class _AllServicesScreenState extends State<AllServicesScreen> {
                     ),
                   ),
                 ),
-              ],
-            ),
-          ),
 
           // Full Screen Grid View of All Categories
           Expanded(

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import '../widgets/superapp_header.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class KependudukanScreen extends StatefulWidget {
@@ -45,113 +46,24 @@ class _KependudukanScreenState extends State<KependudukanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
-    final double topPadding = MediaQuery.of(context).padding.top;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            // Top Ocean Blue Gradient Header Bar
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 24),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: isDark
-                      ? const [
-                          Color(0xFF030712),
-                          Color(0xFF0B1936),
-                          Color(0xFF0F2B66),
-                        ]
-                      : const [
-                          Color(0xFF0052D4),
-                          Color(0xFF0D62F1),
-                          Color(0xFF1E6CF6),
-                        ],
-                ),
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF0D62F1).withAlpha(50),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
+      body: Column(
+        children: [
+          SuperAppHeader(
+            title: 'Layanan Kependudukan',
+            subtitle: 'Disdukcapil Kabupaten Bojonegoro',
+            isDarkMode: isDark,
+            onToggleDarkMode: widget.onToggleDarkMode,
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      const Text(
-                        'Layanan Kependudukan',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          isDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
-                          color: isDark ? Colors.amber : Colors.white,
-                        ),
-                        onPressed: widget.onToggleDarkMode,
-                      ),
-                    ],
-                  ),
                   const SizedBox(height: 16),
-
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(35),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.badge_rounded, color: Colors.white, size: 36),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              'Disdukcapil Bojonegoro',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Informasi Data Kependudukan & Panduan Persyaratan Layanan',
-                              style: TextStyle(
-                                color: Color(0xFFE0E7FF),
-                                fontSize: 12,
-                                height: 1.3,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
 
             // 2 Main Feature Cards Requested by User
             Padding(
@@ -206,6 +118,9 @@ class _KependudukanScreenState extends State<KependudukanScreen> {
           ],
         ),
       ),
+    ),
+  ],
+),
     );
   }
 
@@ -396,7 +311,7 @@ class _DataPendudukDetailScreenState extends State<DataPendudukDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     final filteredList = _allKecamatan.where((item) {
       final name = (item['nama'] as String).toLowerCase();
@@ -865,7 +780,7 @@ class PersyaratanLayananScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || isDarkMode;
 
     final syarats = [
       {
