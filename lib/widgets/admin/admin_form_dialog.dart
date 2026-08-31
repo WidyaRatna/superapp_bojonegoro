@@ -315,34 +315,42 @@ class _AdminFormDialogState extends State<AdminFormDialog> {
 
               // Action Buttons
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: const Text(
+                        'Batal',
+                        style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.bold),
+                      ),
                     ),
-                    child: const Text('Batal', style: TextStyle(color: Color(0xFF64748B))),
                   ),
-                  const SizedBox(width: 12),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        widget.onSave();
-                        Navigator.pop(context);
-                      }
-                    },
-                    icon: const Icon(Icons.save_rounded, color: Colors.white, size: 18),
-                    label: Text(
-                      widget.isEditing ? 'Simpan Perubahan' : 'Tambah Data',
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0D62F1),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      elevation: 2,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          widget.onSave();
+                          Navigator.pop(context);
+                        }
+                      },
+                      icon: const Icon(Icons.save_rounded, color: Colors.white, size: 18),
+                      label: Text(
+                        widget.isEditing ? 'Simpan Perubahan' : 'Tambah Data',
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0D62F1),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        elevation: 2,
+                      ),
                     ),
                   ),
                 ],

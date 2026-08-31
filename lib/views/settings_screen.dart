@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'security_privacy_screen.dart';
+import 'admin/admin_login_screen.dart';
+import 'admin/admin_main_screen.dart';
+import '../services/auth_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -242,6 +245,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     builder: (context) => SecurityPrivacyScreen(isDarkMode: isDark),
                   ),
                 );
+              },
+              trailing: Icon(Icons.chevron_right_rounded, color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1)),
+            ),
+            const SizedBox(height: 24),
+
+            // Section Title: Administrator
+            Padding(
+              padding: const EdgeInsets.only(left: 4, bottom: 8),
+              child: Text(
+                'Portal Administrator',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                ),
+              ),
+            ),
+
+            // 5. Portal Admin Diskominfo Tile
+            _buildSettingCard(
+              icon: Icons.admin_panel_settings_rounded,
+              iconColor: const Color(0xFF8B5CF6),
+              title: 'Portal Admin Diskominfo',
+              subtitle: 'Kelola data, input, edit & hapus layanan publik',
+              isDark: isDark,
+              onTap: () {
+                final auth = AuthService();
+                if (auth.isLoggedIn && auth.isAdmin) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdminMainScreen(
+                        isDarkMode: widget.isDarkMode,
+                        onToggleDarkMode: widget.onToggleDarkMode,
+                      ),
+                    ),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdminLoginScreen(
+                        isDarkMode: widget.isDarkMode,
+                        onToggleDarkMode: widget.onToggleDarkMode,
+                      ),
+                    ),
+                  );
+                }
               },
               trailing: Icon(Icons.chevron_right_rounded, color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1)),
             ),

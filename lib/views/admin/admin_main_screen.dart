@@ -1,6 +1,13 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
+import '../../models/service_model.dart';
 import '../../services/auth_service.dart';
-import '../../widgets/admin/admin_sidebar.dart';
+import '../../widgets/bottom_nav_bar.dart';
+import '../all_services_screen.dart';
+import '../emergency_screen.dart';
+import '../profile_screen.dart';
 import 'admin_dashboard_overview_screen.dart';
 import 'admin_emergency_screen.dart';
 import 'admin_kependudukan_screen.dart';
@@ -9,11 +16,13 @@ import 'admin_lapor_screen.dart';
 import 'admin_layanan_sosial_screen.dart';
 import 'admin_login_screen.dart';
 import 'admin_loker_screen.dart';
-import 'admin_news_screen.dart';
 import 'admin_pariwisata_screen.dart';
 import 'admin_pendidikan_screen.dart';
 import 'admin_pertanian_screen.dart';
+import 'admin_pajak_screen.dart';
+import '../kesehatan_screen.dart';
 
+/// Admin Main Screen - Uses EXACT SAME SuperApp App Layout & Bottom Navigation Bar as User HomeScreen
 class AdminMainScreen extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback onToggleDarkMode;
@@ -29,8 +38,7 @@ class AdminMainScreen extends StatefulWidget {
 }
 
 class _AdminMainScreenState extends State<AdminMainScreen> {
-  int _selectedTabIndex = 0;
-  bool _isSidebarCollapsed = false;
+  int _currentNavIndex = 0;
 
   @override
   void initState() {
@@ -39,10 +47,9 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final auth = AuthService();
       if (!auth.isLoggedIn || !auth.isAdmin) {
-        // Access Denied: User is not authenticated as Admin -> Redirect to Admin Login
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Akses Ditolak: Anda harus login sebagai Admin untuk mengakses Dashboard.'),
+            content: Text('Akses Ditolak: Anda harus login sebagai Admin untuk mengakses Portal Admin.'),
             backgroundColor: Color(0xFFEF4444),
           ),
         );
@@ -59,71 +66,132 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
     });
   }
 
-  void _handleAdminLogout() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: const Text('Konfirmasi Logout Admin'),
-        content: const Text('Apakah Anda yakin ingin keluar dari sesi Admin Dashboard?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              AuthService().logout();
-              // Admin Logout redirects back to Admin Login Screen
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AdminLoginScreen(
-                    isDarkMode: widget.isDarkMode,
-                    onToggleDarkMode: widget.onToggleDarkMode,
-                  ),
-                ),
-                (route) => false,
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF4444)),
-            child: const Text('Keluar (Logout)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
+  Future<void> _openExternalUrl(String urlStr) async {
+    final Uri url = Uri.parse(urlStr);
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+        return;
+      }
+    } catch (_) {}
+
+    if (!kIsWeb) {
+      try {
+        if (Platform.isWindows) {
+          await Process.run('cmd', ['/c', 'start', '', urlStr]);
+          return;
+        }
+      } catch (_) {}
+    }
+  }
+
+  void _navigateToAdminService(ServiceCategory service) {
+    Widget targetScreen;
+    final id = service.id.toLowerCase();
+    final title = service.title.toLowerCase();
+
+    if (id == 'umkm' || id == 'pangan' || title.contains('pangan')) {
+      _openExternalUrl('https://disdag-online.bojonegorokab.go.id/trend/tabel');
+      return;
+    } else if (id == 'cctv' || title.contains('cctv')) {
+      _openExternalUrl('https://bojonegorokab.go.id/gis-cctv/0');
+      return;
+    } else if (id == 'kependudukan' || title.contains('kependudukan')) {
+      targetScreen = AdminKependudukanScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    } else if (id == 'kesehatan' || title.contains('kesehatan')) {
+      targetScreen = KesehatanScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    } else if (id == 'pendidikan' || title.contains('pendidikan')) {
+      targetScreen = AdminPendidikanScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    } else if (id == 'perpajakan' || id == 'pajak' || title.contains('pajak')) {
+      targetScreen = AdminPajakScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    } else if (id == 'pertanian' || title.contains('tani')) {
+      targetScreen = AdminPertanianScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    } else if (id == 'pariwisata' || title.contains('wisata')) {
+      targetScreen = AdminPariwisataScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    } else if (id == 'pengaduan' || title.contains('pengaduan') || title.contains('lapor')) {
+      targetScreen = AdminLaporScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    } else if (id == 'kontak_instansi' || title.contains('instansi')) {
+      targetScreen = AdminKontakInstansiScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    } else if (id == 'emergency' || title.contains('darurat')) {
+      targetScreen = AdminEmergencyScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    } else if (id == 'loker' || title.contains('loker') || title.contains('kerja')) {
+      targetScreen = AdminLokerScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    } else if (id == 'layanan_sosial' || title.contains('sosial')) {
+      targetScreen = AdminLayananSosialScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    } else {
+      targetScreen = AdminKependudukanScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => targetScreen),
     );
   }
 
   Widget _buildBodyContent() {
-    switch (_selectedTabIndex) {
+    switch (_currentNavIndex) {
       case 0:
         return AdminDashboardOverviewScreen(
-          onNavigateTab: (index) => setState(() => _selectedTabIndex = index),
+          isDarkMode: widget.isDarkMode,
+          onToggleDarkMode: widget.onToggleDarkMode,
         );
       case 1:
-        return const AdminKependudukanScreen();
+        return AllServicesScreen(
+          allServices: sampleServices,
+          isDarkMode: widget.isDarkMode,
+          onServiceTap: _navigateToAdminService,
+          onToggleDarkMode: widget.onToggleDarkMode,
+        );
       case 2:
-        return const AdminPendidikanScreen();
+        return EmergencyScreen(
+          isDarkMode: widget.isDarkMode,
+          onToggleDarkMode: widget.onToggleDarkMode,
+        );
       case 3:
-        return const AdminPertanianScreen();
-      case 4:
-        return const AdminPariwisataScreen();
-      case 5:
-        return const AdminLaporScreen();
-      case 6:
-        return const AdminKontakInstansiScreen();
-      case 7:
-        return const AdminEmergencyScreen();
-      case 8:
-        return const AdminLokerScreen();
-      case 9:
-        return const AdminLayananSosialScreen();
-      case 10:
-        return const AdminNewsScreen();
+        return ProfileScreen(
+          isDarkMode: widget.isDarkMode,
+          onToggleDarkMode: widget.onToggleDarkMode,
+        );
       default:
         return AdminDashboardOverviewScreen(
-          onNavigateTab: (index) => setState(() => _selectedTabIndex = index),
+          isDarkMode: widget.isDarkMode,
+          onToggleDarkMode: widget.onToggleDarkMode,
         );
     }
   }
@@ -132,7 +200,6 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
   Widget build(BuildContext context) {
     final authService = AuthService();
 
-    // Secondary Security Check
     if (!authService.isLoggedIn || !authService.isAdmin) {
       return const Scaffold(
         backgroundColor: Color(0xFF0F172A),
@@ -142,220 +209,34 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
       );
     }
 
-    final user = authService.currentUser;
-    final isDesktop = MediaQuery.of(context).size.width > 900;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      body: Row(
+      backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
+      body: Stack(
         children: [
-          // Left Permanent Sidebar for Desktop/Tablet
-          if (isDesktop)
-            AdminSidebar(
-              selectedIndex: _selectedTabIndex,
-              onSelectTab: (index) => setState(() => _selectedTabIndex = index),
-              onLogout: _handleAdminLogout,
-              isCollapsed: _isSidebarCollapsed,
-              onToggleCollapse: () => setState(() => _isSidebarCollapsed = !_isSidebarCollapsed),
-            ),
+          // Main Body Content matching current tab index
+          _buildBodyContent(),
 
-          // Main Screen Area (Topbar Header + Content Body)
-          Expanded(
-            child: Column(
-              children: [
-                // Topbar Header
-                Container(
-                  height: 72,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    border: Border(
-                      bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Mobile Drawer Toggle or Active Menu Title
-                      Expanded(
-                        child: Row(
-                          children: [
-                            if (!isDesktop)
-                              IconButton(
-                                icon: const Icon(Icons.menu_rounded, color: Color(0xFF0F172A)),
-                                onPressed: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    backgroundColor: Colors.transparent,
-                                    builder: (context) => SizedBox(
-                                      height: MediaQuery.of(context).size.height * 0.85,
-                                      child: AdminSidebar(
-                                        selectedIndex: _selectedTabIndex,
-                                        onSelectTab: (index) {
-                                          Navigator.pop(context);
-                                          setState(() => _selectedTabIndex = index);
-                                        },
-                                        onLogout: () {
-                                          Navigator.pop(context);
-                                          _handleAdminLogout();
-                                        },
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            const SizedBox(width: 4),
-                            Flexible(
-                              child: Text(
-                                AdminSidebar.sidebarItems[_selectedTabIndex].title,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF0F172A),
-                                  letterSpacing: -0.3,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Admin Profile Avatar & Quick Actions Right Topbar
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Theme Toggle Button
-                          IconButton(
-                            icon: Icon(
-                              widget.isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                              color: const Color(0xFF0D62F1),
-                              size: 20,
-                            ),
-                            onPressed: widget.onToggleDarkMode,
-                            tooltip: 'Ganti Mode Tampilan',
-                          ),
-
-                          // Notification Badge
-                          Stack(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.notifications_none_rounded, color: Color(0xFF475569)),
-                                onPressed: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Sistem Admin Bojonegoro: Semua layanan berjalan normal.'),
-                                      backgroundColor: Color(0xFF0D62F1),
-                                    ),
-                                  );
-                                },
-                              ),
-                              Positioned(
-                                top: 10,
-                                right: 10,
-                                child: Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.red,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(width: 6),
-
-                          // Admin User Profile Avatar (Compact on Mobile, Full on Desktop)
-                          PopupMenuButton<String>(
-                            onSelected: (val) {
-                              if (val == 'logout') {
-                                _handleAdminLogout();
-                              }
-                            },
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                enabled: false,
-                                child: Text(
-                                  user?.email ?? 'admin@bojonegoro.go.id',
-                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0D62F1)),
-                                ),
-                              ),
-                              const PopupMenuDivider(),
-                              const PopupMenuItem(
-                                value: 'logout',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.logout_rounded, color: Colors.red, size: 18),
-                                    SizedBox(width: 8),
-                                    Text('Kelolar (Logout)', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                                  ],
-                                ),
-                              ),
-                            ],
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 36,
-                                  height: 36,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF0D62F1),
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color(0xFF0D62F1).withAlpha(50),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.admin_panel_settings_rounded,
-                                      color: Colors.white,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ),
-                                if (isDesktop) ...[
-                                  const SizedBox(width: 10),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        user?.name ?? 'Admin Bojonegoro',
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF0F172A),
-                                        ),
-                                      ),
-                                      const Text(
-                                        'Administrator System',
-                                        style: TextStyle(
-                                          fontSize: 10.5,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xFF0D62F1),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Main Content Body
-                Expanded(child: _buildBodyContent()),
-              ],
+          // Floating Curved Bottom Navigation Bar (Identical to User UI)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: CustomBottomNavBar(
+              currentIndex: _currentNavIndex,
+              onTapTab: (index) {
+                setState(() {
+                  _currentNavIndex = index;
+                });
+              },
+              onCenterQrTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AdminLaporScreen()),
+                );
+              },
+              isDarkMode: isDark,
             ),
           ),
         ],

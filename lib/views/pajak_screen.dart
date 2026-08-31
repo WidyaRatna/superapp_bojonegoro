@@ -12,6 +12,8 @@ import 'cek_bayar_image_data.dart';
 import 'dijamin_minul_image_data.dart';
 import 'smart_report_image_data.dart';
 import 'epbb_image_data.dart';
+import '../services/admin_data_service.dart';
+import '../widgets/admin/admin_form_dialog.dart';
 
 class PajakItem {
   final String id;
@@ -46,11 +48,13 @@ class PajakItem {
 class PajakScreen extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback? onToggleDarkMode;
+  final bool isAdmin;
 
   const PajakScreen({
     super.key,
     required this.isDarkMode,
     this.onToggleDarkMode,
+    this.isAdmin = false,
   });
 
   @override
@@ -61,6 +65,130 @@ class _PajakScreenState extends State<PajakScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String _selectedFilter = 'Semua';
+
+  ItemPajak? _findAdminItem(String id) {
+    try {
+      return AdminDataService().pajakList.firstWhere((e) => e.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _showAddEditPajakDialog([ItemPajak? existingItem]) {
+    final isEditing = existingItem != null;
+    final titleController = TextEditingController(text: existingItem?.title ?? '');
+    final subtitleController = TextEditingController(text: existingItem?.subtitle ?? '');
+    final categoryController = TextEditingController(text: existingItem?.categoryTag ?? 'Sembilan Pajak');
+    final urlController = TextEditingController(text: existingItem?.webUrl ?? 'https://pajakonlinebojonegorokab.id/');
+    final badgeController = TextEditingController(text: existingItem?.badgeText ?? 'Pajak Daerah');
+    final descController = TextEditingController(text: existingItem?.fullDescription ?? '');
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AdminFormDialog(
+          title: isEditing ? 'Edit Layanan Pajak' : 'Tambah Layanan Pajak Baru',
+          subtitle: isEditing
+              ? 'Perbarui rincian layanan perpajakan & retribusi daerah'
+              : 'Isi formulir di bawah untuk menambahkan layanan pajak baru',
+          isEditing: isEditing,
+          fields: [
+            AdminFormField(
+              label: 'Nama Layanan / Aplikasi Pajak',
+              controller: titleController,
+              hint: 'Contoh: SIMPATDU, BPHTB, E-PBB',
+            ),
+            AdminFormField(
+              label: 'Sub-Judul / Ringkasan',
+              controller: subtitleController,
+              hint: 'Contoh: Sistem Informasi Sembilan Pajak Lainnya',
+            ),
+            AdminFormField(
+              label: 'Kategori Pajak',
+              controller: categoryController,
+              hint: 'Pilih: Sembilan Pajak, PBB & BPHTB, E-Payment, Digitalisasi',
+            ),
+            AdminFormField(
+              label: 'URL Portal / Website Resmi',
+              controller: urlController,
+              hint: 'https://pajakonlinebojonegorokab.id/',
+            ),
+            AdminFormField(
+              label: 'Label Badge (Singkat)',
+              controller: badgeController,
+              hint: 'Contoh: Pajak Daerah, PBB-P2 Online',
+            ),
+            AdminFormField(
+              label: 'Deskripsi Lengkap Layanan',
+              controller: descController,
+              hint: 'Jelaskan fungsi dan cakupan layanan perpajakan ini...',
+            ),
+          ],
+          onSave: () {
+            final newItem = ItemPajak(
+              id: isEditing ? existingItem.id : 'pajak_${DateTime.now().millisecondsSinceEpoch}',
+              title: titleController.text.trim().isEmpty ? 'Layanan Pajak Baru' : titleController.text.trim(),
+              subtitle: subtitleController.text.trim().isEmpty ? 'Pelayanan Perpajakan Bojonegoro' : subtitleController.text.trim(),
+              categoryTag: categoryController.text.trim().isEmpty ? 'Sembilan Pajak' : categoryController.text.trim(),
+              webUrl: urlController.text.trim().isEmpty ? 'https://pajakonlinebojonegorokab.id/' : urlController.text.trim(),
+              badgeText: badgeController.text.trim().isEmpty ? 'Pajak Daerah' : badgeController.text.trim(),
+              fullDescription: descController.text.trim().isEmpty ? 'Layanan resmi perpajakan BAPENDA Kab. Bojonegoro' : descController.text.trim(),
+            );
+
+            if (isEditing) {
+              AdminDataService().updatePajak(newItem);
+            } else {
+              AdminDataService().addPajak(newItem);
+            }
+
+            setState(() {});
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  isEditing
+                      ? 'Layanan pajak "${newItem.title}" berhasil diperbarui! 🧾'
+                      : 'Layanan pajak baru "${newItem.title}" berhasil ditambahkan! ✨',
+                ),
+                backgroundColor: const Color(0xFF0D62F1),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _confirmDeletePajak(ItemPajak item) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Hapus Layanan Pajak'),
+        content: Text('Apakah Anda yakin ingin menghapus layanan pajak "${item.title}"? Perubahan akan langsung berdampak pada tampilan pengguna.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              AdminDataService().deletePajak(item.id);
+              setState(() {});
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Layanan pajak "${item.title}" telah dihapus.'),
+                  backgroundColor: const Color(0xFFEF4444),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF4444)),
+            child: const Text('Hapus', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
 
   final List<String> _filters = [
     'Semua',
@@ -132,162 +260,44 @@ class _PajakScreenState extends State<PajakScreen> {
   }
 
   List<PajakItem> _getPajakItems() {
-    return const [
-      PajakItem(
-        id: 'simpatdu',
-        title: 'SIMPATDU',
-        subtitle: 'Sistem Informasi Sembilan Pajak Lainnya',
-        categoryTag: 'Sembilan Pajak',
-        primaryColor: Color(0xFF10B981), // Green
-        secondaryColor: Color(0xFF059669),
-        icon: Icons.receipt_long_rounded,
-        webUrl: 'https://pajakonlinebojonegorokab.id/',
-        badgeText: 'Pajak Daerah',
-        fullDescription:
-            'SIMPATDU (Sistem Informasi Sembilan Pajak Lainnya) diakses via portal resmi pajakonlinebojonegorokab.id. Meliputi pelayanan pelaporan dan pembayaran 9 Pajak Daerah: Pajak Hotel, Restoran, Hiburan, Reklame, Penerangan Jalan, Parkir, Air Tanah, MBLB, serta Burung Walet di Kabupaten Bojonegoro.',
-        features: [
-          'Pelaporan Pajak Daerah Online via pajakonlinebojonegorokab.id',
-          'Perhitungan Tarif & Tagihan Pajak Otomatis',
-          'Penerbitan Surat Pemberitahuan Pajak Daerah (SPTPD)',
-          'Monitoring Riwayat & Verifikasi Setoran Pajak Daerah',
-        ],
-      ),
-      PajakItem(
-        id: 'bphtb',
-        title: 'BPHTB',
-        subtitle: 'Sistem Informasi Pajak BPHTB',
-        categoryTag: 'PBB & BPHTB',
-        primaryColor: Color(0xFF0284C7), // Blue
-        secondaryColor: Color(0xFF0369A1),
-        icon: Icons.domain_rounded,
-        webUrl: 'https://pajakonlinebojonegorokab.id/ebphtb/',
-        badgeText: 'Pajak Transaksi Tanah',
-        fullDescription:
-            'Sistem Informasi Pajak Bea Perolehan Hak atas Tanah dan Bangunan (BPHTB) Kabupaten Bojonegoro. Memudahkan PPAT, Notaris, dan masyarakat dalam proses validasi, verifikasi, dan pembayaran BPHTB secara transparan & akuntabel.',
-        features: [
-          'E-Validasi BPHTB Online',
-          'Pengecekan NOP & NJOP PBB',
-          'Integrasi dengan BPN & Notaris/PPAT',
-          'Cetak Kode Bayar & Bukti Setor Resmi',
-        ],
-      ),
-      PajakItem(
-        id: 'epayment',
-        title: 'E-Payment',
-        subtitle: 'Pembayaran Online Dengan QRIS',
-        categoryTag: 'E-Payment',
-        primaryColor: Color(0xFF8B5CF6), // Purple
-        secondaryColor: Color(0xFF7C3AED),
-        icon: Icons.qr_code_scanner_rounded,
-        webUrl: 'https://pajakonlinebojonegorokab.id/epayment/',
-        badgeText: 'QRIS & Multi-Payment',
-        fullDescription:
-            'Kanal e-Payment resmi BAPENDA Bojonegoro untuk kemudahan pembayaran pajak daerah menggunakan QRIS (Semua E-Wallet & Mobile Banking), Transfer Bank, serta Payment Gateway Nasional secara instan.',
-        features: [
-          'Pembayaran Instan via QRIS Nasional',
-          'Dukungan Semua Bank & E-Wallet (Gopay, OVO, Dana, ShopeePay)',
-          'Verifikasi Lunas Real-Time',
+    final adminItems = AdminDataService().pajakList;
+    return adminItems.map((item) {
+      Color primary = const Color(0xFF10B981);
+      Color secondary = const Color(0xFF059669);
+      IconData icon = Icons.receipt_long_rounded;
+
+      if (item.categoryTag.contains('PBB') || item.title.contains('PBB') || item.title.contains('BPHTB')) {
+        primary = const Color(0xFF0284C7);
+        secondary = const Color(0xFF0369A1);
+        icon = Icons.domain_rounded;
+      } else if (item.categoryTag.contains('E-Payment') || item.title.contains('Payment')) {
+        primary = const Color(0xFF8B5CF6);
+        secondary = const Color(0xFF7C3AED);
+        icon = Icons.qr_code_scanner_rounded;
+      } else if (item.categoryTag.contains('Digitalisasi') || item.title.contains('Smart')) {
+        primary = const Color(0xFFF97316);
+        secondary = const Color(0xFFEA580C);
+        icon = Icons.auto_graph_rounded;
+      }
+
+      return PajakItem(
+        id: item.id,
+        title: item.title,
+        subtitle: item.subtitle,
+        categoryTag: item.categoryTag,
+        primaryColor: primary,
+        secondaryColor: secondary,
+        icon: icon,
+        webUrl: item.webUrl,
+        badgeText: item.badgeText,
+        fullDescription: item.fullDescription,
+        features: const [
+          'Pelayanan Resmi BAPENDA Kabupaten Bojonegoro',
+          'Akses Portal Online Transparan & Akuntabel',
           'Bebas Antre & Dapat Diakses 24/7',
         ],
-      ),
-      PajakItem(
-        id: 'wizztara',
-        title: 'Wizztara',
-        subtitle:
-            'Whatsapp Instant Zone & Taxpayer Assistant, Layanan Dalam Genggaman',
-        categoryTag: 'Digitalisasi',
-        primaryColor: Color(0xFFF97316), // Orange
-        secondaryColor: Color(0xFFEA580C),
-        icon: Icons.chat_rounded,
-        webUrl: 'https://pajakonlinebojonegorokab.id/callcenter.php',
-        whatsappNumber: '085172330531',
-        badgeText: 'Asisten WA Instant',
-        fullDescription:
-            'Wizztara (Whatsapp Instant Zone & Taxpayer Assistant) adalah inovasi asisten virtual berbasis WhatsApp resmi BAPENDA Bojonegoro. Memberikan layanan konsultasi, cek tagihan, info syarat pajak, dan panduan pembayaran langsung dari genggaman.',
-        features: [
-          'Chatbot Asisten Pajak Siaga 24 Jam',
-          'Cek Tagihan PBB & Pajak Daerah via WA',
-          'Konsultasi Petugas Pelayanan BAPENDA',
-          'Notifikasi Pengingat Jatuh Tempo Pajak',
-        ],
-      ),
-      PajakItem(
-        id: 'cek_pembayaran',
-        title: 'CEK PEMBAYARAN',
-        subtitle: 'Cek Pembayaran Pajak Anda',
-        categoryTag: 'E-Payment',
-        primaryColor: Color(0xFF22C55E), // Emerald Green
-        secondaryColor: Color(0xFF16A34A),
-        icon: Icons.fact_check_rounded,
-        webUrl: 'https://pajakonlinebojonegorokab.id/cek-bayar/ceksaja.php',
-        badgeText: 'Status & Bukti Bayar',
-        fullDescription:
-            'Fasilitas pencarian dan verifikasi status pembayaran pajak daerah Bojonegoro. Masukkan Nomor Objek Pajak (NOP) atau Kode Transaksi untuk memastikan setoran pajak Anda sudah tercatat resmi di sistem BAPENDA.',
-        features: [
-          'Pencarian Status Bayar Berdasarkan NOP / NPWPD',
-          'Unduh Bukti Penerimaan Negara / Daerah',
-          'Riwayat Pembayaran Pajak Terdahulu',
-          'Validasi Keabsahan Resi Pembayaran',
-        ],
-      ),
-      PajakItem(
-        id: 'dijamin_minul',
-        title: 'DIJAMIN MINUL',
-        subtitle: 'Digitalisasi Pajak Mamin & MBLB',
-        categoryTag: 'Digitalisasi',
-        primaryColor: Color(0xFF9333EA), // Deep Purple
-        secondaryColor: Color(0xFF7E22CE),
-        icon: Icons.restaurant_rounded,
-        webUrl: 'https://pajakonlinebojonegorokab.id/eSPTPDbjn/',
-        badgeText: 'Mamin & MBLB Online',
-        fullDescription:
-            'DIJAMIN MINUL (Digitalisasi Pajak Makanan Minuman & Mineral Bukan Logam dan Batuan) adalah program prioritas BAPENDA Bojonegoro untuk transparansi, kemudahan pelaporan, dan optimalisasi omzet usaha kuliner & tambang MBLB.',
-        features: [
-          'Pelaporan Omzet Usaha Makanan & Minuman',
-          'Pendataan Pajak MBLB Terintegrasi',
-          'Monitoring Tapping Box / POS Restoran',
-          'Skema Insentif & Kemudahan Pelaporan Usaha',
-        ],
-      ),
-      PajakItem(
-        id: 'smart_report',
-        title: 'SMART REPORT',
-        subtitle: 'Kumpulan Berbagai laporan Pendapatan Pajak',
-        categoryTag: 'Digitalisasi',
-        primaryColor: Color(0xFF6366F1), // Indigo
-        secondaryColor: Color(0xFF4F46E5),
-        icon: Icons.analytics_rounded,
-        webUrl: 'https://pajakonlinebojonegorokab.id/smartreport/',
-        badgeText: 'Dashboard Pendapatan',
-        fullDescription:
-            'Portal Smart Report menyajikan transparansi data rekapitulasi, grafik realisasi target pendapatan pajak daerah, serta analisis statistik penerimaan pajak Kabupaten Bojonegoro secara berkala.',
-        features: [
-          'Dashboard Realisasi Target Pajak Daerah',
-          'Grafik Penerimaan Per Sektor Pajak',
-          'Laporan Statistik Bulanan & Tahunan',
-          'Keterbukaan Informasi Publik BAPENDA',
-        ],
-      ),
-      PajakItem(
-        id: 'epbb',
-        title: 'e-PBB',
-        subtitle: 'Cek Pembayaran dan Pelayanan PBB-P2',
-        categoryTag: 'PBB & BPHTB',
-        primaryColor: Color(0xFF0D9488), // Teal
-        secondaryColor: Color(0xFF0F766E),
-        icon: Icons.house_rounded,
-        webUrl: 'https://pajakonlinebojonegorokab.id/wpbb/',
-        badgeText: 'Pajak Bumi & Bangunan',
-        fullDescription:
-            'Portal e-PBB merupakan sarana pelayanan Pajak Bumi dan Bangunan Perdesaan dan Perkotaan (PBB-P2) Kabupaten Bojonegoro. Digunakan untuk cetak e-SPPT, cek tagihan PBB, mutasi NOP, dan permohonan pembetulan data PBB.',
-        features: [
-          'Cek Tagihan & Tunggakan PBB-P2',
-          'Unduh e-SPPT PBB Digital Resmi',
-          'Pengajuan Mutasi & Pemecahan NOP',
-          'Informasi Tempat Pembayaran PBB Terdekat',
-        ],
-      ),
-    ];
+      );
+    }).toList();
   }
 
   List<PajakItem> get _filteredItems {
@@ -530,31 +540,48 @@ class _PajakScreenState extends State<PajakScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
-    final filtered = _filteredItems;
 
-    final pajakGradient = isDark
-        ? const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
-          )
-        : const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF0D62F1), Color(0xFF0A47B8)],
-          );
+    return ListenableBuilder(
+      listenable: AdminDataService(),
+      builder: (context, child) {
+        final filtered = _filteredItems;
 
-    return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
-      body: Column(
-        children: [
-          SuperAppHeader(
-            title: 'Pajak & Retribusi Daerah',
-            subtitle: 'BAPENDA Kabupaten Bojonegoro',
-            gradient: pajakGradient,
-            isDarkMode: isDark,
-            onToggleDarkMode: widget.onToggleDarkMode,
-          ),
+        final pajakGradient = isDark
+            ? const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+              )
+            : const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF0D62F1), Color(0xFF0A47B8)],
+              );
+
+        return Scaffold(
+          backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+          floatingActionButton: widget.isAdmin
+              ? FloatingActionButton.extended(
+                  onPressed: () => _showAddEditPajakDialog(),
+                  backgroundColor: const Color(0xFF0D62F1),
+                  icon: const Icon(Icons.add_rounded, color: Colors.white),
+                  label: const Text(
+                    'Tambah Layanan Pajak',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                )
+              : null,
+          body: Column(
+            children: [
+              SuperAppHeader(
+                title: 'Pajak & Retribusi Daerah',
+                subtitle: widget.isAdmin
+                    ? 'BAPENDA Kab. Bojonegoro • ADMIN MODE'
+                    : 'BAPENDA Kabupaten Bojonegoro',
+                gradient: pajakGradient,
+                isDarkMode: isDark,
+                onToggleDarkMode: widget.onToggleDarkMode,
+              ),
           Expanded(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
@@ -1016,19 +1043,20 @@ class _PajakScreenState extends State<PajakScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 24),
-                ],
-              ),
-            ),
           ],
         ),
       ),
-    ),
-  ],
+    ],
+  ),
 ),
-    );
-  }
+),
+],
+),
+);
+},
+);
+}
 
   Widget _buildPajakCard(PajakItem item, bool isDark) {
     return Container(
@@ -1049,103 +1077,148 @@ class _PajakScreenState extends State<PajakScreen> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => _openWebUrl(item.webUrl),
-            child: SizedBox(
-              height: 200,
-              child: Column(
-                children: [
-                  // Top Image Graphic Area
-                  Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      color: item.id == 'bphtb'
-                          ? const Color(0xFF8ED6F5)
-                          : (item.id == 'simpatdu'
-                              ? const Color(0xFF4CAF50)
-                              : item.primaryColor.withAlpha(40)),
-                      child: _buildCardGraphicBanner(item, isDark),
-                    ),
-                  ),
+        child: Stack(
+          children: [
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _openWebUrl(item.webUrl),
+                child: SizedBox(
+                  height: 200,
+                  child: Column(
+                    children: [
+                      // Top Image Graphic Area
+                      Expanded(
+                        child: Container(
+                          width: double.infinity,
+                          color: item.id == 'bphtb'
+                              ? const Color(0xFF8ED6F5)
+                              : (item.id == 'simpatdu'
+                                  ? const Color(0xFF4CAF50)
+                                  : item.primaryColor.withAlpha(40)),
+                          child: _buildCardGraphicBanner(item, isDark),
+                        ),
+                      ),
 
-                  // Bottom Colored Banner Bar
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: item.primaryColor,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withAlpha(40),
-                          blurRadius: 4,
-                          offset: const Offset(0, -2),
+                      // Bottom Colored Banner Bar
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: item.primaryColor,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(40),
+                              blurRadius: 4,
+                              offset: const Offset(0, -2),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                item.title,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
-                                  letterSpacing: 0.3,
-                                  shadows: [
-                                    Shadow(
-                                      offset: Offset(0, 1),
-                                      blurRadius: 3,
-                                      color: Colors.black54,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    item.title,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.white,
+                                      letterSpacing: 0.3,
+                                      shadows: [
+                                        Shadow(
+                                          offset: Offset(0, 1),
+                                          blurRadius: 3,
+                                          color: Colors.black54,
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    item.subtitle,
+                                    style: const TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white70,
+                                      height: 1.2,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 2),
-                              Text(
-                                item.subtitle,
-                                style: const TextStyle(
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white70,
-                                  height: 1.2,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(width: 10),
+                            // Square Action Button [ ↗ ]
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withAlpha(40),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.white.withAlpha(70)),
                               ),
-                            ],
-                          ),
+                              child: const Icon(
+                                Icons.north_east_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 10),
-                        // Square Action Button [ ↗ ]
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withAlpha(40),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.white.withAlpha(70)),
-                          ),
-                          child: const Icon(
-                            Icons.north_east_rounded,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
+
+            if (widget.isAdmin)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Material(
+                      color: Colors.white,
+                      shape: const CircleBorder(),
+                      elevation: 4,
+                      child: InkWell(
+                        onTap: () => _showAddEditPajakDialog(_findAdminItem(item.id)),
+                        customBorder: const CircleBorder(),
+                        child: const Padding(
+                          padding: EdgeInsets.all(6),
+                          child: Icon(Icons.edit_rounded, color: Color(0xFF0D62F1), size: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Material(
+                      color: const Color(0xFFEF4444),
+                      shape: const CircleBorder(),
+                      elevation: 4,
+                      child: InkWell(
+                        onTap: () {
+                          final adminItem = _findAdminItem(item.id);
+                          if (adminItem != null) _confirmDeletePajak(adminItem);
+                        },
+                        customBorder: const CircleBorder(),
+                        child: const Padding(
+                          padding: EdgeInsets.all(6),
+                          child: Icon(Icons.delete_outline_rounded, color: Colors.white, size: 16),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
         ),
       ),
     );

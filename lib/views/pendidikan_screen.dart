@@ -5,6 +5,7 @@ import '../widgets/superapp_header.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../assets/brosur_beasiswa_data.dart';
+import '../services/admin_data_service.dart';
 
 class PendidikanScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -94,50 +95,54 @@ class _PendidikanScreenState extends State<PendidikanScreen> {
           Expanded(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 16),
-                  Text(
-                    'Pilih Layanan Pendidikan',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    Text(
+                      'Pilih Layanan Pendidikan',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        letterSpacing: -0.2,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Silakan pilih salah satu layanan online di bawah ini:',
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Silakan pilih salah satu layanan online di bawah ini:',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 18),
+                    const SizedBox(height: 20),
 
-                  // ITEM 1: Pendaftaran Beasiswa Daerah
-                  _buildMenuItem(
-                    icon: Icons.workspace_premium_rounded,
-                    color: const Color(0xFF8B5CF6),
-                    title: 'Pendaftaran Beasiswa Daerah',
-                    subtitle: 'Program Beasiswa Kuliah & Sekolah Kab. Bojonegoro',
-                    onTap: _openBeasiswaDetail,
-                    isDark: isDark,
-                  ),
-                  const SizedBox(height: 12),
+                    // ITEM 1: Pendaftaran Beasiswa Daerah
+                    _buildMenuItem(
+                      icon: Icons.workspace_premium_rounded,
+                      color: const Color(0xFF8B5CF6),
+                      title: 'Pendaftaran Beasiswa Daerah',
+                      subtitle: 'Program Beasiswa Kuliah & Sekolah Kab. Bojonegoro',
+                      onTap: _openBeasiswaDetail,
+                      isDark: isDark,
+                    ),
+                    const SizedBox(height: 14),
 
-                  // ITEM 2: Informasi Perpustakaan Daerah
-                  _buildMenuItem(
-                    icon: Icons.local_library_rounded,
-                    color: const Color(0xFF0D62F1),
-                    title: 'Informasi Perpustakaan Daerah',
-                    subtitle: 'Katalog Buku Digital E-Pustaka, Download & Baca Buku',
-                    onTap: _openPerpustakaanDetail,
-                    isDark: isDark,
-                  ),
-                  const SizedBox(height: 30),
-                ],
+                    // ITEM 2: Informasi Perpustakaan Daerah
+                    _buildMenuItem(
+                      icon: Icons.local_library_rounded,
+                      color: const Color(0xFF0D62F1),
+                      title: 'Informasi Perpustakaan Daerah',
+                      subtitle: 'Katalog Buku Digital E-Pustaka, Download & Baca Buku',
+                      onTap: _openPerpustakaanDetail,
+                      isDark: isDark,
+                    ),
+                    const SizedBox(height: 30),
+                  ],
+                ),
               ),
             ),
           ),
@@ -259,19 +264,11 @@ class _BeasiswaDetailScreenState extends State<BeasiswaDetailScreen> {
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
-            // Top Bar Header
+            // Top Bar Header (Royal Blue Government Theme)
             Container(
               width: double.infinity,
               padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 24),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: isDark
-                      ? const [Color(0xFF311B92), Color(0xFF4A148C)]
-                      : const [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                ),
-              ),
+              color: isDark ? const Color(0xFF0F172A) : const Color(0xFF0D62F1),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -301,10 +298,10 @@ class _BeasiswaDetailScreenState extends State<BeasiswaDetailScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(35),
+                          color: Colors.white.withAlpha(30),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.workspace_premium_rounded, color: Colors.white, size: 32),
+                        child: const Icon(Icons.school_rounded, color: Colors.white, size: 28),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -313,12 +310,12 @@ class _BeasiswaDetailScreenState extends State<BeasiswaDetailScreen> {
                           children: const [
                             Text(
                               'Program Beasiswa Pemkab 2026',
-                              style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.bold),
+                              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 2),
                             Text(
                               'Dinas Pendidikan Kabupaten Bojonegoro',
-                              style: TextStyle(color: Color(0xFFEDE9FE), fontSize: 12),
+                              style: TextStyle(color: Color(0xFFDBEAFE), fontSize: 12),
                             ),
                           ],
                         ),
@@ -335,7 +332,7 @@ class _BeasiswaDetailScreenState extends State<BeasiswaDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Official Flyer Banner Image (Direct Uint8List Memory rendering)
+                  // Official Flyer Banner Image
                   GestureDetector(
                     onTap: () {
                       showDialog(
@@ -372,17 +369,20 @@ class _BeasiswaDetailScreenState extends State<BeasiswaDetailScreen> {
                     child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withAlpha(isDark ? 40 : 15),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
+                            color: Colors.black.withAlpha(isDark ? 30 : 8),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(16),
                         child: Image.memory(
                           brosurBeasiswaBytes,
                           fit: BoxFit.cover,
@@ -394,17 +394,17 @@ class _BeasiswaDetailScreenState extends State<BeasiswaDetailScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 24),
 
-                  // SECTION 1: 🎓 Program Beasiswa Pendidikan Tinggi
+                  // SECTION 1: Program Beasiswa Pendidikan Tinggi
                   Row(
                     children: [
-                      const Text('🎓', style: TextStyle(fontSize: 20)),
+                      const Icon(Icons.school_rounded, color: Color(0xFF0D62F1), size: 22),
                       const SizedBox(width: 8),
                       Text(
                         'Program Beasiswa Pendidikan Tinggi',
                         style: TextStyle(
-                          fontSize: 16.5,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
@@ -413,74 +413,38 @@ class _BeasiswaDetailScreenState extends State<BeasiswaDetailScreen> {
                   ),
                   const SizedBox(height: 14),
 
-                  // 1. Beasiswa Pondok Pesantren
-                  _buildScholarshipItem(
-                    emoji: '🕌',
-                    title: 'Beasiswa Pondok Pesantren',
-                    subtitle: 'Mahasiswa S1/D4 PTN/PTS alumni Ponpes Bojonegoro (IPS min 3.00)',
-                    tag1: 'Alumni Ponpes Bojonegoro',
-                    tag2: 'S1 / D4 PTN-PTS',
-                    accentColor: const Color(0xFF10B981), // Emerald
-                    docName: 'Beasiswa Pondok Pesantren',
-                    isDark: isDark,
-                  ),
+                  // Dynamic Scholarship List synced with AdminDataService
+                  ListenableBuilder(
+                    listenable: AdminDataService(),
+                    builder: (context, child) {
+                      final items = AdminDataService().beasiswaList;
 
-                  // 2. Beasiswa Keluarga Miskin
-                  _buildScholarshipItem(
-                    emoji: '👨‍🎓',
-                    title: 'Beasiswa Keluarga Miskin',
-                    subtitle: 'Mahasiswa S1/D4 PTN/PTS Kab. Bojonegoro terdaftar DTSEN Desil 1-5',
-                    tag1: 'DTSEN Desil 1-5',
-                    tag2: 'Minimal IPS 2,75',
-                    accentColor: const Color(0xFF8B5CF6), // Royal Purple
-                    docName: 'Beasiswa Keluarga Miskin',
-                    isDark: isDark,
-                  ),
+                      return Column(
+                        children: List.generate(items.length, (index) {
+                          final item = items[index];
 
-                  // 3. Beasiswa Tugas Akhir
-                  _buildScholarshipItem(
-                    emoji: '📖',
-                    title: 'Beasiswa Tugas Akhir',
-                    subtitle: 'Mahasiswa S1/D4 menyusun tugas akhir, IPK min 2.75 & DTSEN Desil 1-5',
-                    tag1: 'Tugas Akhir',
-                    tag2: 'IPK ≥ 2.75',
-                    accentColor: const Color(0xFF0D62F1), // Royal Blue
-                    docName: 'Beasiswa Tugas Akhir',
-                    isDark: isDark,
-                  ),
-
-                  // 4. Sepuluh Sarjana per Desa
-                  _buildScholarshipItem(
-                    emoji: '🏡',
-                    title: 'Sepuluh Sarjana per Desa',
-                    subtitle: 'Program bantuan 10 sarjana per desa untuk putra-putri daerah Bojonegoro',
-                    tag1: 'Program Desa',
-                    tag2: 'Putra-Putri Daerah',
-                    accentColor: const Color(0xFFF59E0B), // Amber Gold
-                    docName: 'Sepuluh Sarjana per Desa',
-                    isDark: isDark,
+                          return _buildScholarshipItemClean(
+                            item: item,
+                            isDark: isDark,
+                          );
+                        }),
+                      );
+                    },
                   ),
                   const SizedBox(height: 24),
 
-                  // SECTION 2: 📂 Dokumen Pendukung
+                  // SECTION 2: Dokumen Pendukung
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF10B981).withAlpha(25),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Text('📂', style: TextStyle(fontSize: 18)),
-                      ),
-                      const SizedBox(width: 10),
+                      const Icon(Icons.folder_open_rounded, color: Color(0xFF0D62F1), size: 22),
+                      const SizedBox(width: 8),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Dokumen Pendukung',
                             style: TextStyle(
-                              fontSize: 17,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: isDark ? Colors.white : const Color(0xFF0F172A),
                             ),
@@ -488,7 +452,7 @@ class _BeasiswaDetailScreenState extends State<BeasiswaDetailScreen> {
                           Text(
                             'Peraturan Bupati, SOP, & Blangko Proposal Resmi',
                             style: TextStyle(
-                              fontSize: 11.5,
+                              fontSize: 12,
                               color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                             ),
                           ),
@@ -518,35 +482,29 @@ class _BeasiswaDetailScreenState extends State<BeasiswaDetailScreen> {
     );
   }
 
-  Widget _buildScholarshipItem({
-    required String emoji,
-    required String title,
-    required String subtitle,
-    required String tag1,
-    required String tag2,
-    required Color accentColor,
-    required String docName,
+  Widget _buildScholarshipItemClean({
+    required ItemBeasiswa item,
     required bool isDark,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-          width: 1.2,
+          width: 1.0,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(isDark ? 40 : 10),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: Colors.black.withAlpha(isDark ? 25 : 6),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -554,35 +512,33 @@ class _BeasiswaDetailScreenState extends State<BeasiswaDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: accentColor.withAlpha(25),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: accentColor.withAlpha(60)),
+                    color: const Color(0xFF0D62F1).withAlpha(18),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Text(emoji, style: const TextStyle(fontSize: 24)),
+                  child: const Icon(Icons.workspace_premium_rounded, color: Color(0xFF0D62F1), size: 24),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        title,
+                        item.title,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15.5,
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 4,
-                        children: [
-                          _buildChip(tag1, accentColor, isDark),
-                          _buildChip(tag2, isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), isDark),
-                        ],
+                      const SizedBox(height: 4),
+                      Text(
+                        'Penyelenggara: ${item.provider}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                        ),
                       ),
                     ],
                   ),
@@ -591,92 +547,70 @@ class _BeasiswaDetailScreenState extends State<BeasiswaDetailScreen> {
             ),
             const SizedBox(height: 12),
 
-            Text(
-              subtitle,
-              style: TextStyle(
-                fontSize: 12.5,
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 14),
-            Divider(color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9), height: 1),
-            const SizedBox(height: 14),
-
+            // Clean Information Rows (Kuota & Deadline)
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    const Icon(Icons.picture_as_pdf_rounded, color: Color(0xFFEF4444), size: 18),
-                    const SizedBox(width: 6),
-                    Text(
-                      'PDF Petunjuk Teknis',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
-                      ),
-                    ),
-                  ],
+                Icon(Icons.people_outline_rounded, size: 14, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                const SizedBox(width: 6),
+                Text(
+                  'Kuota: ${item.quota}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
+                  ),
                 ),
-                InkWell(
-                  onTap: () => _downloadDoc(docName),
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [accentColor, accentColor.withAlpha(210)],
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: accentColor.withAlpha(80),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
+                const SizedBox(width: 16),
+                Icon(Icons.event_outlined, size: 14, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'Batas: ${item.deadline}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.download_rounded, color: Colors.white, size: 16),
-                        SizedBox(width: 6),
-                        Text(
-                          'Unduh PDF',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Divider(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0), height: 1),
+            const SizedBox(height: 12),
+
+            // PDF File & Clean Download Button
+            Row(
+              children: [
+                const Icon(Icons.picture_as_pdf_rounded, color: Color(0xFFEF4444), size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    item.pdfFileName,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                     ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
+                  onPressed: () => _downloadDoc(item.pdfFileName),
+                  icon: const Icon(Icons.download_rounded, size: 14, color: Colors.white),
+                  label: const Text('Unduh PDF', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0D62F1),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   ),
                 ),
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildChip(String label, Color color, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: color.withAlpha(20),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withAlpha(50)),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 10.5,
-          fontWeight: FontWeight.bold,
         ),
       ),
     );
@@ -790,33 +724,6 @@ class PerpustakaanDetailScreen extends StatefulWidget {
 }
 
 class _PerpustakaanDetailScreenState extends State<PerpustakaanDetailScreen> {
-  final List<Map<String, String>> _bookList = [
-    {
-      'title': 'Sejarah & Kebudayaan Kabupaten Bojonegoro',
-      'author': 'Dinas Kebudayaan & Pariwisata Kab. Bojonegoro',
-      'category': 'Sejarah Daerah',
-      'size': '12.4 MB • PDF',
-    },
-    {
-      'title': 'Bojonegoro Menuju Kota Cerdas & Berkelanjutan',
-      'author': 'Bappeda Bojonegoro',
-      'category': 'Pembangunan',
-      'size': '8.2 MB • PDF',
-    },
-    {
-      'title': 'Panduan Pertanian Organik & Ketahanan Pangan',
-      'author': 'Dinas Ketahanan Pangan Bojonegoro',
-      'category': 'Pertanian',
-      'size': '15.0 MB • PDF',
-    },
-    {
-      'title': 'Antologi Puisi & Cerita Rakyat Wong Bojonegoro',
-      'author': 'Komunitas Literasi Bojonegoro',
-      'category': 'Sastra & Budaya',
-      'size': '5.7 MB • PDF',
-    },
-  ];
-
   final List<String> _userUploadedFiles = [];
 
   Future<void> _uploadNewBookFile() async {
@@ -1052,88 +959,108 @@ class _PerpustakaanDetailScreenState extends State<PerpustakaanDetailScreen> {
                   ),
                   const SizedBox(height: 14),
 
-                  Column(
-                    children: _bookList.map((book) {
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
-                          boxShadow: [
-                            BoxShadow(color: Colors.black.withAlpha(isDark ? 30 : 6), blurRadius: 8, offset: const Offset(0, 2)),
-                          ],
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF0D62F1).withAlpha(20),
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: const Icon(Icons.menu_book_rounded, color: Color(0xFF0D62F1), size: 28),
+                  ListenableBuilder(
+                    listenable: AdminDataService(),
+                    builder: (context, child) {
+                      final items = AdminDataService().perpustakaanList;
+                      return Column(
+                        children: items.map((book) {
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                              boxShadow: [
+                                BoxShadow(color: Colors.black.withAlpha(isDark ? 30 : 6), blurRadius: 8, offset: const Offset(0, 2)),
+                              ],
                             ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF8B5CF6).withAlpha(25),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      book['category']!,
-                                      style: const TextStyle(color: Color(0xFF8B5CF6), fontSize: 10.5, fontWeight: FontWeight.bold),
-                                    ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF0D62F1).withAlpha(20),
+                                    borderRadius: BorderRadius.circular(14),
                                   ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    book['title']!,
-                                    style: TextStyle(
-                                      fontSize: 14.5,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Penulis: ${book['author']}',
-                                    style: TextStyle(fontSize: 11.5, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    book['size']!,
-                                    style: const TextStyle(fontSize: 11, color: Color(0xFF10B981), fontWeight: FontWeight.w600),
-                                  ),
-                                  const SizedBox(height: 12),
-
-                                  Row(
+                                  child: const Icon(Icons.menu_book_rounded, color: Color(0xFF0D62F1), size: 28),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      ElevatedButton.icon(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xFF0D62F1),
-                                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF8B5CF6).withAlpha(25),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              book.category,
+                                              style: const TextStyle(color: Color(0xFF8B5CF6), fontSize: 10.5, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF10B981).withAlpha(25),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              book.stock,
+                                              style: const TextStyle(color: Color(0xFF10B981), fontSize: 10.5, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        book.title,
+                                        style: TextStyle(
+                                          fontSize: 14.5,
+                                          fontWeight: FontWeight.bold,
+                                          color: isDark ? Colors.white : const Color(0xFF0F172A),
                                         ),
-                                        onPressed: () => _downloadBook(book['title']!),
-                                        icon: const Icon(Icons.download_rounded, color: Colors.white, size: 16),
-                                        label: const Text('Download PDF', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        'Pengarang: ${book.author}',
+                                        style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        book.description,
+                                        style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: ElevatedButton.icon(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(0xFF0D62F1),
+                                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                          ),
+                                          onPressed: () => _downloadBook(book.title),
+                                          icon: const Icon(Icons.download_rounded, size: 15, color: Colors.white),
+                                          label: const Text('Unduh E-Book (PDF)', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                                        ),
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        }).toList(),
                       );
-                    }).toList(),
+                    },
                   ),
                   const SizedBox(height: 30),
                 ],

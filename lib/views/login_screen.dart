@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
+import 'admin/admin_main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -33,6 +34,20 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  void _fillAdminDemoCredentials() {
+    setState(() {
+      _identifierController.text = 'admin@bojonegoro.go.id';
+      _passwordController.text = 'admin123';
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Kredensial Admin Demo terisi otomatis! Silakan tekan tombol Masuk. 🔑'),
+        backgroundColor: Color(0xFF0D62F1),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   void _handleLogin() {
     if (!_formKey.currentState!.validate()) return;
 
@@ -41,10 +56,45 @@ class _LoginScreenState extends State<LoginScreen> {
     Future.delayed(const Duration(milliseconds: 500), () {
       if (!mounted) return;
 
+      final identifier = _identifierController.text.trim();
+      final password = _passwordController.text.trim();
       final auth = AuthService();
+
+      // Check if credentials are for Admin Account
+      if (identifier.toLowerCase().contains('admin') || identifier == '3522000000000001') {
+        final adminSuccess = auth.loginAdmin(
+          email: identifier,
+          password: password,
+        );
+
+        setState(() => _isLoading = false);
+
+        if (adminSuccess && auth.isAdmin) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Autentikasi Administrator Berhasil! Selamat datang di Portal Admin Pemkab Bojonegoro.'),
+              backgroundColor: Color(0xFF10B981),
+            ),
+          );
+
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AdminMainScreen(
+                isDarkMode: widget.isDarkMode,
+                onToggleDarkMode: widget.onToggleDarkMode ?? () {},
+              ),
+            ),
+            (route) => false,
+          );
+          return;
+        }
+      }
+
+      // Standard User Login
       final success = auth.login(
-        identifier: _identifierController.text.trim(),
-        password: _passwordController.text.trim(),
+        identifier: identifier,
+        password: password,
       );
 
       setState(() => _isLoading = false);
@@ -59,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (widget.onLoginSuccess != null) {
           Navigator.pop(context); // Close Login Screen
-          widget.onLoginSuccess!(); // Restore target service screen (e.g. Layanan Kependudukan)
+          widget.onLoginSuccess!(); // Restore target service screen
         } else {
           Navigator.pushAndRemoveUntil(
             context,
@@ -148,8 +198,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       ),
-                      child: Image.asset(
-                        'assets/images/logo_bojonegoro.png',
+                      child: Image.network(
+                        'https://upload.wikimedia.org/wikipedia/commons/1/18/Logo_Kabupaten_Bojonegoro.png',
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) => const Icon(
                           Icons.account_balance_rounded,
@@ -407,6 +457,72 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Demo Administrator Credentials Quick Fill Card
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: const Color(0xFF0D62F1).withAlpha(isDark ? 60 : 30),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.shield_rounded, color: Color(0xFF0D62F1), size: 18),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Akun Demo Administrator:',
+                                style: TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            '• Email: admin@bojonegoro.go.id\n• Password: admin123',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+                              height: 1.4,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 38,
+                            child: OutlinedButton.icon(
+                              onPressed: _fillAdminDemoCredentials,
+                              icon: const Icon(Icons.touch_app_rounded, color: Color(0xFF0D62F1), size: 16),
+                              label: const Text(
+                                'Isi Otomatis Akun Admin Demo',
+                                style: TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF0D62F1),
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Color(0xFF0D62F1), width: 1.2),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 32),
                   ],

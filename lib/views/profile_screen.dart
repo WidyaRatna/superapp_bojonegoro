@@ -6,7 +6,10 @@ import 'settings_screen.dart';
 import 'security_privacy_screen.dart';
 import 'faq_screen.dart';
 import '../services/auth_service.dart';
-import 'welcome_screen.dart';
+import 'login_screen.dart';
+import 'home_screen.dart';
+import 'admin/admin_login_screen.dart';
+import 'admin/admin_main_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -24,13 +27,27 @@ class ProfileScreen extends StatefulWidget {
 
 // Global Profile Data Store for Persistent Session Memory
 class UserProfileData {
-  static String name = 'Widya Ratna';
-  static String nik = '3522081234560001';
-  static String email = 'widya.ratna@bojonegoro.go.id';
-  static String phone = '0812-3456-7890';
-  static String address = 'Jl. Mastrip No. 12, Kab. Bojonegoro';
+  static String name = 'Pengguna Tamu';
+  static String nik = 'Belum Login';
+  static String email = 'Akses Publik / Non-Login';
+  static String phone = '-';
+  static String address = 'Kab. Bojonegoro';
   static String avatarType = 'default';
   static String avatarImagePath = '';
+
+  static void syncFromUser(UserAccount? user) {
+    if (user != null) {
+      name = user.name;
+      nik = user.nik;
+      email = user.email;
+      phone = user.phone;
+    } else {
+      name = 'Pengguna Tamu';
+      nik = 'Belum Login';
+      email = 'Akses Publik / Non-Login';
+      phone = '-';
+    }
+  }
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
@@ -55,16 +72,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _userNik = auth.currentUser!.nik;
       _userEmail = auth.currentUser!.email;
       _userPhone = auth.currentUser!.phone;
-    } else if (auth.isGuest) {
+      UserProfileData.syncFromUser(auth.currentUser);
+    } else {
       _userName = 'Pengguna Tamu';
       _userNik = 'Belum Login';
       _userEmail = 'Akses Publik / Non-Login';
       _userPhone = '-';
-    } else {
-      _userName = UserProfileData.name;
-      _userNik = UserProfileData.nik;
-      _userEmail = UserProfileData.email;
-      _userPhone = UserProfileData.phone;
+      UserProfileData.syncFromUser(null);
     }
     _userAddress = UserProfileData.address;
     _avatarType = UserProfileData.avatarType;
@@ -117,6 +131,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     final double topPadding = MediaQuery.of(context).padding.top;
+    final auth = AuthService();
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
@@ -449,20 +464,85 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // 4. AKSI (Keluar)
+                  // 4. PORTAL ADMINISTRATOR
+                  _buildCleanGroupSection(
+                    title: 'PORTAL ADMINISTRATOR',
+                    isDark: isDark,
+                    children: [
+                      _buildCleanGroupItem(
+                        icon: Icons.admin_panel_settings_outlined,
+                        title: 'Portal Admin Diskominfo',
+                        subtitle: 'Kelola data, edit, input & hapus layanan',
+                        onTap: () {
+                          final auth = AuthService();
+                          if (auth.isLoggedIn && auth.isAdmin) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AdminMainScreen(
+                                  isDarkMode: widget.isDarkMode,
+                                  onToggleDarkMode: widget.onToggleDarkMode,
+                                ),
+                              ),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AdminLoginScreen(
+                                  isDarkMode: widget.isDarkMode,
+                                  onToggleDarkMode: widget.onToggleDarkMode,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        isDark: isDark,
+                        isLast: true,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // 4. AKSI (Keluar / Masuk)
                   _buildCleanGroupSection(
                     title: 'AKSI',
                     isDark: isDark,
                     children: [
-                      _buildCleanGroupItem(
-                        icon: Icons.logout_rounded,
-                        title: 'Keluar',
-                        subtitle: '',
-                        onTap: _showLogoutConfirmDialog,
-                        isDark: isDark,
-                        isDestructive: true,
-                        isLast: true,
-                      ),
+                      if (auth.isLoggedIn)
+                        _buildCleanGroupItem(
+                          icon: Icons.logout_rounded,
+                          title: 'Keluar Akun',
+                          subtitle: 'Keluar dari sesi akun Anda',
+                          onTap: _showLogoutConfirmDialog,
+                          isDark: isDark,
+                          isDestructive: true,
+                          isLast: true,
+                        )
+                      else
+                        _buildCleanGroupItem(
+                          icon: Icons.login_rounded,
+                          title: 'Masuk / Daftar Akun',
+                          subtitle: 'Masuk untuk mengakses seluruh fitur',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginScreen(
+                                  isDarkMode: widget.isDarkMode,
+                                  onToggleDarkMode: widget.onToggleDarkMode,
+                                  onLoginSuccess: () {
+                                    setState(() {
+                                      _loadProfileData();
+                                    });
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                          isDark: isDark,
+                          isLast: true,
+                        ),
                     ],
                   ),
                   const SizedBox(height: 44),
@@ -657,17 +737,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _showLogoutConfirmDialog() {
     final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
     final auth = AuthService();
+    final bool wasAdmin = auth.isAdmin;
 
     if (auth.isGuest) {
-      Navigator.pushAndRemoveUntil(
+      Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => WelcomeScreen(
+          builder: (context) => LoginScreen(
             isDarkMode: widget.isDarkMode,
             onToggleDarkMode: widget.onToggleDarkMode,
+            onLoginSuccess: () {
+              setState(() {
+                _loadProfileData();
+              });
+            },
           ),
         ),
-        (route) => false,
       );
       return;
     }
@@ -682,7 +767,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A)),
         ),
         content: Text(
-          'Apakah Anda yakin ingin keluar dari akun SuperApp Bojonegoro?',
+          wasAdmin
+              ? 'Apakah Anda yakin ingin keluar dari sesi Portal Administrator?'
+              : 'Apakah Anda yakin ingin keluar dari akun SuperApp Bojonegoro?',
           style: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
         ),
         actions: [
@@ -700,19 +787,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
               
               // Perform AuthService logout
               AuthService().logout();
+              UserProfileData.syncFromUser(null);
 
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Anda telah berhasil keluar dari akun.'),
-                    backgroundColor: Color(0xFFEF4444),
+                  SnackBar(
+                    content: Text(
+                      wasAdmin
+                          ? 'Anda telah berhasil keluar dari sesi Administrator.'
+                          : 'Anda telah berhasil keluar dari akun.',
+                    ),
+                    backgroundColor: const Color(0xFFEF4444),
                   ),
                 );
 
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => WelcomeScreen(
+                    builder: (context) => HomeScreen(
                       isDarkMode: widget.isDarkMode,
                       onToggleDarkMode: widget.onToggleDarkMode,
                     ),

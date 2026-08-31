@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../views/profile_screen.dart';
 
 /// User Account Data Model
 class UserAccount {
@@ -51,11 +52,11 @@ class AuthService extends ChangeNotifier {
     _isGuest = true;
     _isLoggedIn = false;
     _currentUser = null;
+    UserProfileData.syncFromUser(null);
     notifyListeners();
   }
 
   /// Perform USER Login with NIK/Email and Password
-  // TODO: [Backend Auth Integration] Replace with Supabase Auth: supabase.auth.signInWithPassword(...)
   bool login({
     required String identifier,
     required String password,
@@ -68,23 +69,29 @@ class AuthService extends ChangeNotifier {
       return false;
     }
 
+    String displayName = name ?? 'Budi Santoso';
+    if (name == null && cleanId.contains('@')) {
+      final parts = cleanId.split('@').first.split('.');
+      displayName = parts.map((p) => p.isNotEmpty ? '${p[0].toUpperCase()}${p.substring(1)}' : '').join(' ').trim();
+      if (displayName.isEmpty) displayName = 'Warga Bojonegoro';
+    }
+
     _isGuest = false;
     _isLoggedIn = true;
     _currentUser = UserAccount(
-      name: name ?? 'Budi Santoso',
+      name: displayName,
       nik: cleanId.contains('@') ? '3522102005920001' : cleanId,
-      email: cleanId.contains('@') ? cleanId : 'budi.santoso@bojonegoro.go.id',
+      email: cleanId.contains('@') ? cleanId : '$cleanId@bojonegoro.go.id',
       phone: '081234567890',
       role: 'user',
     );
 
+    UserProfileData.syncFromUser(_currentUser);
     notifyListeners();
     return true;
   }
 
   /// Dedicated ADMIN Login with Role Verification
-  /// Returns false if credentials or role check fails.
-  // TODO: [Backend Auth & Role Integration] Replace with Supabase Auth & query profiles table where role == 'admin'
   bool loginAdmin({
     required String email,
     required String password,
@@ -114,6 +121,7 @@ class AuthService extends ChangeNotifier {
       role: 'admin',
     );
 
+    UserProfileData.syncFromUser(_currentUser);
     notifyListeners();
     return true;
   }
@@ -139,6 +147,7 @@ class AuthService extends ChangeNotifier {
       phone: phone.trim().isEmpty ? '081234567890' : phone.trim(),
       role: 'user',
     );
+    UserProfileData.syncFromUser(_currentUser);
     notifyListeners();
     return true;
   }
@@ -148,6 +157,7 @@ class AuthService extends ChangeNotifier {
     _isGuest = true;
     _isLoggedIn = false;
     _currentUser = null;
+    UserProfileData.syncFromUser(null);
     notifyListeners();
   }
 }

@@ -6,6 +6,7 @@ class PopularServicesWidget extends StatelessWidget {
   final Function(ServiceCategory) onServiceTap;
   final VoidCallback onViewAllTap;
   final bool isDarkMode;
+  final bool isAdminMode;
 
   const PopularServicesWidget({
     super.key,
@@ -13,6 +14,7 @@ class PopularServicesWidget extends StatelessWidget {
     required this.onServiceTap,
     required this.onViewAllTap,
     required this.isDarkMode,
+    this.isAdminMode = false,
   });
 
   @override
@@ -74,11 +76,11 @@ class PopularServicesWidget extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: displayServices.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
-              childAspectRatio: 2.3,
+              childAspectRatio: isAdminMode ? 1.85 : 2.15,
             ),
             itemBuilder: (context, index) {
               final service = displayServices[index];
@@ -86,7 +88,7 @@ class PopularServicesWidget extends StatelessWidget {
                 onTap: () => onServiceTap(service),
                 borderRadius: BorderRadius.circular(14),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
                     color: isDark ? const Color(0xFF1E293B) : Colors.white,
                     borderRadius: BorderRadius.circular(14),
@@ -99,8 +101,8 @@ class PopularServicesWidget extends StatelessWidget {
                     children: [
                       // Soft Tint Colored Icon Box
                       Container(
-                        width: 38,
-                        height: 38,
+                        width: 36,
+                        height: 36,
                         decoration: BoxDecoration(
                           color: service.color.withAlpha(isDark ? 35 : 20),
                           borderRadius: BorderRadius.circular(10),
@@ -109,23 +111,48 @@ class PopularServicesWidget extends StatelessWidget {
                           child: Icon(
                             service.icon,
                             color: service.color,
-                            size: 20,
+                            size: 19,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 8),
                       // Service Title Label
                       Expanded(
-                        child: Text(
-                          service.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            height: 1.2,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              service.title,
+                              maxLines: isAdminMode ? 1 : 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w600,
+                                height: 1.15,
+                              ),
+                            ),
+                            if (isAdminMode) ...[
+                              const SizedBox(height: 2),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF0D62F1).withAlpha(isDark ? 50 : 25),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Text(
+                                  'Kelola',
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF0D62F1),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                     ],

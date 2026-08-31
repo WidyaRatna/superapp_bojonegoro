@@ -29,80 +29,75 @@ class _AdminLokerScreenState extends State<AdminLokerScreen> {
 
   void _showAddEditDialog([ItemLokerAdmin? existing]) {
     final titleController = TextEditingController(text: existing?.title ?? '');
-    final companyController = TextEditingController(text: existing?.companyName ?? '');
-    final categoryController = TextEditingController(text: existing?.category ?? 'Teknologi & IT');
-    final salaryController = TextEditingController(text: existing?.salaryRange ?? 'Rp 3.500.000 - Rp 5.000.000');
-    final descController = TextEditingController(text: existing?.description ?? '');
-    final contactController = TextEditingController(text: existing?.contactPhone ?? '081234567890');
+    final companyController = TextEditingController(text: existing?.company ?? '');
+    final locationController = TextEditingController(text: existing?.location ?? 'Bojonegoro');
+    final salaryController = TextEditingController(text: existing?.salary ?? 'Rp 3.000.000 - Rp 4.500.000');
+    final categoryController = TextEditingController(text: existing?.category ?? 'Swasta / UMKM');
 
     showDialog(
       context: context,
       builder: (context) {
         return AdminFormDialog(
-          title: existing != null ? 'Edit Lowongan Kerja' : 'Tambah Lowongan Kerja',
-          subtitle: 'Kelola informasi lowongan pekerjaan daerah & status verifikasi',
+          title: existing != null ? 'Edit Lowongan Kerja' : 'Tambah Loker Baru',
+          subtitle: 'Kelola informasi lowongan pekerjaan daerah Bojonegoro',
           isEditing: existing != null,
           fields: [
             AdminFormField(
-              label: 'Judul Posisi Lowongan',
+              label: 'Judul Posisi Pekerjaan',
               controller: titleController,
-              hint: 'Contoh: Frontend Developer',
+              hint: 'Contoh: Staf Administrasi & Kasir',
             ),
             AdminFormField(
-              label: 'Nama Perusahaan / Usaha',
+              label: 'Nama Perusahaan / PT / Instansi',
               controller: companyController,
-              hint: 'PT Bojonegoro Teknologi Utama',
+              hint: 'PT Surya Bojonegoro',
             ),
             AdminFormField(
-              label: 'Kategori Pekerjaan',
+              label: 'Lokasi Kerja',
+              controller: locationController,
+              hint: 'Kec. Bojonegoro, Kab. Bojonegoro',
+            ),
+            AdminFormField(
+              label: 'Kategori Sektor',
               controller: categoryController,
-              hint: 'Pilih kategori',
-              options: const ['Teknologi & IT', 'Administrasi & Keuangan', 'Pemasaran & Penjualan', 'Industri & Teknik', 'Jasa & Pelayanan'],
+              hint: 'Swasta / Industri / Perbankan / BUMD',
             ),
             AdminFormField(
-              label: 'Kisaran Gaji / Insentif',
+              label: 'Kisaran Gaji',
               controller: salaryController,
-              hint: 'Rp 3.500.000 - Rp 5.000.000',
-            ),
-            AdminFormField(
-              label: 'Deskripsi Kebutuhan & Syarat',
-              controller: descController,
-              hint: 'Jelaskan kualifikasi calon pelamar...',
-              isMultiLine: true,
-            ),
-            AdminFormField(
-              label: 'Nomor Kontak HP / WA',
-              controller: contactController,
-              hint: '081234567890',
+              hint: 'Rp 3.000.000 - Rp 4.500.000',
             ),
           ],
           onSave: () {
             final service = AdminDataService();
-
             if (existing != null) {
               existing.title = titleController.text.trim();
-              existing.companyName = companyController.text.trim();
+              existing.company = companyController.text.trim();
+              existing.location = locationController.text.trim();
+              existing.salary = salaryController.text.trim();
               existing.category = categoryController.text.trim();
-              existing.salaryRange = salaryController.text.trim();
-              existing.description = descController.text.trim();
-              existing.contactPhone = contactController.text.trim();
               service.updateLoker(existing);
             } else {
               service.addLoker(
                 ItemLokerAdmin(
-                  id: 'LKR-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
-                  title: titleController.text.trim(),
-                  company: companyController.text.trim(),
-                  location: 'Bojonegoro',
-                  salary: salaryController.text.trim(),
-                  category: categoryController.text.trim(),
-                  description: descController.text.trim(),
-                  contactPhone: contactController.text.trim(),
-                  postedDate: '24 Agustus 2026',
+                  id: 'LOK-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
+                  title: titleController.text.trim().isEmpty ? 'Posisi Kerja Baru' : titleController.text.trim(),
+                  company: companyController.text.trim().isEmpty ? 'Perusahaan Mitra Bojonegoro' : companyController.text.trim(),
+                  location: locationController.text.trim().isEmpty ? 'Bojonegoro' : locationController.text.trim(),
+                  salary: salaryController.text.trim().isEmpty ? 'Sesuai UMK Bojonegoro' : salaryController.text.trim(),
+                  category: categoryController.text.trim().isEmpty ? 'Swasta' : categoryController.text.trim(),
+                  postedDate: 'Hari Ini',
                   status: 'Terverifikasi',
                 ),
               );
             }
+            setState(() {});
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(existing != null ? 'Loker berhasil diperbarui!' : 'Loker baru berhasil dipublikasi!'),
+                backgroundColor: const Color(0xFF10B981),
+              ),
+            );
           },
         );
       },
@@ -112,333 +107,224 @@ class _AdminLokerScreenState extends State<AdminLokerScreen> {
   void _confirmDelete(ItemLokerAdmin item) {
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          title: const Text('Hapus Lowongan'),
-          content: Text('Apakah Anda yakin ingin menghapus "${item.title}"?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Batal'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                AdminDataService().deleteLoker(item.id);
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('Hapus', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        );
-      },
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Hapus Lowongan Kerja'),
+        content: Text('Apakah Anda yakin ingin menghapus lowongan "${item.title}" dari ${item.company}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              AdminDataService().deleteLoker(item.id);
+              setState(() {});
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Loker "${item.title}" telah dihapus.'),
+                  backgroundColor: const Color(0xFFEF4444),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF4444)),
+            child: const Text('Hapus', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
-    final adminService = AdminDataService();
+    final items = AdminDataService().lokerList;
+    final filtered = items.where((loker) {
+      final q = _searchQuery.toLowerCase();
+      return loker.title.toLowerCase().contains(q) || loker.company.toLowerCase().contains(q);
+    }).toList();
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddEditDialog(),
         backgroundColor: const Color(0xFF0D62F1),
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
+        icon: const Icon(Icons.work_history_rounded, color: Colors.white),
         label: const Text(
           'Tambah Loker',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
       body: Column(
         children: [
           SuperAppHeader(
             title: 'Kelola Lowongan Kerja',
-            subtitle: 'Admin Panel • SuperApp Bojonegoro',
+            subtitle: 'Publikasi, verifikasi, edit & hapus loker Bojonegoro',
             isDarkMode: isDark,
             onToggleDarkMode: widget.onToggleDarkMode,
           ),
-          const SizedBox(height: 12),
-
-          // Search Bar (User Style)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Container(
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: isDark ? Border.all(color: const Color(0xFF334155)) : null,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(15),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: TextField(
-                controller: _searchController,
-                onChanged: (val) => setState(() => _searchQuery = val),
-                style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A), fontSize: 13.5),
-                decoration: InputDecoration(
-                  hintText: 'Cari posisi lowongan atau perusahaan...',
-                  hintStyle: TextStyle(color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8), fontSize: 13.5),
-                  prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF0D62F1), size: 20),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+            TextField(
+              controller: _searchController,
+              onChanged: (val) => setState(() => _searchQuery = val),
+              decoration: InputDecoration(
+                hintText: 'Cari posisi pekerjaan atau nama perusahaan...',
+                prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF0D62F1)),
+                filled: true,
+                fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: Color(0xFF0D62F1), width: 1.5),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-          // List of Job Cards (User Parity + Verification Controls)
-          Expanded(
-            child: ListenableBuilder(
-              listenable: adminService,
-              builder: (context, child) {
-                final list = adminService.lokerList.where((job) {
-                  if (_searchQuery.trim().isEmpty) return true;
-                  final q = _searchQuery.toLowerCase();
-                  return job.title.toLowerCase().contains(q) ||
-                      job.companyName.toLowerCase().contains(q) ||
-                      job.category.toLowerCase().contains(q);
-                }).toList();
-
-                if (list.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.work_outline_rounded, size: 54, color: Color(0xFF94A3B8)),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Tidak ada data lowongan kerja',
-                          style: TextStyle(color: isDark ? Colors.white70 : const Color(0xFF64748B), fontWeight: FontWeight.w600),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 80),
-                  itemCount: list.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 16),
-                  itemBuilder: (context, index) {
-                    final item = list[index];
-
-                    Color statusColor;
-                    IconData statusIcon;
-                    if (item.status == 'Terverifikasi') {
-                      statusColor = const Color(0xFF10B981);
-                      statusIcon = Icons.check_circle_rounded;
-                    } else if (item.status == 'Ditolak') {
-                      statusColor = const Color(0xFFEF4444);
-                      statusIcon = Icons.cancel_rounded;
-                    } else {
-                      statusColor = Colors.amber.shade700;
-                      statusIcon = Icons.hourglass_top_rounded;
-                    }
-
-                    return Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withAlpha(isDark ? 50 : 15),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: filtered.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final item = filtered[index];
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(isDark ? 30 : 8),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 44,
-                                height: 44,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF0D62F1).withAlpha(isDark ? 40 : 15),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(Icons.work_rounded, color: Color(0xFF0D62F1), size: 24),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item.title,
-                                      style: TextStyle(
-                                        fontSize: 16.5,
-                                        fontWeight: FontWeight.bold,
-                                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 3),
-                                    Text(
-                                      item.companyName,
-                                      style: TextStyle(
-                                        fontSize: 13.5,
-                                        fontWeight: FontWeight.w600,
-                                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // Status Verification Badge Dropdown/Button
-                              PopupMenuButton<String>(
-                                onSelected: (val) {
-                                  adminService.updateLokerStatus(item.id, val);
-                                },
-                                itemBuilder: (context) => [
-                                  const PopupMenuItem(
-                                    value: 'Terverifikasi',
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.check_circle_rounded, color: Color(0xFF10B981), size: 18),
-                                        SizedBox(width: 8),
-                                        Text('Setujui (Terverifikasi)'),
-                                      ],
-                                    ),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: 'Menunggu Verifikasi',
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.hourglass_top_rounded, color: Colors.amber, size: 18),
-                                        SizedBox(width: 8),
-                                        Text('Pending (Menunggu)'),
-                                      ],
-                                    ),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: 'Ditolak',
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.cancel_rounded, color: Color(0xFFEF4444), size: 18),
-                                        SizedBox(width: 8),
-                                        Text('Tolak Loker'),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: statusColor.withAlpha(20),
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(color: statusColor.withAlpha(50)),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(statusIcon, color: statusColor, size: 14),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        item.status,
-                                        style: TextStyle(color: statusColor, fontWeight: FontWeight.bold, fontSize: 11.5),
-                                      ),
-                                      const SizedBox(width: 2),
-                                      Icon(Icons.arrow_drop_down_rounded, color: statusColor, size: 16),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 14),
-
-                          // Salary & Category Row
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF10B981).withAlpha(15),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  item.salaryRange,
-                                  style: const TextStyle(color: Color(0xFF059669), fontWeight: FontWeight.bold, fontSize: 12),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  item.category,
-                                  style: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569), fontSize: 12),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-
-                          Text(
-                            item.description,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
-                              height: 1.4,
+                          Container(
+                            width: 46,
+                            height: 46,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0D62F1).withAlpha(isDark ? 40 : 15),
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                            child: const Center(
+                              child: Icon(Icons.business_center_rounded, color: Color(0xFF0D62F1), size: 24),
+                            ),
                           ),
-                          const SizedBox(height: 16),
-                          const Divider(height: 1),
-                          const SizedBox(height: 12),
-
-                          // Admin Actions Row
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              OutlinedButton.icon(
-                                onPressed: () => _showAddEditDialog(item),
-                                icon: const Icon(Icons.edit_rounded, size: 16, color: Color(0xFF0D62F1)),
-                                label: const Text('Edit Loker', style: TextStyle(fontSize: 12.5, color: Color(0xFF0D62F1), fontWeight: FontWeight.bold)),
-                                style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(color: Color(0xFF0D62F1)),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.title,
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              ElevatedButton.icon(
-                                onPressed: () => _confirmDelete(item),
-                                icon: const Icon(Icons.delete_outline_rounded, size: 16, color: Colors.white),
-                                label: const Text('Hapus', style: TextStyle(fontSize: 12.5, color: Colors.white, fontWeight: FontWeight.bold)),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFEF4444),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                const SizedBox(height: 2),
+                                Text(
+                                  item.company,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF10B981).withAlpha(isDark ? 40 : 20),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              item.status,
+                              style: const TextStyle(color: Color(0xFF10B981), fontSize: 11, fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ],
                       ),
-                    );
-                  },
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on_rounded, size: 14, color: Color(0xFF64748B)),
+                          const SizedBox(width: 4),
+                          Text(
+                            item.location,
+                            style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                          ),
+                          const Spacer(),
+                          const Icon(Icons.payments_rounded, size: 14, color: Color(0xFF10B981)),
+                          const SizedBox(width: 4),
+                          Text(
+                            item.salary,
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF10B981)),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      const Divider(height: 1),
+                      const SizedBox(height: 10),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          OutlinedButton.icon(
+                            onPressed: () => _showAddEditDialog(item),
+                            icon: const Icon(Icons.edit_rounded, size: 15, color: Color(0xFF0D62F1)),
+                            label: const Text('Edit', style: TextStyle(color: Color(0xFF0D62F1), fontWeight: FontWeight.bold)),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFF0D62F1)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          ElevatedButton.icon(
+                            onPressed: () => _confirmDelete(item),
+                            icon: const Icon(Icons.delete_outline_rounded, size: 15, color: Colors.white),
+                            label: const Text('Hapus', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFEF4444),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 );
               },
             ),
-          ),
-        ],
+            const SizedBox(height: 80),
+          ],
+        ),
       ),
+    ),
+  ],
+),
     );
   }
 }
