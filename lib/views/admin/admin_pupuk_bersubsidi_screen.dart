@@ -612,9 +612,11 @@ class _AdminPupukBersubsidiScreenState extends State<AdminPupukBersubsidiScreen>
           color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
         ),
       ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
+      child: Material(
+        color: Colors.transparent,
+        child: Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
           iconColor: primaryGreen,
           collapsedIconColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
           leading: Container(
@@ -677,8 +679,9 @@ class _AdminPupukBersubsidiScreenState extends State<AdminPupukBersubsidiScreen>
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 class _BulletText extends StatelessWidget {

@@ -2,20 +2,21 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import '../widgets/superapp_header.dart';
+import '../widgets/admin/admin_form_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class InstansiItem {
   final String id;
-  final String name;
-  final String category; // BADAN, DINAS, SETDA, KECAMATAN, RSUD, BUMD, SETWAN
-  final String address;
-  final String phone;
-  final String whatsapp;
-  final String email;
-  final String website;
-  final String operationalHours;
+  String name;
+  String category; // BADAN, DINAS, SETDA, KECAMATAN, RSUD, BUMD, SETWAN
+  String address;
+  String phone;
+  String whatsapp;
+  String email;
+  String website;
+  String operationalHours;
 
-  const InstansiItem({
+  InstansiItem({
     required this.id,
     required this.name,
     required this.category,
@@ -28,9 +29,10 @@ class InstansiItem {
   });
 }
 
+
 final List<InstansiItem> sampleInstansiList = [
   // BADAN & INSPEKTORAT (8 Badan Resmi Pemkab Bojonegoro)
-  const InstansiItem(
+  InstansiItem(
     id: 'bkpp',
     name: 'BADAN KEPEGAWAIAN, PENDIDIKAN, DAN PELATIHAN',
     category: 'BADAN',
@@ -39,7 +41,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'bkpp@bojonegorokab.go.id, bkdbojonegoro2015@gmail.com',
     website: 'bkpp.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'bappeda',
     name: 'BADAN PERENCANAAN PEMBANGUNAN DAERAH',
     category: 'BADAN',
@@ -48,7 +50,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'bappeda@bojonegorokab.go.id',
     website: 'bappeda.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'bpkad',
     name: 'BADAN PENGELOLAAN KEUANGAN DAN ASET DAERAH',
     category: 'BADAN',
@@ -58,7 +60,7 @@ final List<InstansiItem> sampleInstansiList = [
     website: 'bpkad.bojonegorokab.go.id',
     operationalHours: 'Senin - Jumat: 08.00 - 16.00 WIB',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'bapenda',
     name: 'BADAN PENDAPATAN DAERAH',
     category: 'BADAN',
@@ -68,7 +70,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'bapenda@bojonegorokab.go.id, mail@bapendabojonegoro.id',
     website: 'bapenda.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'bakesbangpol',
     name: 'BADAN KESATUAN BANGSA DAN POLITIK',
     category: 'BADAN',
@@ -77,7 +79,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kesbangpolbgoro@gmail.com',
     website: 'bakesbangpol.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'bpbd',
     name: 'BADAN PENANGGULANGAN BENCANA DAERAH',
     category: 'BADAN',
@@ -88,7 +90,7 @@ final List<InstansiItem> sampleInstansiList = [
     website: 'bpbd.bojonegorokab.go.id',
     operationalHours: '24 Jam Nonstop (Layanan Darurat)',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'brida',
     name: 'BADAN RISET DAN INOVASI DAERAH',
     category: 'BADAN',
@@ -97,7 +99,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'brida.bojonegorokab@gmail.com',
     website: 'brida.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'inspektorat',
     name: 'INSPEKTORAT KABUPATEN BOJONEGORO',
     category: 'BADAN',
@@ -108,7 +110,7 @@ final List<InstansiItem> sampleInstansiList = [
   ),
 
   // DINAS (22 Dinas Resmi Pemkab Bojonegoro)
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_pendidikan',
     name: 'DINAS PENDIDIKAN',
     category: 'DINAS',
@@ -117,7 +119,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'diknasbjn@gmail.com',
     website: 'disdik.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_kesehatan',
     name: 'DINAS KESEHATAN',
     category: 'DINAS',
@@ -127,7 +129,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'dinaskesehatan@bojonegorokab.go.id',
     website: 'dinkes.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_pu_bina_marga',
     name: 'DINAS PEKERJAAN UMUM BINA MARGA DAN PENATAAN RUANG',
     category: 'DINAS',
@@ -136,7 +138,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'dpubinamarga@bojonegorokab.go.id',
     website: 'dpubinamarga.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_pu_sda',
     name: 'DINAS PEKERJAAN UMUM SUMBER DAYA AIR',
     category: 'DINAS',
@@ -144,7 +146,7 @@ final List<InstansiItem> sampleInstansiList = [
     phone: '(0353) 881491',
     email: 'pengairan.bjn@gmail.com',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_perkim_cipta_karya',
     name: 'DINAS PERUMAHAN, KAWASAN PERMUKIMAN DAN CIPTA KARYA',
     category: 'DINAS',
@@ -152,7 +154,7 @@ final List<InstansiItem> sampleInstansiList = [
     phone: '(0353) 887444',
     email: 'dpkpck@bojonegorokab.go.id / ciptakaryadpkpck@gmail.com',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_sosial',
     name: 'DINAS SOSIAL',
     category: 'DINAS',
@@ -160,7 +162,7 @@ final List<InstansiItem> sampleInstansiList = [
     phone: '(0353) 888918',
     email: 'dinsos@bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_damkar',
     name: 'DINAS PEMADAM KEBAKARAN',
     category: 'DINAS',
@@ -169,7 +171,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'damkarbojonegoro@gmail.com',
     operationalHours: '24 Jam Nonstop (Layanan Darurat)',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'satpol_pp',
     name: 'SATUAN POLISI PAMONG PRAJA',
     category: 'DINAS',
@@ -177,7 +179,7 @@ final List<InstansiItem> sampleInstansiList = [
     phone: '082228911677',
     email: 'satpolkabbjn@gmail.com',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_p3akb',
     name: 'DINAS PEMBERDAYAAN PEREMPUAN, PERLINDUNGAN ANAK DAN KELUARGA BERENCANA',
     category: 'DINAS',
@@ -185,7 +187,7 @@ final List<InstansiItem> sampleInstansiList = [
     phone: '(0353) 889515',
     email: 'dp3akb@bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_dukcapil',
     name: 'DINAS KEPENDUDUKAN DAN PENCATATAN SIPIL',
     category: 'DINAS',
@@ -195,7 +197,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'dinasdukcapil@bojonegorokab.go.id / dispendukcapilbjn@gmail.com',
     website: 'disdukcapil.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_pmd',
     name: 'DINAS PEMBERDAYAAN MASYARAKAT DAN DESA',
     category: 'DINAS',
@@ -203,7 +205,7 @@ final List<InstansiItem> sampleInstansiList = [
     phone: '(0353) 881512',
     email: 'dinpmd@bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_perhubungan',
     name: 'DINAS PERHUBUNGAN',
     category: 'DINAS',
@@ -212,7 +214,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'dishubbjn@gmail.com',
     website: 'dishub.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_kominfo',
     name: 'DINAS KOMUNIKASI DAN INFORMATIKA',
     category: 'DINAS',
@@ -221,7 +223,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'dinkominfo@bojonegorokab.go.id',
     website: 'diskominfo.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_dispora',
     name: 'DINAS KEPEMUDAAN DAN OLAHRAGA',
     category: 'DINAS',
@@ -229,7 +231,7 @@ final List<InstansiItem> sampleInstansiList = [
     phone: '(0353) 881257',
     email: 'disporabjn@gmail.com',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_dpmptsp',
     name: 'DINAS PENANAMAN MODAL DAN PELAYANAN TERPADU SATU PINTU',
     category: 'DINAS',
@@ -239,7 +241,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'dpmptsp@bojonegorokab.go.id, dpmptsp.kabbjn@gmail.com',
     website: 'dpmptsp.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_perpustakaan',
     name: 'DINAS PERPUSTAKAAN DAN KEARSIPAN',
     category: 'DINAS',
@@ -247,7 +249,7 @@ final List<InstansiItem> sampleInstansiList = [
     phone: '(0353) 891907',
     email: 'perpus.arsip.bjn@gmail.com',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_lh',
     name: 'DINAS LINGKUNGAN HIDUP',
     category: 'DINAS',
@@ -256,7 +258,7 @@ final List<InstansiItem> sampleInstansiList = [
     whatsapp: '081359241645',
     email: 'dlh.bojonegoro@gmail.com',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_disnaker',
     name: 'DINAS PERINDUSTRIAN DAN TENAGA KERJA',
     category: 'DINAS',
@@ -265,7 +267,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'disnaker@bojonegorokab.go.id',
     website: 'disnaker.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_disbudpar',
     name: 'DINAS KEBUDAYAAN DAN PARIWISATA',
     category: 'DINAS',
@@ -273,7 +275,7 @@ final List<InstansiItem> sampleInstansiList = [
     phone: '(0353) 881571',
     email: 'dinbudpar@bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_dagkop',
     name: 'DINAS PERDAGANGAN, KOPERASI DAN USAHA MIKRO',
     category: 'DINAS',
@@ -281,7 +283,7 @@ final List<InstansiItem> sampleInstansiList = [
     phone: '(0353) 881089',
     email: 'dinasperdaganganbjn@gmail.com',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_pertanian',
     name: 'DINAS KETAHANAN PANGAN DAN PERTANIAN',
     category: 'DINAS',
@@ -289,7 +291,7 @@ final List<InstansiItem> sampleInstansiList = [
     phone: '(0353) 881410',
     email: 'dinaspertanian@bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'dinas_peternakan',
     name: 'DINAS PETERNAKAN DAN PERIKANAN',
     category: 'DINAS',
@@ -299,7 +301,7 @@ final List<InstansiItem> sampleInstansiList = [
   ),
 
   // SETDA (9 Bagian Resmi Sekretariat Daerah Kab. Bojonegoro)
-  const InstansiItem(
+  InstansiItem(
     id: 'setda_adbang',
     name: 'BAGIAN ADMINISTRASI PEMBANGUNAN',
     category: 'SETDA',
@@ -308,7 +310,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'bagpembangunan@bojonegorokab.go.id, pembangunanbojonegoro@gmail.com',
     website: 'bagpembangunan.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'setda_pemerintahan',
     name: 'BAGIAN PEMERINTAHAN',
     category: 'SETDA',
@@ -318,7 +320,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'bagpembjn@gmail.com',
     website: 'bagpem.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'setda_perekonomian',
     name: 'BAGIAN PEREKONOMIAN DAN SUMBER DAYA ALAM',
     category: 'SETDA',
@@ -327,7 +329,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'ekonomi.bjn@gmail.com',
     website: 'bagekonomi.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'setda_kesra',
     name: 'BAGIAN KESEJAHTERAAN RAKYAT',
     category: 'SETDA',
@@ -336,7 +338,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kesrabojonegoro24@gmail.com',
     website: 'bagkesra.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'setda_prokopim',
     name: 'BAGIAN PROTOKOL DAN KOMUNIKASI PIMPINAN',
     category: 'SETDA',
@@ -345,7 +347,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'bagprokopim@bojonegorokab.go.id',
     website: 'bagprokopim.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'setda_umum',
     name: 'BAGIAN UMUM',
     category: 'SETDA',
@@ -354,7 +356,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'bagumum@bojonegorokab.go.id',
     website: 'bagumumkeu.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'setda_hukum',
     name: 'BAGIAN HUKUM',
     category: 'SETDA',
@@ -363,7 +365,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'hukumsetdabjn@gmail.com',
     website: 'baghukum.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'setda_organisasi',
     name: 'BAGIAN ORGANISASI',
     category: 'SETDA',
@@ -372,7 +374,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'bagortalabjn@gmail.com',
     website: 'bagortala.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'setda_pbj',
     name: 'BAGIAN PENGADAAN BARANG / JASA',
     category: 'SETDA',
@@ -383,7 +385,7 @@ final List<InstansiItem> sampleInstansiList = [
   ),
 
   // KECAMATAN (28 Kecamatan Resmi Kab. Bojonegoro)
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_balen',
     name: 'KANTOR KECAMATAN BALEN',
     category: 'KECAMATAN',
@@ -392,7 +394,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kecamatanbalen.balendamai@gmail.com',
     website: 'kecbalen.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_baureno',
     name: 'KANTOR KECAMATAN BAURENO',
     category: 'KECAMATAN',
@@ -401,7 +403,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kecamatanbaureno@ymail.com',
     website: 'kecbaureno.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_bubulan',
     name: 'KANTOR KECAMATAN BUBULAN',
     category: 'KECAMATAN',
@@ -411,7 +413,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'bubulankecamatan@gmail.com',
     website: 'kecbubulan.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_bojonegoro',
     name: 'KANTOR KECAMATAN BOJONEGORO (KOTA)',
     category: 'KECAMATAN',
@@ -420,7 +422,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kec.bojonegoro@bojonegorokab.go.id',
     website: 'kecbojonegoro.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_kalitidu',
     name: 'KANTOR KECAMATAN KALITIDU',
     category: 'KECAMATAN',
@@ -429,7 +431,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kecamatankalitidu98@gmail.com',
     website: 'keckalitidu.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_gondang',
     name: 'KANTOR KECAMATAN GONDANG',
     category: 'KECAMATAN',
@@ -438,7 +440,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kecamatangondang26@gmail.com',
     website: 'kecgondang.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_dander',
     name: 'KANTOR KECAMATAN DANDER',
     category: 'KECAMATAN',
@@ -447,7 +449,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kecamatandander@gmail.com',
     website: 'kecdander.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_kanor',
     name: 'KANTOR KECAMATAN KANOR',
     category: 'KECAMATAN',
@@ -456,7 +458,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kec.kanor@gmail.com',
     website: 'keckanor.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_kapas',
     name: 'KANTOR KECAMATAN KAPAS',
     category: 'KECAMATAN',
@@ -466,7 +468,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kapas@bojonegorokab.go.id',
     website: 'keckapas.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_kasiman',
     name: 'KANTOR KECAMATAN KASIMAN',
     category: 'KECAMATAN',
@@ -475,7 +477,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kecamatan.kasiman@gmail.com',
     website: 'keckasiman.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_kedewan',
     name: 'KANTOR KECAMATAN KEDEWAN',
     category: 'KECAMATAN',
@@ -484,7 +486,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kecamatankedewan@gmail.com',
     website: 'keckedewan.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_kedungadem',
     name: 'KANTOR KECAMATAN KEDUNGADEM',
     category: 'KECAMATAN',
@@ -493,7 +495,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'sekretariatkedungadem@gmail.com',
     website: 'keckedungadem.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_kepohbaru',
     name: 'KANTOR KECAMATAN KEPOHBARU',
     category: 'KECAMATAN',
@@ -502,7 +504,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kepohbaru@bojonegorokab.go.id',
     website: 'keckepohbaru.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_malo',
     name: 'KANTOR KECAMATAN MALO',
     category: 'KECAMATAN',
@@ -511,7 +513,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kecamatanmalo@gmail.com',
     website: 'kecmalo.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_margomulyo',
     name: 'KANTOR KECAMATAN MARGOMULYO',
     category: 'KECAMATAN',
@@ -520,7 +522,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kec.margomulyo@gmail.com, margomulyo@bojonegorokab.go.id',
     website: 'kecmargomulyo.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_ngambon',
     name: 'KANTOR KECAMATAN NGAMBON',
     category: 'KECAMATAN',
@@ -529,7 +531,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kantorkecamatanngambon@gmail.com',
     website: 'kecngambon.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_ngasem',
     name: 'KANTOR KECAMATAN NGASEM',
     category: 'KECAMATAN',
@@ -539,7 +541,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'ngasem.prima1230@gmail.com',
     website: 'kecngasem.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_ngraho',
     name: 'KANTOR KECAMATAN NGRAHO',
     category: 'KECAMATAN',
@@ -548,7 +550,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kantorkecamatanngraho@gmail.com',
     website: 'kecngraho.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_padangan',
     name: 'KANTOR KECAMATAN PADANGAN',
     category: 'KECAMATAN',
@@ -557,7 +559,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kec.padangan@gmail.com',
     website: 'kecpadangan.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_purwosari',
     name: 'KANTOR KECAMATAN PURWOSARI',
     category: 'KECAMATAN',
@@ -566,7 +568,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kecamatan.purwosari@gmail.com, purwosari@bojonegorokab.go.id',
     website: 'kecpurwosari.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_temayang',
     name: 'KANTOR KECAMATAN TEMAYANG',
     category: 'KECAMATAN',
@@ -575,7 +577,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kec.temayang@bojonegorokab.go.id',
     website: 'kectemayang.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_trucuk',
     name: 'KANTOR KECAMATAN TRUCUK',
     category: 'KECAMATAN',
@@ -584,7 +586,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kecamatantrucuk@gmail.com',
     website: 'kectrucuk.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_tambakrejo',
     name: 'KANTOR KECAMATAN TAMBAKREJO',
     category: 'KECAMATAN',
@@ -593,7 +595,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kecamatantambakrejo@gmail.com',
     website: 'kectambakrejo.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_gayam',
     name: 'KANTOR KECAMATAN GAYAM',
     category: 'KECAMATAN',
@@ -603,7 +605,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'kecamatangayam@yahoo.co.id',
     website: 'kecgayam.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_sumberrejo',
     name: 'KANTOR KECAMATAN SUMBERREJO',
     category: 'KECAMATAN',
@@ -612,7 +614,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'Sumberrejokec@gmail.com',
     website: 'kecsumberrejo.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_sukosewu',
     name: 'KANTOR KECAMATAN SUKOSEWU',
     category: 'KECAMATAN',
@@ -621,7 +623,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'sukosewu@bojonegorokab.go.id',
     website: 'kecsukosewu.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_sugihwaras',
     name: 'KANTOR KECAMATAN SUGIHWARAS',
     category: 'KECAMATAN',
@@ -630,7 +632,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'garaskec@gmail.com',
     website: 'kecsugihwaras.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'kec_sekar',
     name: 'KANTOR KECAMATAN SEKAR',
     category: 'KECAMATAN',
@@ -641,7 +643,7 @@ final List<InstansiItem> sampleInstansiList = [
   ),
 
   // RSUD (3 Rumah Sakit Umum Daerah Resmi Kab. Bojonegoro)
-  const InstansiItem(
+  InstansiItem(
     id: 'rsud_sosodoro',
     name: 'RSUD dr. R. SOSODORO DJATIKOESOEMO (RSUD BOJONEGORO)',
     category: 'RSUD',
@@ -652,7 +654,7 @@ final List<InstansiItem> sampleInstansiList = [
     website: 'rsudsosodoro.bojonegorokab.go.id',
     operationalHours: '24 Jam Nonstop (UGD & Rawat Inap)',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'rsud_sumberrejo',
     name: 'RSUD SUMBERREJO KABUPATEN BOJONEGORO',
     category: 'RSUD',
@@ -662,7 +664,7 @@ final List<InstansiItem> sampleInstansiList = [
     website: 'rsudsumberrejo.bojonegorokab.go.id',
     operationalHours: '24 Jam Nonstop (UGD & Rawat Inap)',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'rsud_padangan',
     name: 'RSUD PADANGAN KABUPATEN BOJONEGORO',
     category: 'RSUD',
@@ -674,7 +676,7 @@ final List<InstansiItem> sampleInstansiList = [
   ),
 
   // BUMD (3 Badan Usaha Milik Daerah Resmi Kab. Bojonegoro)
-  const InstansiItem(
+  InstansiItem(
     id: 'bumd_bbs',
     name: 'PT. Bojonegoro Bangun Sarana (BBS)',
     category: 'BUMD',
@@ -684,7 +686,7 @@ final List<InstansiItem> sampleInstansiList = [
     email: 'pt.bbs.bojonegoro@gmail.com',
     website: 'ptbbs.bojonegorokab.go.id',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'bumd_pdam',
     name: 'PD. Air Minum (PDAM) Tirta Buana',
     category: 'BUMD',
@@ -695,7 +697,7 @@ final List<InstansiItem> sampleInstansiList = [
     website: 'pdam.bojonegorokab.go.id',
     operationalHours: 'Senin - Sabtu: 07.30 - 16.00 WIB',
   ),
-  const InstansiItem(
+  InstansiItem(
     id: 'bumd_bpr',
     name: 'PD. Bank Perkreditan Rakyat (BPR) Bank Daerah Bojonegoro',
     category: 'BUMD',
@@ -707,7 +709,7 @@ final List<InstansiItem> sampleInstansiList = [
   ),
 
   // SETWAN (Sekretariat DPRD Kab. Bojonegoro)
-  const InstansiItem(
+  InstansiItem(
     id: 'setwan',
     name: 'Sekretariat DPRD (SETWAN) Kab. Bojonegoro',
     category: 'SETWAN',
@@ -721,11 +723,13 @@ final List<InstansiItem> sampleInstansiList = [
 class KontakInstansiScreen extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback? onToggleDarkMode;
+  final bool isAdmin;
 
   const KontakInstansiScreen({
     super.key,
     required this.isDarkMode,
     this.onToggleDarkMode,
+    this.isAdmin = false,
   });
 
   @override
@@ -802,6 +806,142 @@ class _KontakInstansiScreenState extends State<KontakInstansiScreen> {
     super.dispose();
   }
 
+  void _showAddEditInstansiDialog([InstansiItem? existing]) {
+    final nameController = TextEditingController(text: existing?.name ?? '');
+    final categoryController = TextEditingController(text: existing?.category ?? (_selectedCategory ?? 'DINAS'));
+    final addressController = TextEditingController(text: existing?.address ?? '');
+    final phoneController = TextEditingController(text: existing?.phone ?? '');
+    final waController = TextEditingController(text: existing?.whatsapp ?? '');
+    final emailController = TextEditingController(text: existing?.email ?? '');
+    final webController = TextEditingController(text: existing?.website ?? '');
+    final hoursController = TextEditingController(text: existing?.operationalHours ?? 'Senin - Jumat: 07.30 - 15.30 WIB');
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AdminFormDialog(
+          title: existing != null ? 'Edit Kontak Instansi' : 'Tambah Kontak Instansi Baru',
+          subtitle: 'Atur data instansi, kategori, alamat, telepon, dan layanan publik',
+          isEditing: existing != null,
+          fields: [
+            AdminFormField(
+              label: 'Nama Instansi / Dinas',
+              controller: nameController,
+              hint: 'Contoh: DINAS KESEHATAN',
+            ),
+            AdminFormField(
+              label: 'Kategori Instansi',
+              controller: categoryController,
+              hint: 'Pilih Kategori',
+              options: const ['BADAN', 'DINAS', 'SETDA', 'KECAMATAN', 'RSUD', 'BUMD', 'SETWAN'],
+            ),
+            AdminFormField(
+              label: 'Alamat Kantor',
+              controller: addressController,
+              hint: 'Contoh: Jl. P. Mastumapel No. 1 Bojonegoro',
+            ),
+            AdminFormField(
+              label: 'Nomor Telepon / Hotline',
+              controller: phoneController,
+              hint: 'Contoh: (0353) 881234',
+            ),
+            AdminFormField(
+              label: 'Nomor WhatsApp Hotline',
+              controller: waController,
+              hint: 'Contoh: 08123456789',
+              isRequired: false,
+            ),
+            AdminFormField(
+              label: 'Email Resmi',
+              controller: emailController,
+              hint: 'Contoh: dinkes@bojonegorokab.go.id',
+              isRequired: false,
+            ),
+            AdminFormField(
+              label: 'Situs Web Resmi',
+              controller: webController,
+              hint: 'Contoh: dinkes.bojonegorokab.go.id',
+              isRequired: false,
+            ),
+            AdminFormField(
+              label: 'Jam Operasional Layanan',
+              controller: hoursController,
+              hint: 'Contoh: Senin - Jumat: 07.30 - 15.30 WIB',
+            ),
+          ],
+          onSave: () {
+            if (existing != null) {
+              existing.name = nameController.text.trim();
+              existing.category = categoryController.text.trim();
+              existing.address = addressController.text.trim();
+              existing.phone = phoneController.text.trim();
+              existing.whatsapp = waController.text.trim();
+              existing.email = emailController.text.trim();
+              existing.website = webController.text.trim();
+              existing.operationalHours = hoursController.text.trim();
+            } else {
+              sampleInstansiList.insert(
+                0,
+                InstansiItem(
+                  id: 'instansi_${DateTime.now().millisecondsSinceEpoch}',
+                  name: nameController.text.trim(),
+                  category: categoryController.text.trim(),
+                  address: addressController.text.trim(),
+                  phone: phoneController.text.trim(),
+                  whatsapp: waController.text.trim(),
+                  email: emailController.text.trim(),
+                  website: webController.text.trim(),
+                  operationalHours: hoursController.text.trim(),
+                ),
+              );
+            }
+            setState(() {});
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(existing != null ? 'Kontak instansi berhasil diperbarui!' : 'Instansi baru berhasil ditambahkan!'),
+                backgroundColor: const Color(0xFF10B981),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _confirmDeleteInstansi(InstansiItem item) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Hapus Kontak Instansi?'),
+          content: Text('Apakah Anda yakin ingin menghapus "${item.name}"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF4444)),
+              onPressed: () {
+                sampleInstansiList.removeWhere((e) => e.id == item.id);
+                Navigator.pop(context);
+                setState(() {});
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Instansi "${item.name}" berhasil dihapus.'),
+                    backgroundColor: const Color(0xFFEF4444),
+                  ),
+                );
+              },
+              child: const Text('Hapus', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   List<InstansiItem> get _filteredList {
     return sampleInstansiList.where((item) {
       final matchesCategory = _selectedCategory == null || item.category == _selectedCategory;
@@ -812,6 +952,7 @@ class _KontakInstansiScreenState extends State<KontakInstansiScreen> {
       return matchesCategory && matchesQuery;
     }).toList();
   }
+
 
   Future<void> _makePhoneCall(BuildContext context, String phone) async {
     final cleanPhone = phone.replaceAll(RegExp(r'[^0-9+]'), '');
@@ -1049,6 +1190,46 @@ class _KontakInstansiScreenState extends State<KontakInstansiScreen> {
                   ),
               ],
             ),
+            if (widget.isAdmin) ...[
+              const SizedBox(height: 14),
+              const Divider(height: 1),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _showAddEditInstansiDialog(item);
+                      },
+                      icon: const Icon(Icons.edit_rounded, size: 16, color: Color(0xFF2563EB)),
+                      label: const Text('Edit Instansi', style: TextStyle(color: Color(0xFF2563EB), fontWeight: FontWeight.bold)),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 44),
+                        side: const BorderSide(color: Color(0xFF2563EB)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _confirmDeleteInstansi(item);
+                      },
+                      icon: const Icon(Icons.delete_outline_rounded, size: 16, color: Colors.white),
+                      label: const Text('Hapus', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFEF4444),
+                        minimumSize: const Size(double.infinity, 44),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 10),
           ],
         ),
@@ -1063,7 +1244,19 @@ class _KontakInstansiScreenState extends State<KontakInstansiScreen> {
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
+      floatingActionButton: widget.isAdmin
+          ? FloatingActionButton.extended(
+              onPressed: () => _showAddEditInstansiDialog(),
+              backgroundColor: const Color(0xFF2563EB),
+              icon: const Icon(Icons.add_rounded, color: Colors.white),
+              label: const Text(
+                'Tambah Instansi',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            )
+          : null,
       body: Column(
+
         children: [
           SuperAppHeader(
             title: _selectedCategory != null ? 'Direktori $_selectedCategory' : 'Kontak Instansi',

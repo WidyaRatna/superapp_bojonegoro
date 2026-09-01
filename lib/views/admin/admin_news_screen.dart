@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../services/admin_data_service.dart';
+import '../../models/news_model.dart';
 import '../../widgets/superapp_header.dart';
 import '../../widgets/admin/admin_form_dialog.dart';
+import '../../widgets/news_detail_sheet.dart';
 
 class AdminNewsScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -18,13 +21,37 @@ class AdminNewsScreen extends StatefulWidget {
 }
 
 class _AdminNewsScreenState extends State<AdminNewsScreen> {
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
+  final String _officialNewsWebUrl = 'https://bojonegorokab.go.id/berita';
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  Future<void> _openOfficialWeb([String? url]) async {
+    final targetUrl = Uri.parse(url ?? _officialNewsWebUrl);
+    if (await canLaunchUrl(targetUrl)) {
+      await launchUrl(targetUrl, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Tidak dapat membuka $targetUrl')),
+        );
+      }
+    }
+  }
+
+  void _openNewsDetail(NewsItem news) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => NewsDetailSheet(news: news),
+    );
+  }
+
+  void _shareArticle(NewsItem news) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Tautan berita disalin: ${news.webUrl}'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   void _showAddEditDialog([ItemBeritaAdmin? existing]) {
@@ -34,12 +61,12 @@ class _AdminNewsScreenState extends State<AdminNewsScreen> {
 
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AdminFormDialog(
           title: existing != null ? 'Edit Berita' : 'Publikasi Berita Baru',
           subtitle: 'Kelola artikel warta & pengumuman Pemkab Bojonegoro',
           isEditing: existing != null,
-          initialImageName: existing?.imageUrl ?? 'Berita_Bojonegoro.jpg',
+          initialImageName: existing?.imageUrl ?? 'bojonegoro_gate.jpg',
           fields: [
             AdminFormField(
               label: 'Judul Berita',
@@ -95,18 +122,24 @@ class _AdminNewsScreenState extends State<AdminNewsScreen> {
   void _confirmDelete(ItemBeritaAdmin item) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Hapus Berita'),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Color(0xFFEF4444), size: 24),
+            SizedBox(width: 8),
+            Text('Hapus Berita'),
+          ],
+        ),
         content: Text('Apakah Anda yakin ingin menghapus berita "${item.title}"?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Batal'),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               AdminDataService().deleteBerita(item.id);
               setState(() {});
               ScaffoldMessenger.of(context).showSnackBar(
@@ -127,182 +160,417 @@ class _AdminNewsScreenState extends State<AdminNewsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
-    final items = AdminDataService().beritaList;
-    final filtered = items.where((news) {
-      final q = _searchQuery.toLowerCase();
-      return news.title.toLowerCase().contains(q) || news.category.toLowerCase().contains(q);
-    }).toList();
+    final backgroundColor = isDark ? const Color(0xFF0F172A) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtitleColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
+      backgroundColor: backgroundColor,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddEditDialog(),
         backgroundColor: const Color(0xFF0D62F1),
-        icon: const Icon(Icons.post_add_rounded, color: Colors.white),
+        elevation: 4,
+        icon: const Icon(Icons.post_add_rounded, color: Colors.white, size: 20),
         label: const Text(
           'Tambah Berita',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13.5),
         ),
       ),
       body: Column(
         children: [
           SuperAppHeader(
-            title: 'Kelola Berita & Informasi',
-            subtitle: 'Publikasikan warta, edit & hapus artikel',
+            title: 'Berita Terkini',
+            subtitle: 'Pemerintah Kabupaten Bojonegoro',
             isDarkMode: isDark,
             onToggleDarkMode: widget.onToggleDarkMode,
+            actions: [
+              IconButton(
+                tooltip: 'Buka Web Resmi Pemkab Bojonegoro',
+                icon: const Icon(Icons.language_rounded, color: Colors.white),
+                onPressed: () => _openOfficialWeb(),
+              ),
+            ],
           ),
           Expanded(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-            TextField(
-              controller: _searchController,
-              onChanged: (val) => setState(() => _searchQuery = val),
-              decoration: InputDecoration(
-                hintText: 'Cari berita atau kategori...',
-                prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF0D62F1)),
-                filled: true,
-                fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFF0D62F1), width: 1.5),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: filtered.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final news = filtered[index];
-                return Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(isDark ? 30 : 8),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
+                  // Top Banner Button directing to official news site (100% Identical to User UI)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF0284C7), Color(0xFF0369A1)],
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Container(
-                              width: 58,
-                              height: 58,
-                              color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-                              child: const Icon(Icons.newspaper_rounded, color: Color(0xFF0D62F1), size: 28),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF0284C7).withAlpha(64),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withAlpha(50),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.public_rounded,
+                            color: Colors.white,
+                            size: 22,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Text(
+                                'Portal Berita Resmi Pemkab',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                'bojonegorokab.go.id/berita',
+                                style: TextStyle(
+                                  color: Color(0xFFE0F2FE),
+                                  fontSize: 11.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => _openOfficialWeb(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: const Color(0xFF0369A1),
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  news.category,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
-                                  ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Buka Web',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  news.title,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 13.5,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark ? Colors.white : const Color(0xFF0F172A),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  news.date,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                                  ),
+                              ),
+                              SizedBox(width: 4),
+                              Icon(Icons.open_in_new_rounded, size: 14),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // News Feed List with exact 100% User Layout + Admin CRUD buttons below
+                  AnimatedBuilder(
+                    animation: AdminDataService(),
+                    builder: (context, _) {
+                      final adminService = AdminDataService();
+                      final allItems = adminService.beritaList;
+
+                      // Fallback to sampleNews if admin list is empty
+                      final newsList = allItems.isNotEmpty
+                          ? allItems
+                          : sampleNews.map((sn) => ItemBeritaAdmin(
+                                id: sn.id,
+                                title: sn.title,
+                                category: sn.category,
+                                date: sn.date,
+                                author: 'Humas Bojonegoro',
+                                content: sn.content,
+                                imageUrl: sn.imageUrl,
+                                status: 'Published',
+                              )).toList();
+
+                      return ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: newsList.length,
+                        separatorBuilder: (context, index) => const SizedBox(height: 24),
+                        itemBuilder: (context, index) {
+                          final item = newsList[index];
+                          final news = NewsItem(
+                            id: item.id,
+                            title: item.title,
+                            category: item.category,
+                            snippet: item.content,
+                            content: item.content,
+                            imageUrl: item.imageUrl,
+                            date: item.date,
+                            readTime: '3 mnt baca',
+                            likes: 120,
+                            views: 950,
+                            webUrl: 'https://bojonegorokab.go.id/berita',
+                          );
+
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0), width: 1.2),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withAlpha(isDark ? 40 : 10),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        news.content,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Divider(height: 1),
-                      const SizedBox(height: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // 1. User Exact News Card Body
+                                InkWell(
+                                  onTap: () => _openNewsDetail(news),
+                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // Full-width Hero Image matching User UI 100%
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(14),
+                                          child: AspectRatio(
+                                            aspectRatio: 16 / 9,
+                                            child: news.imageUrl.startsWith('assets/')
+                                                ? Image.asset(
+                                                    news.imageUrl,
+                                                    width: double.infinity,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (context, error, stackTrace) => Container(
+                                                      color: const Color(0xFFE2E8F0),
+                                                      child: const Center(
+                                                        child: Icon(Icons.image_not_supported_rounded, color: Color(0xFF94A3B8), size: 40),
+                                                      ),
+                                                    ),
+                                                  )
+                                                : Image.network(
+                                                    news.imageUrl,
+                                                    width: double.infinity,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (context, error, stackTrace) => Container(
+                                                      color: const Color(0xFFE2E8F0),
+                                                      child: const Center(
+                                                        child: Icon(Icons.image_not_supported_rounded, color: Color(0xFF94A3B8), size: 40),
+                                                      ),
+                                                    ),
+                                                  ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 12),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          OutlinedButton.icon(
-                            onPressed: () => _showAddEditDialog(news),
-                            icon: const Icon(Icons.edit_rounded, size: 15, color: Color(0xFF0D62F1)),
-                            label: const Text('Edit', style: TextStyle(color: Color(0xFF0D62F1), fontWeight: FontWeight.bold)),
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Color(0xFF0D62F1)),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                        // Bold Title Text below image
+                                        Text(
+                                          news.title,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            color: textColor,
+                                            height: 1.3,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+
+                                        // Date & Share Row
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              '${news.date} • ${news.category}',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: subtitleColor,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                IconButton(
+                                                  icon: Icon(
+                                                    Icons.open_in_new_rounded,
+                                                    size: 20,
+                                                    color: subtitleColor,
+                                                  ),
+                                                  tooltip: 'Buka di bojonegorokab.go.id',
+                                                  onPressed: () => _openOfficialWeb(news.webUrl),
+                                                ),
+                                                IconButton(
+                                                  icon: Icon(
+                                                    Icons.share_outlined,
+                                                    size: 20,
+                                                    color: subtitleColor,
+                                                  ),
+                                                  tooltip: 'Bagikan Berita',
+                                                  onPressed: () => _shareArticle(news),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                 // 2. High-Contrast Admin CRUD Bar Attached Directly Underneath (2-Row Responsive Layout)
+                                 Padding(
+                                   padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                                   child: Container(
+                                     width: double.infinity,
+                                     padding: const EdgeInsets.all(10),
+                                     decoration: BoxDecoration(
+                                       color: isDark ? const Color(0xFF0F172A) : const Color(0xFFE0F2FE),
+                                       borderRadius: BorderRadius.circular(12),
+                                       border: Border.all(
+                                         color: isDark ? const Color(0xFF0D62F1).withAlpha(80) : const Color(0xFFBAE6FD),
+                                         width: 1,
+                                       ),
+                                     ),
+                                     child: Column(
+                                       children: [
+                                         // Row 1: Label & Status Rilis Badge
+                                         Row(
+                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                           children: [
+                                             Row(
+                                               children: [
+                                                 Container(
+                                                   padding: const EdgeInsets.all(4),
+                                                   decoration: BoxDecoration(
+                                                     color: const Color(0xFF0D62F1).withAlpha(30),
+                                                     shape: BoxShape.circle,
+                                                   ),
+                                                   child: const Icon(
+                                                     Icons.admin_panel_settings_rounded,
+                                                     size: 15,
+                                                     color: Color(0xFF0D62F1),
+                                                   ),
+                                                 ),
+                                                 const SizedBox(width: 6),
+                                                 Text(
+                                                   'Kelola Berita',
+                                                   style: TextStyle(
+                                                     fontSize: 12,
+                                                     fontWeight: FontWeight.bold,
+                                                     color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF1E40AF),
+                                                   ),
+                                                 ),
+                                               ],
+                                             ),
+                                             // Toggle Publish / Draft
+                                             InkWell(
+                                               onTap: () {
+                                                 adminService.toggleBeritaStatus(item.id);
+                                               },
+                                               borderRadius: BorderRadius.circular(8),
+                                               child: Container(
+                                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                 decoration: BoxDecoration(
+                                                   color: item.status == 'Published'
+                                                       ? const Color(0xFF10B981).withAlpha(25)
+                                                       : const Color(0xFFF59E0B).withAlpha(25),
+                                                   borderRadius: BorderRadius.circular(6),
+                                                   border: Border.all(
+                                                     color: item.status == 'Published'
+                                                         ? const Color(0xFF10B981)
+                                                         : const Color(0xFFF59E0B),
+                                                   ),
+                                                 ),
+                                                 child: Text(
+                                                   item.status,
+                                                   style: TextStyle(
+                                                     fontSize: 11,
+                                                     fontWeight: FontWeight.bold,
+                                                     color: item.status == 'Published'
+                                                         ? const Color(0xFF10B981)
+                                                         : const Color(0xFFD97706),
+                                                   ),
+                                                 ),
+                                               ),
+                                             ),
+                                           ],
+                                         ),
+                                         const SizedBox(height: 8),
+                                         Divider(height: 1, thickness: 0.8, color: isDark ? const Color(0xFF334155) : const Color(0xFFBAE6FD)),
+                                         const SizedBox(height: 8),
+                                         // Row 2: Equal Width Action Buttons (Edit & Hapus)
+                                         Row(
+                                           children: [
+                                             Expanded(
+                                               child: ElevatedButton.icon(
+                                                 onPressed: () => _showAddEditDialog(item),
+                                                 icon: const Icon(Icons.edit_rounded, size: 14, color: Colors.white),
+                                                 label: const Text(
+                                                   'Edit Berita',
+                                                   style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                                                 ),
+                                                 style: ElevatedButton.styleFrom(
+                                                   backgroundColor: const Color(0xFF0D62F1),
+                                                   elevation: 0,
+                                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                   padding: const EdgeInsets.symmetric(vertical: 8),
+                                                 ),
+                                               ),
+                                             ),
+                                             const SizedBox(width: 8),
+                                             Expanded(
+                                               child: ElevatedButton.icon(
+                                                 onPressed: () => _confirmDelete(item),
+                                                 icon: const Icon(Icons.delete_outline_rounded, size: 14, color: Colors.white),
+                                                 label: const Text(
+                                                   'Hapus Berita',
+                                                   style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                                                 ),
+                                                 style: ElevatedButton.styleFrom(
+                                                   backgroundColor: const Color(0xFFEF4444),
+                                                   elevation: 0,
+                                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                   padding: const EdgeInsets.symmetric(vertical: 8),
+                                                 ),
+                                               ),
+                                             ),
+                                           ],
+                                         ),
+                                       ],
+                                     ),
+                                   ),
+                                 ),
+                              ],
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          ElevatedButton.icon(
-                            onPressed: () => _confirmDelete(news),
-                            icon: const Icon(Icons.delete_outline_rounded, size: 15, color: Colors.white),
-                            label: const Text('Hapus', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFEF4444),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          );
+                        },
+                      );
+                    },
                   ),
-                );
-              },
+                  const SizedBox(height: 80),
+                ],
+              ),
             ),
-            const SizedBox(height: 80),
-          ],
-        ),
+          ),
+        ],
       ),
-    ),
-  ],
-),
     );
   }
 }

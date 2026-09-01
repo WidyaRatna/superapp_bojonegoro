@@ -1,27 +1,27 @@
 /// Model representing a Job Vacancy (Lowongan Pekerjaan / Info Loker)
 class LokerItem {
   final String id;
-  final String title;
-  final String companyName;
-  final String category;
-  final String locationKecamatan;
-  final String fullAddress; // Custom full typed address
-  final String salaryRange;
-  final String jobType; // Full-Time, Part-Time, Kontrak, Freelance
-  final String description;
-  final List<String> requirements;
-  final String contactName; // Nama Penanggung Jawab / Contact Person
-  final String contactPhone;
-  final String contactWhatsapp;
-  final String instagram; // Instagram handle / link
-  final String email; // HRD / Office email
-  final String website; // Company / Official website link
-  final String posterImagePath; // Uploaded poster image path
-  final String postedByRole; // Aparat / Masyarakat
-  final String postedDate;
-  final bool isVerified;
+  String title;
+  String companyName;
+  String category;
+  String locationKecamatan;
+  String fullAddress; // Custom full typed address
+  String salaryRange;
+  String jobType; // Full-Time, Part-Time, Kontrak, Freelance
+  String description;
+  List<String> requirements;
+  String contactName; // Nama Penanggung Jawab / Contact Person
+  String contactPhone;
+  String contactWhatsapp;
+  String instagram; // Instagram handle / link
+  String email; // HRD / Office email
+  String website; // Company / Official website link
+  String posterImagePath; // Uploaded poster image path
+  String postedByRole; // Aparat / Masyarakat
+  String postedDate;
+  bool isVerified;
 
-  const LokerItem({
+  LokerItem({
     required this.id,
     required this.title,
     required this.companyName,
@@ -147,7 +147,7 @@ const List<String> listKecamatanLokerForm = [
 
 /// Initial Sample Job Vacancies Data in Bojonegoro
 List<LokerItem> initialLokerItems = [
-  const LokerItem(
+  LokerItem(
     id: 'loker_1',
     title: 'Staff Layanan Administrasi Kantor Desa',
     companyName: 'Pemerintah Desa Balenrejo',
@@ -175,7 +175,7 @@ List<LokerItem> initialLokerItems = [
     postedDate: '6 Agu 2026',
     isVerified: true,
   ),
-  const LokerItem(
+  LokerItem(
     id: 'loker_2',
     title: 'Kasir & Pramuniaga Toko Sembako',
     companyName: 'Toko Sembako Berkah Jaya',
@@ -202,7 +202,7 @@ List<LokerItem> initialLokerItems = [
     postedDate: '5 Agu 2026',
     isVerified: true,
   ),
-  const LokerItem(
+  LokerItem(
     id: 'loker_3',
     title: 'Operator Mesin Industri & Produksi',
     companyName: 'PT Mitra Karya Industri Bojonegoro',
@@ -227,6 +227,7 @@ List<LokerItem> initialLokerItems = [
     posterImagePath: '',
     postedByRole: 'Masyarakat / Perusahaan',
     postedDate: '4 Agu 2026',
-    isVerified: true,
+    isVerified: false,
   ),
 ];
+

@@ -45,68 +45,72 @@ class _SettingsScreenState extends State<SettingsScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              leading: Icon(
-                _selectedLanguage == 'Bahasa Indonesia' ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
-                color: _selectedLanguage == 'Bahasa Indonesia' ? const Color(0xFF0D62F1) : Colors.grey,
-              ),
-              title: Text(
-                '🇮🇩 Bahasa Indonesia (Default)',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+            Material(
+              color: Colors.transparent,
+              child: ListTile(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                leading: Icon(
+                  _selectedLanguage == 'Bahasa Indonesia' ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
+                  color: _selectedLanguage == 'Bahasa Indonesia' ? const Color(0xFF0D62F1) : Colors.grey,
                 ),
-              ),
-              onTap: () {
-                setState(() {
-                  _selectedLanguage = 'Bahasa Indonesia';
-                });
-                Navigator.pop(dialogCtx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Bahasa aplikasi diubah ke Bahasa Indonesia 🇮🇩'),
-                    backgroundColor: Color(0xFF10B981),
+                title: Text(
+                  '🇮🇩 Bahasa Indonesia (Default)',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
-                );
-              },
+                ),
+                onTap: () {
+                  setState(() {
+                    _selectedLanguage = 'Bahasa Indonesia';
+                  });
+                  Navigator.pop(dialogCtx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Bahasa aplikasi diubah ke Bahasa Indonesia 🇮🇩'),
+                      backgroundColor: Color(0xFF10B981),
+                    ),
+                  );
+                },
+              ),
             ),
             const SizedBox(height: 6),
-            ListTile(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              leading: Icon(
-                _selectedLanguage == 'English (US)' ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
-                color: _selectedLanguage == 'English (US)' ? const Color(0xFF0D62F1) : Colors.grey,
-              ),
-              title: Text(
-                '🇺🇸 English (United States)',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+            Material(
+              color: Colors.transparent,
+              child: ListTile(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                leading: Icon(
+                  _selectedLanguage == 'English (US)' ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
+                  color: _selectedLanguage == 'English (US)' ? const Color(0xFF0D62F1) : Colors.grey,
                 ),
-              ),
-              onTap: () {
-                setState(() {
-                  _selectedLanguage = 'English (US)';
-                });
-                Navigator.pop(dialogCtx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('App language changed to English (US) 🇺🇸'),
-                    backgroundColor: Color(0xFF10B981),
+                title: Text(
+                  '🇺🇸 English (United States)',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
-                );
-              },
+                ),
+                onTap: () {
+                  setState(() {
+                    _selectedLanguage = 'English (US)';
+                  });
+                  Navigator.pop(dialogCtx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Language updated to English (US) 🇺🇸'),
+                      backgroundColor: Color(0xFF10B981),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
       ),
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {

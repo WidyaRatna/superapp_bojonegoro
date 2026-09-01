@@ -795,44 +795,50 @@ class _SecurityPrivacyScreenState extends State<SecurityPrivacyScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            ListTile(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              tileColor: _profileStatus == 'Publik' ? const Color(0xFF0D62F1).withAlpha(20) : null,
-              leading: const Icon(Icons.public_rounded, color: Color(0xFF0D62F1)),
-              title: Text(
-                'Profil Publik',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+            Material(
+              color: Colors.transparent,
+              child: ListTile(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                tileColor: _profileStatus == 'Publik' ? const Color(0xFF0D62F1).withAlpha(20) : null,
+                leading: const Icon(Icons.public_rounded, color: Color(0xFF0D62F1)),
+                title: Text(
+                  'Profil Publik',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
                 ),
+                subtitle: const Text('Dapat dilihat oleh sesama warga Bojonegoro'),
+                trailing: _profileStatus == 'Publik' ? const Icon(Icons.check_circle_rounded, color: Color(0xFF0D62F1)) : null,
+                onTap: () {
+                  setState(() => _profileStatus = 'Publik');
+                  Navigator.pop(sheetCtx);
+                  _showSnackBar('Status profil diubah ke Publik', Icons.public_rounded, const Color(0xFF0D62F1));
+                },
               ),
-              subtitle: const Text('Dapat dilihat oleh sesama warga Bojonegoro'),
-              trailing: _profileStatus == 'Publik' ? const Icon(Icons.check_circle_rounded, color: Color(0xFF0D62F1)) : null,
-              onTap: () {
-                setState(() => _profileStatus = 'Publik');
-                Navigator.pop(sheetCtx);
-                _showSnackBar('Status profil diubah ke Publik', Icons.public_rounded, const Color(0xFF0D62F1));
-              },
             ),
             const SizedBox(height: 8),
-            ListTile(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              tileColor: _profileStatus == 'Privat' ? const Color(0xFF0D62F1).withAlpha(20) : null,
-              leading: const Icon(Icons.lock_rounded, color: Color(0xFF8B5CF6)),
-              title: Text(
-                'Profil Privat',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+            Material(
+              color: Colors.transparent,
+              child: ListTile(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                tileColor: _profileStatus == 'Privat' ? const Color(0xFF0D62F1).withAlpha(20) : null,
+                leading: const Icon(Icons.lock_rounded, color: Color(0xFF8B5CF6)),
+                title: Text(
+                  'Profil Privat',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
                 ),
+                subtitle: const Text('Hanya dapat dilihat Anda & Petugas Pemkab'),
+                trailing: _profileStatus == 'Privat' ? const Icon(Icons.check_circle_rounded, color: Color(0xFF8B5CF6)) : null,
+                onTap: () {
+                  setState(() => _profileStatus = 'Privat');
+                  Navigator.pop(sheetCtx);
+                  _showSnackBar('Status profil diubah ke Privat', Icons.lock_rounded, const Color(0xFF8B5CF6));
+                },
               ),
-              subtitle: const Text('Hanya dapat dilihat Anda & Petugas Pemkab'),
-              trailing: _profileStatus == 'Privat' ? const Icon(Icons.check_circle_rounded, color: Color(0xFF8B5CF6)) : null,
-              onTap: () {
-                setState(() => _profileStatus = 'Privat');
-                Navigator.pop(sheetCtx);
-                _showSnackBar('Status profil diubah ke Privat', Icons.lock_rounded, const Color(0xFF8B5CF6));
-              },
             ),
           ],
         ),
@@ -898,24 +904,27 @@ class _SecurityPrivacyScreenState extends State<SecurityPrivacyScreen> {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
-      child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        tileColor: isSelected ? color.withAlpha(20) : null,
-        leading: Icon(icon, color: color),
-        title: Text(
-          label,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : const Color(0xFF0F172A),
+      child: Material(
+        color: Colors.transparent,
+        child: ListTile(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          tileColor: isSelected ? color.withAlpha(20) : null,
+          leading: Icon(icon, color: color),
+          title: Text(
+            label,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
+            ),
           ),
+          subtitle: Text(sub, style: const TextStyle(fontSize: 11.5)),
+          trailing: isSelected ? Icon(Icons.check_circle_rounded, color: color) : null,
+          onTap: () {
+            setState(() => _reportPrivacyDefault = key);
+            Navigator.pop(sheetCtx);
+            _showSnackBar('Default privasi laporan: $label', icon, color);
+          },
         ),
-        subtitle: Text(sub, style: const TextStyle(fontSize: 11.5)),
-        trailing: isSelected ? Icon(Icons.check_circle_rounded, color: color) : null,
-        onTap: () {
-          setState(() => _reportPrivacyDefault = key);
-          Navigator.pop(sheetCtx);
-          _showSnackBar('Default privasi laporan: $label', icon, color);
-        },
       ),
     );
   }

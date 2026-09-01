@@ -1,6 +1,124 @@
 import 'package:flutter/material.dart';
 import '../widgets/superapp_header.dart';
+import '../widgets/admin/admin_form_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+class EmergencyContactItem {
+  final String id;
+  String title;
+  String subtitle;
+  IconData icon;
+  Color color;
+  String phone;
+
+  EmergencyContactItem({
+    required this.id,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    required this.phone,
+  });
+}
+
+void _showAddEditEmergencyDialog(
+  BuildContext context, {
+  EmergencyContactItem? existing,
+  required Function(EmergencyContactItem) onSave,
+}) {
+  final titleController = TextEditingController(text: existing?.title ?? '');
+  final phoneController = TextEditingController(text: existing?.phone ?? '');
+  final subtitleController = TextEditingController(text: existing?.subtitle ?? '');
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AdminFormDialog(
+        title: existing != null ? 'Edit Kontak Darurat' : 'Tambah Kontak Darurat Baru',
+        subtitle: 'Atur nama layanan, posko, nomor hotline/telepon, dan informasi layanan',
+        isEditing: existing != null,
+        fields: [
+          AdminFormField(
+            label: 'Nama Layanan / Posko',
+            controller: titleController,
+            hint: 'Contoh: Pos Damkar Utama Kota Bojonegoro',
+          ),
+          AdminFormField(
+            label: 'Nomor Telepon / Hotline',
+            controller: phoneController,
+            hint: 'Contoh: 113 / 0823-3066-8443',
+          ),
+          AdminFormField(
+            label: 'Deskripsi / Subtitle Informasi',
+            controller: subtitleController,
+            hint: 'Contoh: Telepon: (0353) 113 • Siaga 24 Jam',
+          ),
+        ],
+        onSave: () {
+          final item = existing ??
+              EmergencyContactItem(
+                id: 'emg_${DateTime.now().millisecondsSinceEpoch}',
+                title: '',
+                subtitle: '',
+                icon: Icons.phone_in_talk_rounded,
+                color: const Color(0xFFDC2626),
+                phone: '',
+              );
+          item.title = titleController.text.trim();
+          item.phone = phoneController.text.trim();
+          item.subtitle = subtitleController.text.trim().isEmpty
+              ? 'Telepon: ${item.phone} • Siaga 24 Jam'
+              : subtitleController.text.trim();
+          onSave(item);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(existing != null ? 'Kontak darurat diperbarui!' : 'Kontak darurat baru ditambahkan!'),
+              backgroundColor: const Color(0xFF10B981),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+void _confirmDeleteEmergency(
+  BuildContext context, {
+  required String title,
+  required VoidCallback onDelete,
+}) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Hapus Kontak Darurat?'),
+        content: Text('Apakah Anda yakin ingin menghapus "$title"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF4444)),
+            onPressed: () {
+              Navigator.pop(context);
+              onDelete();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Kontak "$title" telah dihapus.'),
+                  backgroundColor: const Color(0xFFEF4444),
+                ),
+              );
+            },
+            child: const Text('Hapus', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
 // Helper for making phone calls with system dialer app
 Future<void> _makeCall(BuildContext context, String number, String name) async {
@@ -54,11 +172,13 @@ Future<void> _launchPlayStoreUrl(BuildContext context, String urlString) async {
 class EmergencyScreen extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback onToggleDarkMode;
+  final bool isAdmin;
 
   const EmergencyScreen({
     super.key,
     required this.isDarkMode,
     required this.onToggleDarkMode,
+    this.isAdmin = false,
   });
 
   @override
@@ -66,6 +186,160 @@ class EmergencyScreen extends StatefulWidget {
 }
 
 class _EmergencyScreenState extends State<EmergencyScreen> {
+  late List<Map<String, dynamic>> _menuCategories;
+
+  @override
+  void initState() {
+    super.initState();
+    _menuCategories = [
+      {
+        'id': 'cat_psc',
+        'title': 'SIAGA BRO PSC 119 & Ambulans',
+        'subtitle': 'Layanan kegawatdaruratan medis 24 Jam (Gratis)',
+        'icon': Icons.airport_shuttle_rounded,
+        'color': const Color(0xFFDC2626),
+        'target': 'ambulans',
+      },
+      {
+        'id': 'cat_damkar',
+        'title': 'Pemadam Kebakaran (Damkar)',
+        'subtitle': 'Dinas Pemadam Kebakaran & Penyelamatan',
+        'icon': Icons.local_fire_department_rounded,
+        'color': const Color(0xFFEA580C),
+        'target': 'damkar',
+      },
+      {
+        'id': 'cat_polisi',
+        'title': 'Kepolisian (Polres & Polsek)',
+        'subtitle': 'Sentra Pelayanan Kepolisian Terpadu (SPKT)',
+        'icon': Icons.local_police_rounded,
+        'color': const Color(0xFF2563EB),
+        'target': 'polisi',
+      },
+    ];
+  }
+
+  void _showAddCategoryDialog(BuildContext context) {
+    final titleController = TextEditingController();
+    final subtitleController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AdminFormDialog(
+          title: 'Tambah Layanan Kedaruratan Baru',
+          subtitle: 'Buat kategori menu layanan darurat baru Pemkab Bojonegoro',
+          isEditing: false,
+          fields: [
+            AdminFormField(
+              label: 'Judul Menu Layanan',
+              controller: titleController,
+              hint: 'Contoh: BPBD & Tim SAR Bojonegoro',
+            ),
+            AdminFormField(
+              label: 'Subjudul / Keterangan Layanan',
+              controller: subtitleController,
+              hint: 'Contoh: Penanggulangan bencana alam & evakuasi 24 jam',
+            ),
+          ],
+          onSave: () {
+            setState(() {
+              _menuCategories.add({
+                'id': 'cat_${DateTime.now().millisecondsSinceEpoch}',
+                'title': titleController.text.trim().isEmpty ? 'Layanan Darurat Baru' : titleController.text.trim(),
+                'subtitle': subtitleController.text.trim().isEmpty ? 'Layanan Kedaruratan Bojonegoro 24 Jam' : subtitleController.text.trim(),
+                'icon': Icons.emergency_rounded,
+                'color': const Color(0xFFDC2626),
+                'target': 'ambulans',
+              });
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Layanan darurat baru berhasil ditambahkan!'),
+                backgroundColor: Color(0xFF10B981),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showEditCategoryDialog(BuildContext context, Map<String, dynamic> cat) {
+    final titleController = TextEditingController(text: cat['title'] as String);
+    final subtitleController = TextEditingController(text: cat['subtitle'] as String);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AdminFormDialog(
+          title: 'Edit Menu Layanan Darurat',
+          subtitle: 'Perbarui judul dan keterangan menu kedaruratan',
+          isEditing: true,
+          fields: [
+            AdminFormField(
+              label: 'Judul Menu Layanan',
+              controller: titleController,
+              hint: 'Judul Layanan Kedaruratan',
+            ),
+            AdminFormField(
+              label: 'Subjudul / Keterangan Layanan',
+              controller: subtitleController,
+              hint: 'Keterangan Layanan',
+            ),
+          ],
+          onSave: () {
+            setState(() {
+              cat['title'] = titleController.text.trim();
+              cat['subtitle'] = subtitleController.text.trim();
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Menu layanan darurat berhasil diperbarui!'),
+                backgroundColor: Color(0xFF10B981),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _confirmDeleteCategory(BuildContext context, Map<String, dynamic> cat) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Hapus Menu Layanan?'),
+          content: Text('Apakah Anda yakin ingin menghapus "${cat['title']}"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF4444)),
+              onPressed: () {
+                setState(() {
+                  _menuCategories.removeWhere((e) => e['id'] == cat['id']);
+                });
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Menu "${cat['title']}" berhasil dihapus.'),
+                    backgroundColor: const Color(0xFFEF4444),
+                  ),
+                );
+              },
+              child: const Text('Hapus', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
@@ -80,6 +354,14 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      floatingActionButton: widget.isAdmin
+          ? FloatingActionButton.extended(
+              onPressed: () => _showAddCategoryDialog(context),
+              backgroundColor: const Color(0xFFDC2626),
+              icon: const Icon(Icons.add_rounded, color: Colors.white),
+              label: const Text('Tambah Layanan Darurat', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            )
+          : null,
       body: Column(
         children: [
           SuperAppHeader(
@@ -119,67 +401,44 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  // CARD MENU 1: SIAGA BRO PSC 119 & AMBULANS (Soft Red)
-                  _buildCategoryMenuCard(
-                    context,
-                    title: 'SIAGA BRO PSC 119 & Ambulans',
-                    categoryLabel: 'Layanan kegawatdaruratan medis 24 Jam (Gratis)',
-                    icon: Icons.airport_shuttle_rounded,
-                    color: const Color(0xFFDC2626),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AmbulansDetailScreen(
+                  ..._menuCategories.map((cat) {
+                    return _buildCategoryMenuCard(
+                      context,
+                      title: cat['title'] as String,
+                      categoryLabel: cat['subtitle'] as String,
+                      icon: cat['icon'] as IconData,
+                      color: cat['color'] as Color,
+                      onTap: () {
+                        Widget targetWidget;
+                        if (cat['target'] == 'damkar') {
+                          targetWidget = DamkarDetailScreen(
                             isDarkMode: widget.isDarkMode,
                             onToggleDarkMode: widget.onToggleDarkMode,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 12),
+                            isAdmin: widget.isAdmin,
+                          );
+                        } else if (cat['target'] == 'polisi') {
+                          targetWidget = KepolisianDetailScreen(
+                            isDarkMode: widget.isDarkMode,
+                            onToggleDarkMode: widget.onToggleDarkMode,
+                            isAdmin: widget.isAdmin,
+                          );
+                        } else {
+                          targetWidget = AmbulansDetailScreen(
+                            isDarkMode: widget.isDarkMode,
+                            onToggleDarkMode: widget.onToggleDarkMode,
+                            isAdmin: widget.isAdmin,
+                          );
+                        }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => targetWidget),
+                        );
+                      },
+                      onEdit: () => _showEditCategoryDialog(context, cat),
+                      onDelete: () => _confirmDeleteCategory(context, cat),
+                    );
+                  }),
 
-                  // CARD MENU 2: PEMADAM KEBAKARAN (DAMKAR) (Soft Orange)
-                  _buildCategoryMenuCard(
-                    context,
-                    title: 'Pemadam Kebakaran (Damkar)',
-                    categoryLabel: 'Dinas Pemadam Kebakaran & Penyelamatan',
-                    icon: Icons.local_fire_department_rounded,
-                    color: const Color(0xFFEA580C),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DamkarDetailScreen(
-                            isDarkMode: widget.isDarkMode,
-                            onToggleDarkMode: widget.onToggleDarkMode,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  // CARD MENU 3: KEPOLISIAN (POLRES BOJONEGORO) (Soft Blue)
-                  _buildCategoryMenuCard(
-                    context,
-                    title: 'Kepolisian (Polres & Polsek)',
-                    categoryLabel: 'Sentra Pelayanan Kepolisian Terpadu (SPKT)',
-                    icon: Icons.local_police_rounded,
-                    color: const Color(0xFF2563EB),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => KepolisianDetailScreen(
-                            isDarkMode: widget.isDarkMode,
-                            onToggleDarkMode: widget.onToggleDarkMode,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
                   const SizedBox(height: 24),
                 ],
               ),
@@ -197,10 +456,13 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     required IconData icon,
     required Color color,
     required VoidCallback onTap,
+    VoidCallback? onEdit,
+    VoidCallback? onDelete,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     return Container(
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -216,89 +478,158 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
           ),
         ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Row(
-              children: [
-                // Soft Pastel Icon Container
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: color.withAlpha(isDark ? 35 : 15),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: color.withAlpha(30),
-                      width: 1.0,
+      child: Column(
+        children: [
+          Material(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  children: [
+                    // Soft Pastel Icon Container
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: color.withAlpha(isDark ? 35 : 15),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: color.withAlpha(30),
+                          width: 1.0,
+                        ),
+                      ),
+                      child: Icon(icon, color: color, size: 24),
                     ),
-                  ),
-                  child: Icon(icon, color: color, size: 24),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : const Color(0xFF1E293B),
-                        ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: TextStyle(
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : const Color(0xFF1E293B),
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            categoryLabel,
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 3),
-                      Text(
-                        categoryLabel,
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w500,
-                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Small Right Chevron in Slate Gray
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      size: 20,
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                // Small Right Chevron in Slate Gray
-                Icon(
-                  Icons.chevron_right_rounded,
-                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                  size: 20,
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+          if (widget.isAdmin) ...[
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: onEdit,
+                    icon: const Icon(Icons.edit_rounded, size: 14, color: Color(0xFFDC2626)),
+                    label: const Text('Edit Menu', style: TextStyle(color: Color(0xFFDC2626), fontSize: 11.5, fontWeight: FontWeight.bold)),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFFDC2626)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton.icon(
+                    onPressed: onDelete,
+                    icon: const Icon(Icons.delete_outline_rounded, size: 14, color: Colors.white),
+                    label: const Text('Hapus', style: TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFEF4444),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
+
 }
 
 // =============================================================================
 // DETAIL SCREEN 1: AMBULANS & SIAGA BRO PSC 119 (FULL 1 LAYAR PENUH)
 // =============================================================================
-class AmbulansDetailScreen extends StatelessWidget {
+class AmbulansDetailScreen extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback onToggleDarkMode;
+  final bool isAdmin;
 
   const AmbulansDetailScreen({
     super.key,
     required this.isDarkMode,
     required this.onToggleDarkMode,
+    this.isAdmin = false,
   });
 
   @override
+  State<AmbulansDetailScreen> createState() => _AmbulansDetailScreenState();
+}
+
+class _AmbulansDetailScreenState extends State<AmbulansDetailScreen> {
+  final List<EmergencyContactItem> _ambulansList = [
+    EmergencyContactItem(id: '1', title: 'Call Center PSC 119 Bojonegoro', subtitle: 'Telepon: (0353) 119 • Bebas Pulsa (24 Jam)', icon: Icons.phone_in_talk_rounded, color: const Color(0xFFDC2626), phone: '(0353) 119'),
+    EmergencyContactItem(id: '2', title: 'Hotline WhatsApp PSC 119', subtitle: 'WhatsApp: 0811-3227-7119 • Bebas Pulsa (24 Jam)', icon: Icons.chat_rounded, color: const Color(0xFF10B981), phone: '0811-3227-7119'),
+    EmergencyContactItem(id: '3', title: 'IGD RSUD dr. R. Sosodoro Djatikoesoemo', subtitle: 'Telepon: (0353) 881193 • UGD 24 Jam', icon: Icons.local_hospital_rounded, color: const Color(0xFFDC2626), phone: '(0353) 881193'),
+    EmergencyContactItem(id: '4', title: 'IGD RSUD Sumberrejo', subtitle: 'Telepon: (0353) 351052 • UGD 24 Jam', icon: Icons.medical_services_rounded, color: const Color(0xFFEA580C), phone: '(0353) 351052'),
+    EmergencyContactItem(id: '5', title: 'IGD RSUD Padangan', subtitle: 'Telepon: (0353) 531070 • UGD 24 Jam', icon: Icons.local_hospital_rounded, color: const Color(0xFFD97706), phone: '(0353) 531070'),
+  ];
+
+  @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark || isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
+      floatingActionButton: widget.isAdmin
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                _showAddEditEmergencyDialog(
+                  context,
+                  onSave: (newItem) {
+                    setState(() {
+                      _ambulansList.insert(0, newItem);
+                    });
+                  },
+                );
+              },
+              backgroundColor: const Color(0xFFDC2626),
+              icon: const Icon(Icons.add_rounded, color: Colors.white),
+              label: const Text('Tambah Kontak Ambulans', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            )
+          : null,
       appBar: AppBar(
         backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFDC2626),
         elevation: 0,
@@ -325,7 +656,7 @@ class AmbulansDetailScreen extends StatelessWidget {
               isDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
               color: isDark ? Colors.amber : Colors.white,
             ),
-            onPressed: onToggleDarkMode,
+            onPressed: widget.onToggleDarkMode,
           ),
         ],
       ),
@@ -442,6 +773,44 @@ class AmbulansDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
 
+                  ..._ambulansList.map((item) {
+                    return _buildDirectPhoneCard(
+                      context,
+                      title: item.title,
+                      subtitle: item.subtitle,
+                      icon: item.icon,
+                      color: item.color,
+                      phone: item.phone,
+                      isAdmin: widget.isAdmin,
+                      onEdit: () {
+                        _showAddEditEmergencyDialog(
+                          context,
+                          existing: item,
+                          onSave: (updated) {
+                            setState(() {
+                              item.title = updated.title;
+                              item.phone = updated.phone;
+                              item.subtitle = updated.subtitle;
+                            });
+                          },
+                        );
+                      },
+                      onDelete: () {
+                        _confirmDeleteEmergency(
+                          context,
+                          title: item.title,
+                          onDelete: () {
+                            setState(() {
+                              _ambulansList.removeWhere((e) => e.id == item.id);
+                            });
+                          },
+                        );
+                      },
+                    );
+                  }),
+
+                  const SizedBox(height: 12),
+
                   // Kondisi Box Notice (Fixed Text Overflow with Expanded)
                   Container(
                     padding: const EdgeInsets.all(16),
@@ -516,25 +885,62 @@ class AmbulansDetailScreen extends StatelessWidget {
   }
 }
 
+
 // =============================================================================
 // DETAIL SCREEN 2: PEMADAM KEBAKARAN (DAMKAR) (FULL 1 LAYAR PENUH)
 // =============================================================================
-class DamkarDetailScreen extends StatelessWidget {
+class DamkarDetailScreen extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback onToggleDarkMode;
+  final bool isAdmin;
 
   const DamkarDetailScreen({
     super.key,
     required this.isDarkMode,
     required this.onToggleDarkMode,
+    this.isAdmin = false,
   });
 
   @override
+  State<DamkarDetailScreen> createState() => _DamkarDetailScreenState();
+}
+
+class _DamkarDetailScreenState extends State<DamkarDetailScreen> {
+  final List<EmergencyContactItem> _damkarList = [
+    EmergencyContactItem(id: '1', title: 'Call Center Damkar 113', subtitle: 'Telepon: (0353) 113 • Bebas Pulsa (24 Jam)', icon: Icons.phone_in_talk_rounded, color: const Color(0xFFDC2626), phone: '(0353) 113'),
+    EmergencyContactItem(id: '2', title: 'Pos Damkar Kota Bojonegoro', subtitle: 'Telepon: 0823-3066-8443 • Posko Utama Kota', icon: Icons.fire_truck_rounded, color: const Color(0xFFEA580C), phone: '0823-3066-8443'),
+    EmergencyContactItem(id: '3', title: 'Pos Damkar Padangan', subtitle: 'Telepon: 0811-3471-448 • Posko Wilayah Barat', icon: Icons.fort_rounded, color: const Color(0xFFD97706), phone: '0811-3471-448'),
+    EmergencyContactItem(id: '4', title: 'Pos Damkar Baureno', subtitle: 'Telepon: 0811-3471-446 • Posko Wilayah Timur', icon: Icons.shield_rounded, color: const Color(0xFFC05621), phone: '0811-3471-446'),
+    EmergencyContactItem(id: '5', title: 'Pos Damkar Sumberrejo', subtitle: 'Telepon: 0823-4943-0066 • Posko Sumberrejo', icon: Icons.local_fire_department_rounded, color: const Color(0xFFEA580C), phone: '0823-4943-0066'),
+    EmergencyContactItem(id: '6', title: 'Pos Damkar Ngasem', subtitle: 'Telepon: 0823-4943-0055 • Posko Ngasem', icon: Icons.local_fire_department_rounded, color: const Color(0xFFD97706), phone: '0823-4943-0055'),
+    EmergencyContactItem(id: '7', title: 'Pos Damkar Ngambon', subtitle: 'Telepon: 0811-3487-039 • Posko Ngambon', icon: Icons.local_fire_department_rounded, color: const Color(0xFFC05621), phone: '0811-3487-039'),
+    EmergencyContactItem(id: '8', title: 'Pos Damkar Sekar', subtitle: 'Telepon: 0811-3487-038 • Posko Sekar', icon: Icons.local_fire_department_rounded, color: const Color(0xFFEA580C), phone: '0811-3487-038'),
+    EmergencyContactItem(id: '9', title: 'Pos Damkar Temayang', subtitle: 'Telepon: 0811-3471-447 • Posko Temayang', icon: Icons.local_fire_department_rounded, color: const Color(0xFFD97706), phone: '0811-3471-447'),
+  ];
+
+  @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark || isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
+      floatingActionButton: widget.isAdmin
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                _showAddEditEmergencyDialog(
+                  context,
+                  onSave: (newItem) {
+                    setState(() {
+                      _damkarList.insert(0, newItem);
+                    });
+                  },
+                );
+              },
+              backgroundColor: const Color(0xFFEA580C),
+              icon: const Icon(Icons.add_rounded, color: Colors.white),
+              label: const Text('Tambah Posko Damkar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            )
+          : null,
       appBar: AppBar(
         backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFEA580C),
         elevation: 0,
@@ -561,7 +967,7 @@ class DamkarDetailScreen extends StatelessWidget {
               isDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
               color: isDark ? Colors.amber : Colors.white,
             ),
-            onPressed: onToggleDarkMode,
+            onPressed: widget.onToggleDarkMode,
           ),
         ],
       ),
@@ -641,94 +1047,41 @@ class DamkarDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  _buildDirectPhoneCard(
-                    context,
-                    title: 'Call Center Damkar 113',
-                    subtitle: 'Telepon: (0353) 113 • Bebas Pulsa (24 Jam)',
-                    icon: Icons.phone_in_talk_rounded,
-                    color: const Color(0xFFDC2626),
-                    phone: '(0353) 113',
-                  ),
-                  _buildDirectPhoneCard(
-                    context,
-                    title: 'Pos Damkar Kota Bojonegoro',
-                    subtitle: 'Telepon: 0823-3066-8443 • Posko Utama Kota',
-                    icon: Icons.fire_truck_rounded,
-                    color: const Color(0xFFEA580C),
-                    phone: '0823-3066-8443',
-                  ),
-                  _buildDirectPhoneCard(
-                    context,
-                    title: 'Pos Damkar Padangan',
-                    subtitle: 'Telepon: 0811-3471-448 • Posko Wilayah Barat',
-                    icon: Icons.fort_rounded,
-                    color: const Color(0xFFD97706),
-                    phone: '0811-3471-448',
-                  ),
-                  _buildDirectPhoneCard(
-                    context,
-                    title: 'Pos Damkar Baureno',
-                    subtitle: 'Telepon: 0811-3471-446 • Posko Wilayah Timur',
-                    icon: Icons.shield_rounded,
-                    color: const Color(0xFFC05621),
-                    phone: '0811-3471-446',
-                  ),
-                  _buildDirectPhoneCard(
-                    context,
-                    title: 'Pos Damkar Sumberrejo',
-                    subtitle: 'Telepon: 0823-4943-0066 • Posko Sumberrejo',
-                    icon: Icons.local_fire_department_rounded,
-                    color: const Color(0xFFEA580C),
-                    phone: '0823-4943-0066',
-                  ),
-                  _buildDirectPhoneCard(
-                    context,
-                    title: 'Pos Damkar Ngasem',
-                    subtitle: 'Telepon: 0823-4943-0055 • Posko Ngasem',
-                    icon: Icons.local_fire_department_rounded,
-                    color: const Color(0xFFD97706),
-                    phone: '0823-4943-0055',
-                  ),
-                  _buildDirectPhoneCard(
-                    context,
-                    title: 'Pos Damkar Ngambon',
-                    subtitle: 'Telepon: 0811-3487-039 • Posko Ngambon',
-                    icon: Icons.local_fire_department_rounded,
-                    color: const Color(0xFFC05621),
-                    phone: '0811-3487-039',
-                  ),
-                  _buildDirectPhoneCard(
-                    context,
-                    title: 'Pos Damkar Sekar',
-                    subtitle: 'Telepon: 0811-3487-038 • Posko Sekar',
-                    icon: Icons.local_fire_department_rounded,
-                    color: const Color(0xFFEA580C),
-                    phone: '0811-3487-038',
-                  ),
-                  _buildDirectPhoneCard(
-                    context,
-                    title: 'Pos Damkar Temayang',
-                    subtitle: 'Telepon: 0811-3471-447 • Posko Temayang',
-                    icon: Icons.local_fire_department_rounded,
-                    color: const Color(0xFFD97706),
-                    phone: '0811-3471-447',
-                  ),
-                  _buildDirectPhoneCard(
-                    context,
-                    title: 'Pos Damkar Kedungadem',
-                    subtitle: 'Telepon: 0811-3487-037 • Posko Kedungadem',
-                    icon: Icons.local_fire_department_rounded,
-                    color: const Color(0xFFC05621),
-                    phone: '0811-3487-037',
-                  ),
-                  _buildDirectPhoneCard(
-                    context,
-                    title: 'Pos Damkar Ngraho',
-                    subtitle: 'Telepon: 0821-3121-9971 • Posko Ngraho',
-                    icon: Icons.local_fire_department_rounded,
-                    color: const Color(0xFFEA580C),
-                    phone: '0821-3121-9971',
-                  ),
+                  ..._damkarList.map((item) {
+                    return _buildDirectPhoneCard(
+                      context,
+                      title: item.title,
+                      subtitle: item.subtitle,
+                      icon: item.icon,
+                      color: item.color,
+                      phone: item.phone,
+                      isAdmin: widget.isAdmin,
+                      onEdit: () {
+                        _showAddEditEmergencyDialog(
+                          context,
+                          existing: item,
+                          onSave: (updated) {
+                            setState(() {
+                              item.title = updated.title;
+                              item.phone = updated.phone;
+                              item.subtitle = updated.subtitle;
+                            });
+                          },
+                        );
+                      },
+                      onDelete: () {
+                        _confirmDeleteEmergency(
+                          context,
+                          title: item.title,
+                          onDelete: () {
+                            setState(() {
+                              _damkarList.removeWhere((e) => e.id == item.id);
+                            });
+                          },
+                        );
+                      },
+                    );
+                  }),
                 ],
               ),
             ),
@@ -740,25 +1093,62 @@ class DamkarDetailScreen extends StatelessWidget {
   }
 }
 
+
 // =============================================================================
 // DETAIL SCREEN 3: KEPOLISIAN (POLRES & POLSEK) (FULL 1 LAYAR PENUH)
 // =============================================================================
-class KepolisianDetailScreen extends StatelessWidget {
+class KepolisianDetailScreen extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback onToggleDarkMode;
+  final bool isAdmin;
 
   const KepolisianDetailScreen({
     super.key,
     required this.isDarkMode,
     required this.onToggleDarkMode,
+    this.isAdmin = false,
   });
 
   @override
+  State<KepolisianDetailScreen> createState() => _KepolisianDetailScreenState();
+}
+
+class _KepolisianDetailScreenState extends State<KepolisianDetailScreen> {
+  final List<EmergencyContactItem> _polisiList = [
+    EmergencyContactItem(id: '1', title: 'Call Center Kepolisian 110', subtitle: 'Telepon: 110 • Bebas Pulsa (24 Jam)', icon: Icons.phone_in_talk_rounded, color: const Color(0xFFDC2626), phone: '110'),
+    EmergencyContactItem(id: '2', title: 'SPKT Polres Bojonegoro', subtitle: 'Telepon: (0353) 881254 • SPKT Siaga 24 Jam', icon: Icons.local_police_rounded, color: const Color(0xFF2563EB), phone: '(0353) 881254'),
+    EmergencyContactItem(id: '3', title: 'WhatsApp SPKT Polres Bojonegoro', subtitle: 'WhatsApp: 0813-3320-1110 • Layanan Pengaduan Cepat', icon: Icons.chat_rounded, color: const Color(0xFF10B981), phone: '0813-3320-1110'),
+    EmergencyContactItem(id: '4', title: 'Polsek Bojonegoro Kota', subtitle: 'Telepon: (0353) 881270 • Wilayah Kota', icon: Icons.local_police_rounded, color: const Color(0xFF2563EB), phone: '(0353) 881270'),
+    EmergencyContactItem(id: '5', title: 'Polsek Kapas', subtitle: 'Telepon: (0353) 881845 • Wilayah Kapas', icon: Icons.shield_rounded, color: const Color(0xFF0284C7), phone: '(0353) 881845'),
+    EmergencyContactItem(id: '6', title: 'Polsek Dander', subtitle: 'Telepon: (0353) 884021 • Wilayah Dander', icon: Icons.local_police_rounded, color: const Color(0xFF2563EB), phone: '(0353) 884021'),
+    EmergencyContactItem(id: '7', title: 'Polsek Kalitidu', subtitle: 'Telepon: (0353) 891004 • Wilayah Kalitidu', icon: Icons.shield_rounded, color: const Color(0xFF0284C7), phone: '(0353) 891004'),
+    EmergencyContactItem(id: '8', title: 'Polsek Padangan', subtitle: 'Telepon: (0353) 531004 • Wilayah Padangan', icon: Icons.local_police_rounded, color: const Color(0xFF2563EB), phone: '(0353) 531004'),
+    EmergencyContactItem(id: '9', title: 'Polsek Baureno', subtitle: 'Telepon: (0353) 351004 • Wilayah Baureno', icon: Icons.shield_rounded, color: const Color(0xFF0284C7), phone: '(0353) 351004'),
+  ];
+
+  @override
   Widget build(BuildContext context) {
-    final isDark = isDarkMode;
+    final isDark = widget.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC),
+      floatingActionButton: widget.isAdmin
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                _showAddEditEmergencyDialog(
+                  context,
+                  onSave: (newItem) {
+                    setState(() {
+                      _polisiList.insert(0, newItem);
+                    });
+                  },
+                );
+              },
+              backgroundColor: const Color(0xFF1E40AF),
+              icon: const Icon(Icons.add_rounded, color: Colors.white),
+              label: const Text('Tambah Kontak Polsek', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            )
+          : null,
       appBar: AppBar(
         backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFF1E40AF),
         elevation: 0,
@@ -785,7 +1175,7 @@ class KepolisianDetailScreen extends StatelessWidget {
               isDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
               color: isDark ? Colors.amber : Colors.white,
             ),
-            onPressed: onToggleDarkMode,
+            onPressed: widget.onToggleDarkMode,
           ),
         ],
       ),
@@ -865,22 +1255,41 @@ class KepolisianDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  _buildDirectPhoneCard(
-                    context,
-                    title: 'Call Center Kepolisian 110',
-                    subtitle: 'Layanan Call Center 110 Polri Bebas Pulsa (24 Jam)',
-                    icon: Icons.phone_in_talk_rounded,
-                    color: const Color(0xFF1E40AF),
-                    phone: '110',
-                  ),
-                  _buildDirectPhoneCard(
-                    context,
-                    title: 'SPKT Polres Bojonegoro',
-                    subtitle: 'Telepon: (0353) 884300 • Pengaduan & Laporan Kriminal',
-                    icon: Icons.shield_rounded,
-                    color: const Color(0xFF2563EB),
-                    phone: '(0353) 884300',
-                  ),
+                  ..._polisiList.map((item) {
+                    return _buildDirectPhoneCard(
+                      context,
+                      title: item.title,
+                      subtitle: item.subtitle,
+                      icon: item.icon,
+                      color: item.color,
+                      phone: item.phone,
+                      isAdmin: widget.isAdmin,
+                      onEdit: () {
+                        _showAddEditEmergencyDialog(
+                          context,
+                          existing: item,
+                          onSave: (updated) {
+                            setState(() {
+                              item.title = updated.title;
+                              item.phone = updated.phone;
+                              item.subtitle = updated.subtitle;
+                            });
+                          },
+                        );
+                      },
+                      onDelete: () {
+                        _confirmDeleteEmergency(
+                          context,
+                          title: item.title,
+                          onDelete: () {
+                            setState(() {
+                              _polisiList.removeWhere((e) => e.id == item.id);
+                            });
+                          },
+                        );
+                      },
+                    );
+                  }),
                   const SizedBox(height: 14),
 
                   // Alamat Card
@@ -953,6 +1362,9 @@ Widget _buildDirectPhoneCard(
   required IconData icon,
   required Color color,
   required String phone,
+  bool isAdmin = false,
+  VoidCallback? onEdit,
+  VoidCallback? onDelete,
 }) {
   final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -965,58 +1377,96 @@ Widget _buildDirectPhoneCard(
         color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
       ),
     ),
-    child: Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(16),
-      child: ListTile(
-        onTap: () {
-          _makeCall(context, phone, title);
-        },
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: color.withAlpha(25),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: color, size: 22),
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: 13.5,
-            fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : const Color(0xFF0F172A),
-          ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: TextStyle(
-            fontSize: 11.5,
-            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-          ),
-        ),
-        trailing: ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: color,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            elevation: 0,
-          ),
-          icon: const Icon(Icons.call_rounded, color: Colors.white, size: 14),
-          label: Text(
-            phone,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11.5,
-              fontWeight: FontWeight.bold,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          child: ListTile(
+            onTap: () {
+              _makeCall(context, phone, title);
+            },
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            leading: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withAlpha(25),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: color, size: 22),
+            ),
+            title: Text(
+              title,
+              style: TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
+              ),
+            ),
+            subtitle: Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 11.5,
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              ),
+            ),
+            trailing: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: color,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 0,
+              ),
+              icon: const Icon(Icons.call_rounded, color: Colors.white, size: 14),
+              label: Text(
+                phone,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () {
+                _makeCall(context, phone, title);
+              },
             ),
           ),
-          onPressed: () {
-            _makeCall(context, phone, title);
-          },
         ),
-      ),
+        if (isAdmin) ...[
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: onEdit,
+                  icon: const Icon(Icons.edit_rounded, size: 14, color: Color(0xFFDC2626)),
+                  label: const Text('Edit Kontak', style: TextStyle(color: Color(0xFFDC2626), fontSize: 11.5, fontWeight: FontWeight.bold)),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFFDC2626)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
+                  onPressed: onDelete,
+                  icon: const Icon(Icons.delete_outline_rounded, size: 14, color: Colors.white),
+                  label: const Text('Hapus', style: TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFEF4444),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
     ),
   );
 }
+

@@ -20,6 +20,8 @@ import 'admin_pariwisata_screen.dart';
 import 'admin_pendidikan_screen.dart';
 import 'admin_pertanian_screen.dart';
 import 'admin_pajak_screen.dart';
+import 'admin_perhubungan_screen.dart';
+import 'admin_news_screen.dart';
 import '../kesehatan_screen.dart';
 
 /// Admin Main Screen - Uses EXACT SAME SuperApp App Layout & Bottom Navigation Bar as User HomeScreen
@@ -148,6 +150,16 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
       );
     } else if (id == 'layanan_sosial' || title.contains('sosial')) {
       targetScreen = AdminLayananSosialScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    } else if (id == 'perhubungan' || title.contains('perhubungan') || title.contains('hubung')) {
+      targetScreen = AdminPerhubunganScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    } else if (id == 'portal_berita' || id == 'berita' || title.contains('berita') || title.contains('news')) {
+      targetScreen = AdminNewsScreen(
         isDarkMode: widget.isDarkMode,
         onToggleDarkMode: widget.onToggleDarkMode,
       );

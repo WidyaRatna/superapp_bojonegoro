@@ -1286,7 +1286,9 @@ class PersyaratanLayananScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                   ),
-                  child: ExpansionTile(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: ExpansionTile(
                     leading: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -1584,9 +1586,10 @@ class PersyaratanLayananScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
+          ),
           ],
         ),
       ),

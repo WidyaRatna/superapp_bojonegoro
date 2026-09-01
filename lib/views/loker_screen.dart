@@ -3,16 +3,19 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../models/loker_model.dart';
+import '../widgets/admin/admin_form_dialog.dart';
 import 'loker_detail_screen.dart';
 
 class LokerScreen extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback? onToggleDarkMode;
+  final bool isAdmin;
 
   const LokerScreen({
     super.key,
     required this.isDarkMode,
     this.onToggleDarkMode,
+    this.isAdmin = false,
   });
 
   @override
@@ -237,6 +240,7 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
           loker: loker,
           isDarkMode: _isDarkModeActive(context),
           onToggleDarkMode: _toggleDarkMode,
+          isAdmin: widget.isAdmin,
         ),
       ),
     );
@@ -419,6 +423,211 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
     );
   }
 
+  void _openEditDialog(LokerItem existing) {
+    final titleController = TextEditingController(text: existing.title);
+    final companyController = TextEditingController(text: existing.companyName);
+    final salaryController = TextEditingController(text: existing.salaryRange);
+    final addressController = TextEditingController(text: existing.fullAddress);
+    final descController = TextEditingController(text: existing.description);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AdminFormDialog(
+          title: 'Edit Lowongan Kerja',
+          subtitle: 'Perbarui informasi posisi pekerjaan dan syarat loker Bojonegoro',
+          isEditing: true,
+          fields: [
+            AdminFormField(
+              label: 'Judul Posisi Pekerjaan',
+              controller: titleController,
+              hint: 'Contoh: Staf Administrasi & Kasir',
+            ),
+            AdminFormField(
+              label: 'Nama Perusahaan / PT / Instansi',
+              controller: companyController,
+              hint: 'PT Surya Bojonegoro',
+            ),
+            AdminFormField(
+              label: 'Kisaran Gaji',
+              controller: salaryController,
+              hint: 'Rp 2.500.000 - Rp 3.500.000 / bulan',
+            ),
+            AdminFormField(
+              label: 'Alamat Lengkap Kantor / Lokasi Kerja',
+              controller: addressController,
+              hint: 'Jl. Raya Bojonegoro No. 12',
+            ),
+            AdminFormField(
+              label: 'Deskripsi Pekerjaan',
+              controller: descController,
+              hint: 'Deskripsi pekerjaan...',
+              minLines: 4,
+              maxLines: 8,
+            ),
+          ],
+          onSave: () {
+            setState(() {
+              existing.title = titleController.text.trim();
+              existing.companyName = companyController.text.trim();
+              existing.salaryRange = salaryController.text.trim();
+              existing.fullAddress = addressController.text.trim();
+              existing.description = descController.text.trim();
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Lowongan kerja berhasil diperbarui!'),
+                backgroundColor: Color(0xFF10B981),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _confirmDeleteLoker(LokerItem item) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Hapus Lowongan Kerja?'),
+        content: Text('Apakah Anda yakin ingin menghapus lowongan "${item.title}" dari ${item.companyName}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _allLokerList.removeWhere((e) => e.id == item.id);
+              });
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Lowongan "${item.title}" telah dihapus.'),
+                  backgroundColor: const Color(0xFFEF4444),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF4444)),
+            child: const Text('Hapus', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showKecamatanPickerModal(BuildContext context, bool isDark) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final screenHeight = MediaQuery.of(context).size.height;
+
+        return Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 36),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+          elevation: 16,
+          child: Container(
+            width: screenWidth * 0.90,
+            height: screenHeight * 0.70,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Column(
+              children: [
+                // Header Title & Close Button
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on_rounded, color: Color(0xFF059669), size: 24),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Pilih Wilayah Kecamatan',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close_rounded, size: 22, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Divider(height: 1),
+                const SizedBox(height: 8),
+
+                // List of Kecamatan
+                Expanded(
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: listKecamatanLoker.length,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    itemBuilder: (context, index) {
+                      final kec = listKecamatanLoker[index];
+                      final isSelected = kec == _selectedKecamatan;
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 6),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? const Color(0xFF059669).withAlpha(isDark ? 40 : 15)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(14),
+                          border: isSelected
+                              ? Border.all(color: const Color(0xFF059669).withAlpha(80), width: 1.2)
+                              : null,
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(14),
+                          child: ListTile(
+                            dense: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                            title: Text(
+                              kec,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                color: isSelected
+                                    ? const Color(0xFF059669)
+                                    : (isDark ? Colors.white : const Color(0xFF1E293B)),
+                              ),
+                            ),
+                            trailing: isSelected
+                                ? const Icon(Icons.check_circle_rounded, color: Color(0xFF059669), size: 22)
+                                : null,
+                            onTap: () {
+                              setState(() {
+                                _selectedKecamatan = kec;
+                              });
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   /// Tab 1: Cari Lowongan (Flow Pencari Kerja)
   Widget _buildCariLowonganTab(bool isDark) {
     return SingleChildScrollView(
@@ -431,80 +640,67 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
           // Search Bar & Location Filter
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
-                    ),
-                    child: TextField(
-                      onChanged: (val) {
-                        setState(() {
-                          _searchQuery = val;
-                        });
-                      },
-                      style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A), fontSize: 13),
-                      decoration: InputDecoration(
-                        hintText: 'Cari pekerjaan (admin, kasir, teknisi...)...',
-                        hintStyle: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), fontSize: 12.5),
-                        prefixIcon: const Icon(Icons.search_rounded, size: 20, color: Color(0xFF059669)),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          // Kecamatan Location Filter Dropdown
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              height: 44,
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
               ),
-              child: Row(
-                children: [
-                  const Icon(Icons.location_on_rounded, size: 18, color: Color(0xFF059669)),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _selectedKecamatan,
-                        isExpanded: true,
-                        dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+              child: TextField(
+                onChanged: (val) {
+                  setState(() {
+                    _searchQuery = val;
+                  });
+                },
+                style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A), fontSize: 13),
+                decoration: InputDecoration(
+                  hintText: 'Cari pekerjaan (admin, kasir, teknisi...)...',
+                  hintStyle: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), fontSize: 12.5),
+                  prefixIcon: const Icon(Icons.search_rounded, size: 20, color: Color(0xFF059669)),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // Kecamatan Location Filter Card (Modal Picker)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: InkWell(
+              onTap: () => _showKecamatanPickerModal(context, isDark),
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                height: 44,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.location_on_rounded, size: 20, color: Color(0xFF059669)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _selectedKecamatan,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
-                        items: listKecamatanLoker.map((kec) {
-                          return DropdownMenuItem<String>(
-                            value: kec,
-                            child: Text(kec, overflow: TextOverflow.ellipsis),
-                          );
-                        }).toList(),
-                        onChanged: (val) {
-                          if (val != null) {
-                            setState(() {
-                              _selectedKecamatan = val;
-                            });
-                          }
-                        },
                       ),
                     ),
-                  ),
-                ],
+                    Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -665,6 +861,25 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                                         ),
                                       ),
                                     ),
+                                    if (item.isVerified) ...[
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                        decoration: BoxDecoration(
+                                          color: isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5),
+                                          borderRadius: BorderRadius.circular(20),
+                                          border: Border.all(color: const Color(0xFF10B981).withAlpha(120), width: 0.8),
+                                        ),
+                                        child: const Text(
+                                          'Terverifikasi',
+                                          style: TextStyle(
+                                            color: Color(0xFF059669),
+                                            fontSize: 10.5,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                     if (item.id.startsWith('loker_') && !item.id.startsWith('loker_1') && !item.id.startsWith('loker_2') && !item.id.startsWith('loker_3')) ...[
                                       const SizedBox(width: 6),
                                       Container(
@@ -724,6 +939,66 @@ class _LokerScreenState extends State<LokerScreen> with SingleTickerProviderStat
                                 _buildMiniBadge(Icons.payments_outlined, item.salaryRange, isDark),
                               ],
                             ),
+
+                            if (widget.isAdmin) ...[
+                              const SizedBox(height: 12),
+                              const Divider(height: 1),
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      setState(() {
+                                        item.isVerified = !item.isVerified;
+                                      });
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(item.isVerified ? 'Lowongan "${item.title}" diverifikasi!' : 'Status verifikasi dibatalkan.'),
+                                          backgroundColor: item.isVerified ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
+                                        ),
+                                      );
+                                    },
+                                    icon: Icon(
+                                      item.isVerified ? Icons.verified_rounded : Icons.check_circle_outline_rounded,
+                                      size: 14,
+                                      color: Colors.white,
+                                    ),
+                                    label: Text(
+                                      item.isVerified ? 'Terverifikasi' : 'Verifikasi',
+                                      style: const TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.bold),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: item.isVerified ? const Color(0xFF059669) : const Color(0xFFF59E0B),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  OutlinedButton.icon(
+                                    onPressed: () => _openEditDialog(item),
+                                    icon: const Icon(Icons.edit_rounded, size: 14, color: Color(0xFF0D62F1)),
+                                    label: const Text('Edit', style: TextStyle(color: Color(0xFF0D62F1), fontSize: 11.5, fontWeight: FontWeight.bold)),
+                                    style: OutlinedButton.styleFrom(
+                                      side: const BorderSide(color: Color(0xFF0D62F1)),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  ElevatedButton.icon(
+                                    onPressed: () => _confirmDeleteLoker(item),
+                                    icon: const Icon(Icons.delete_outline_rounded, size: 14, color: Colors.white),
+                                    label: const Text('Hapus', style: TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.bold)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFFEF4444),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ],
                         ),
                       ),

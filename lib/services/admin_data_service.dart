@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:universal_html/html.dart' as html;
 
 /// Models for Admin Modules Data Management
@@ -197,6 +197,25 @@ class ItemSopLapor {
   });
 }
 
+class DpmptspSopStep {
+  final String id;
+  String stepNumber;
+  String role;
+  String duration;
+  String output;
+  String description;
+
+  DpmptspSopStep({
+    required this.id,
+    required this.stepNumber,
+    required this.role,
+    required this.duration,
+    required this.output,
+    required this.description,
+  });
+}
+
+
 class ItemLaporanWarga {
   final String id;
   String category;
@@ -313,6 +332,26 @@ class ItemLayananSosial {
   });
 }
 
+class ItemPerhubungan {
+  final String id;
+  String title;
+  String description;
+  String category;
+  String urlStr;
+  String phoneNumber;
+  IconData icon;
+
+  ItemPerhubungan({
+    required this.id,
+    required this.title,
+    required this.description,
+    this.category = 'Layanan Utama',
+    this.urlStr = '',
+    this.phoneNumber = '',
+    this.icon = Icons.directions_bus_outlined,
+  });
+}
+
 class ItemBeritaAdmin {
   final String id;
   String title;
@@ -371,6 +410,7 @@ class AdminDataService extends ChangeNotifier {
   final List<ItemEmergencyCall> _emergencyList = [];
   final List<ItemLokerAdmin> _lokerList = [];
   final List<ItemLayananSosial> _layananSosialList = [];
+  final List<ItemPerhubungan> _perhubunganList = [];
   final List<ItemBeritaAdmin> _beritaList = [];
   final List<AdminActivityLog> _activityLogs = [];
 
@@ -385,7 +425,9 @@ class AdminDataService extends ChangeNotifier {
   List<ItemKontakInstansi> get kontakInstansiList => List.unmodifiable(_kontakInstansiList);
   List<ItemEmergencyCall> get emergencyList => List.unmodifiable(_emergencyList);
   List<ItemLokerAdmin> get lokerList => List.unmodifiable(_lokerList);
-  List<ItemLayananSosial> get layananSosialList => List.unmodifiable(_layananSosialList);
+  List<ItemLayananSosial> get layananSosialList =>
+      List.unmodifiable(_layananSosialList.where((e) => e.id != 'SOS-003' && e.id != 'SOS-004'));
+  List<ItemPerhubungan> get perhubunganList => List.unmodifiable(_perhubunganList);
   List<ItemBeritaAdmin> get beritaList => List.unmodifiable(_beritaList);
   List<AdminActivityLog> get activityLogs => List.unmodifiable(_activityLogs);
 
@@ -961,11 +1003,44 @@ class AdminDataService extends ChangeNotifier {
     _layananSosialList.addAll([
       ItemLayananSosial(
         id: 'SOS-001',
-        title: 'Program Bantuan Sosial PKH Daerah',
-        category: 'Bansos',
-        description: 'Bantuan tunai bersyarat bagi keluarga kurang mampu di Bojonegoro.',
-        requirement: 'Terdaftar di DTKS & Memiliki Kartu Komitmen Sosial',
-        mechanism: 'Pencairan berkala melalui Himbara dan Kantor Pos.',
+        title: 'Bantuan Sosial Terpadu',
+        category: 'Layanan Unggulan',
+        description: 'Informasi dan tata cara pengajuan PKH, BPNT, serta DTKS Kemensos.',
+        requirement: 'Terdaftar di DTKS, Fotokopi KTP, KK, & Surat Keterangan Desa',
+        mechanism: 'Pencairan berkala melalui Bank Himbara & PT Pos Indonesia.',
+      ),
+      ItemLayananSosial(
+        id: 'SOS-002',
+        title: 'Persyaratan Pelayanan Publik',
+        category: 'Layanan Unggulan',
+        description: 'Informasi standar pelayanan publik dan dokumen persyaratan administrasi.',
+        requirement: 'Dokumen persyaratan sesuai kategori A - G Dinas Sosial Bojonegoro',
+        mechanism: 'Pengajuan berkas di Kantor Dinsos / Kecamatan / Portal Online.',
+      ),
+    ]);
+
+    // 9b. Perhubungan Initial Data
+    _perhubunganList.addAll([
+      ItemPerhubungan(
+        id: 'PHB-001',
+        title: 'Pengaduan Perhubungan',
+        description: 'Laporkan masalah perhubungan',
+        phoneNumber: '081333555695',
+        icon: Icons.campaign_outlined,
+      ),
+      ItemPerhubungan(
+        id: 'PHB-002',
+        title: 'APEL Gratis',
+        description: 'Angkutan Pelajar Gratis',
+        urlStr: 'https://apelgratis.bojonegorokab.go.id/',
+        icon: Icons.directions_bus_outlined,
+      ),
+      ItemPerhubungan(
+        id: 'PHB-003',
+        title: 'Bojonegoro TIC',
+        description: 'CCTV & informasi lalu lintas',
+        urlStr: 'https://play.google.com/store/apps/details?id=id.go.bojonegorokab.botic&hl=id',
+        icon: Icons.videocam_outlined,
       ),
     ]);
 
@@ -1146,6 +1221,135 @@ class AdminDataService extends ChangeNotifier {
     notifyListeners();
   }
 
+  // 5b. DPMPTSP SOP Engine
+  String _jadwalTatapMuka = 'Jadwal Tatap Muka: Senin - Jumat (08.00 - 15.00 WIB)';
+  String get jadwalTatapMuka => _jadwalTatapMuka;
+  void updateJadwalTatapMuka(String val) {
+    _jadwalTatapMuka = val;
+    _logActivity('Update Jadwal Tatap Muka', 'DPMPTSP Pengaduan');
+    notifyListeners();
+  }
+
+  String _informasiKetentuanPengaduan =
+      'Melalui pengaduan ini, pengguna jasa dapat menyampaikan keluhan maupun komentar terhadap fasilitas gedung, pelayanan, pelanggaran kode etik, serta hal-hal yang terkait dengan pelaksanaan prosedur pelayanan di Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kabupaten Bojonegoro. Pengaduan ini disampaikan secara langsung atau melalui email dengan mengisi formulir pengaduan secara lengkap, agar petugas kami dapat menindaklanjuti pengaduan yang telah disampaikan. Apabila data yang disampaikan tidak benar, pengaduan tidak akan diproses lebih lanjut.';
+  String get informasiKetentuanPengaduan => _informasiKetentuanPengaduan;
+  void updateInformasiKetentuanPengaduan(String val) {
+    _informasiKetentuanPengaduan = val;
+    _logActivity('Update Informasi & Ketentuan Pengaduan', 'DPMPTSP Pengaduan');
+    notifyListeners();
+  }
+
+
+  final Map<String, List<DpmptspSopStep>> _dpmptspSopMap = {};
+
+  List<DpmptspSopStep> getDpmptspSopSteps(String channelKey) {
+    if (!_dpmptspSopMap.containsKey(channelKey) || _dpmptspSopMap[channelKey]!.isEmpty) {
+      _dpmptspSopMap[channelKey] = _getDefaultDpmptspSopSteps(channelKey);
+    }
+    return _dpmptspSopMap[channelKey]!;
+  }
+
+  void addDpmptspSopStep(String channelKey, DpmptspSopStep step) {
+    final list = getDpmptspSopSteps(channelKey);
+    list.add(step);
+    _logActivity('Tambah SOP Step ${step.stepNumber}', 'DPMPTSP Pengaduan');
+    notifyListeners();
+  }
+
+  void updateDpmptspSopStep(String channelKey, DpmptspSopStep step) {
+    final list = getDpmptspSopSteps(channelKey);
+    final idx = list.indexWhere((e) => e.id == step.id);
+    if (idx != -1) {
+      list[idx] = step;
+      _logActivity('Update SOP Step ${step.stepNumber}', 'DPMPTSP Pengaduan');
+      notifyListeners();
+    }
+  }
+
+  void deleteDpmptspSopStep(String channelKey, String stepId) {
+    final list = getDpmptspSopSteps(channelKey);
+    list.removeWhere((e) => e.id == stepId);
+    _logActivity('Hapus SOP Step', 'DPMPTSP Pengaduan');
+    notifyListeners();
+  }
+
+  List<DpmptspSopStep> _getDefaultDpmptspSopSteps(String channelKey) {
+    final kanalName = _getChannelLabel(channelKey);
+    return [
+      DpmptspSopStep(
+        id: '${channelKey}_1',
+        stepNumber: '1',
+        role: 'Masyarakat',
+        duration: '-',
+        output: 'Pengaduan',
+        description: 'Masyarakat membuat pengaduan melalui $kanalName',
+      ),
+      DpmptspSopStep(
+        id: '${channelKey}_2',
+        stepNumber: '2',
+        role: channelKey == 'lapor' ? 'Tim Adm Kab' : 'Staf Pengaduan',
+        duration: '15 Menit',
+        output: 'Berkas Pengaduan Lengkap',
+        description: 'Menerima dan mencatat pengaduan dari masyarakat yang didapat dari $kanalName',
+      ),
+      DpmptspSopStep(
+        id: '${channelKey}_3',
+        stepNumber: '3',
+        role: 'Penata Perizinan Ahli Muda',
+        duration: '15 Menit',
+        output: 'Pengaduan telah diterima',
+        description: 'Pengaduan yang bukan kewenangan DPMPTSP. Menerima pengaduan yang diserahkan staf pengaduan kemudian meneruskan kepada OPD terkait apabila bukan kewenangan DPMPTSP untuk menjawab pengaduan. Selanjutnya OPD menindaklanjuti pengaduan langsung kepada masyarakat',
+      ),
+      DpmptspSopStep(
+        id: '${channelKey}_4',
+        stepNumber: '4',
+        role: 'Penata Perizinan Ahli Muda',
+        duration: channelKey == 'surat' ? '1 Hari' : '30 Menit',
+        output: 'Berkas Pengaduan Lengkap dan konsep jawaban',
+        description: 'Pengaduan kewenangan DPMPTSP. Menyusun berkas pengaduan, menganalisis serta memverifikasi berkas pengaduan untuk dijadikan konsep jawaban pengaduan',
+      ),
+      DpmptspSopStep(
+        id: '${channelKey}_5',
+        stepNumber: '5',
+        role: 'Penata Perizinan Ahli Madya',
+        duration: '15 Menit',
+        output: 'konsep jawaban',
+        description: 'Penata Perizinan Ahli Madya menerima dan memverifikasi rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
+      ),
+      DpmptspSopStep(
+        id: '${channelKey}_6',
+        stepNumber: '6',
+        role: 'Kepala Dinas',
+        duration: channelKey == 'surat' ? '1 Hari' : (channelKey == 'lapor' ? '14 Hari' : '15 Menit'),
+        output: 'Jawaban pengaduan',
+        description: 'Kepala Dinas Menerima dan menyetujui rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
+      ),
+      DpmptspSopStep(
+        id: '${channelKey}_7',
+        stepNumber: '7',
+        role: 'Penata Perizinan Ahli Muda',
+        duration: channelKey == 'lapor' ? '30 Menit' : '15 Menit',
+        output: 'Jawaban pengaduan',
+        description: 'Penata Perizinan Ahli Muda menerima persetujuan jawaban pengaduan kemudian menyampaikan jawaban kepada staf pengaduan untuk disampaikan kepada masyarakat',
+      ),
+    ];
+  }
+
+  String _getChannelLabel(String key) {
+    switch (key) {
+      case 'tatap_muka': return 'tatap muka';
+      case 'surat': return 'kotak pengaduan / surat';
+      case 'lapor': return 'kanal LAPOR';
+      case 'website': return 'Website';
+      case 'email': return 'Email';
+      case 'whatsapp': return 'WhatsApp';
+      case 'instagram': return 'Instagram';
+      case 'twitter': return 'Twitter / X';
+      default: return 'kanal pengaduan';
+    }
+  }
+
+
   // 6. Kontak Instansi
   void addKontakInstansi(ItemKontakInstansi item) {
     _kontakInstansiList.insert(0, item);
@@ -1240,6 +1444,28 @@ class AdminDataService extends ChangeNotifier {
   void deleteLayananSosial(String id) {
     _layananSosialList.removeWhere((e) => e.id == id);
     _logActivity('Hapus Layanan Sosial ($id)', 'Layanan Sosial');
+    notifyListeners();
+  }
+
+  // 9b. Perhubungan
+  void addPerhubungan(ItemPerhubungan item) {
+    _perhubunganList.insert(0, item);
+    _logActivity('Tambah Layanan Perhubungan: ${item.title}', 'Perhubungan');
+    notifyListeners();
+  }
+
+  void updatePerhubungan(ItemPerhubungan item) {
+    final index = _perhubunganList.indexWhere((e) => e.id == item.id);
+    if (index != -1) {
+      _perhubunganList[index] = item;
+      _logActivity('Edit Layanan Perhubungan: ${item.title}', 'Perhubungan');
+      notifyListeners();
+    }
+  }
+
+  void deletePerhubungan(String id) {
+    _perhubunganList.removeWhere((e) => e.id == id);
+    _logActivity('Hapus Layanan Perhubungan ($id)', 'Perhubungan');
     notifyListeners();
   }
 

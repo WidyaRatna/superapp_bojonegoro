@@ -479,9 +479,11 @@ class _PupukBersubsidiScreenState extends State<PupukBersubsidiScreen> {
           color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
         ),
       ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
+      child: Material(
+        color: Colors.transparent,
+        child: Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
           iconColor: const Color(0xFF059669),
           collapsedIconColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
           leading: Icon(icon, color: const Color(0xFF059669), size: 20),
@@ -501,8 +503,9 @@ class _PupukBersubsidiScreenState extends State<PupukBersubsidiScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 class _BulletText extends StatelessWidget {

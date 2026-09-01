@@ -424,8 +424,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 24),
 
                     // Footer Link: Belum punya akun? Daftar
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
                           'Belum punya akun? ',
@@ -478,12 +479,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             children: [
                               const Icon(Icons.shield_rounded, color: Color(0xFF0D62F1), size: 18),
                               const SizedBox(width: 8),
-                              Text(
-                                'Akun Demo Administrator:',
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                              Expanded(
+                                child: Text(
+                                  'Akun Demo Administrator:',
+                                  style: TextStyle(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                  ),
                                 ),
                               ),
                             ],

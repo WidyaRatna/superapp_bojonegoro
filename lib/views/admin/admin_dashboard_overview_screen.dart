@@ -23,6 +23,7 @@ import 'admin_pendidikan_screen.dart';
 import 'admin_pertanian_screen.dart';
 import '../kesehatan_screen.dart';
 import 'admin_pajak_screen.dart';
+import 'admin_perhubungan_screen.dart';
 
 /// Admin Dashboard Overview Screen - 100% REUSES SuperApp User Home UI Layout
 class AdminDashboardOverviewScreen extends StatefulWidget {
@@ -135,6 +136,16 @@ class _AdminDashboardOverviewScreenState extends State<AdminDashboardOverviewScr
       );
     } else if (id == 'layanan_sosial' || title.contains('sosial')) {
       targetScreen = AdminLayananSosialScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    } else if (id == 'perhubungan' || title.contains('perhubungan') || title.contains('hubung')) {
+      targetScreen = AdminPerhubunganScreen(
+        isDarkMode: widget.isDarkMode,
+        onToggleDarkMode: widget.onToggleDarkMode,
+      );
+    } else if (id == 'portal_berita' || id == 'berita' || title.contains('berita') || title.contains('news')) {
+      targetScreen = AdminNewsScreen(
         isDarkMode: widget.isDarkMode,
         onToggleDarkMode: widget.onToggleDarkMode,
       );

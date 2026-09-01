@@ -78,6 +78,7 @@ class TopHeaderWidget extends StatelessWidget {
         width: double.infinity,
         color: const Color(0xFF071927),
         child: Stack(
+          clipBehavior: Clip.antiAlias,
           children: [
             // Full Width Background Photo with Soft Dark Overlay
             Positioned.fill(
@@ -108,226 +109,239 @@ class TopHeaderWidget extends StatelessWidget {
               ),
             ),
 
-            // Foreground Header Content
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(height: topPadding > 0 ? topPadding : 16),
-                  const SizedBox(height: 4),
+            // Foreground Header Content protected against flex overflow
+            Positioned.fill(
+              child: SingleChildScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(height: topPadding > 0 ? topPadding : 16),
+                      const SizedBox(height: 4),
 
-                  // Top Header Row: Crest Logo + "Selamat datang di Kab. Bojonegoro", Bell & Profile Avatar
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: [
-                        const BojonegoroLogoWidget(size: 40),
-                        const SizedBox(width: 10),
+                      // Top Header Row: Crest Logo + "Selamat datang di Kab. Bojonegoro", Bell & Profile Avatar
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          children: [
+                            const BojonegoroLogoWidget(size: 40),
+                            const SizedBox(width: 10),
 
-                        // Greeting Text
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Text(
-                                'Selamat datang di',
-                                style: TextStyle(
-                                  color: Color(0xFFCBD5E1),
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w400,
+                            // Greeting Text
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: const [
+                                  Text(
+                                    'Selamat datang di',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Color(0xFFCBD5E1),
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                  SizedBox(height: 1),
+                                  Text(
+                                    'Kab. Bojonegoro',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -0.2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Theme Toggle
+                            InkWell(
+                              onTap: onToggleTheme,
+                              borderRadius: BorderRadius.circular(20),
+                              child: Container(
+                                padding: const EdgeInsets.all(7),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withAlpha(25),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  effectiveDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
+                                  color: effectiveDark ? Colors.amber : Colors.white,
+                                  size: 19,
                                 ),
                               ),
-                              SizedBox(height: 1),
-                              Text(
-                                'Kab. Bojonegoro',
-                                style: TextStyle(
+                            ),
+                            const SizedBox(width: 8),
+
+                            // Notification Bell
+                            AnimatedBuilder(
+                              animation: NotificationService.instance,
+                              builder: (context, child) {
+                                final unreadCount = NotificationService.instance.unreadCount;
+                                return Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    InkWell(
+                                      onTap: onNotificationTap,
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(7),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withAlpha(25),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.notifications_none_rounded,
+                                          color: Colors.white,
+                                          size: 19,
+                                        ),
+                                      ),
+                                    ),
+                                    if (unreadCount > 0)
+                                      Positioned(
+                                        right: 2,
+                                        top: 2,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(3),
+                                          decoration: const BoxDecoration(
+                                            color: Color(0xFFEF4444),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          constraints: const BoxConstraints(
+                                            minWidth: 14,
+                                            minHeight: 14,
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              '$unreadCount',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                );
+                              },
+                            ),
+                            const SizedBox(width: 8),
+
+                            // User Profile Avatar
+                            GestureDetector(
+                              onTap: onProfileTap,
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: const BoxDecoration(
                                   color: Colors.white,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: -0.2,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: buildAvatarCircle(
+                                  UserProfileData.avatarType,
+                                  16,
+                                  20,
+                                  avatarImagePath: UserProfileData.avatarImagePath,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Search Bar
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: effectiveDark ? const Color(0xFF1E293B) : Colors.white,
+                            borderRadius: BorderRadius.circular(14),
+                            border: effectiveDark ? Border.all(color: const Color(0xFF334155), width: 1) : null,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withAlpha(25),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: TextField(
+                            controller: searchController,
+                            onChanged: onSearchChanged,
+                            style: TextStyle(
+                              color: effectiveDark ? Colors.white : const Color(0xFF0F172A),
+                              fontSize: 13.5,
+                            ),
+                            textAlignVertical: TextAlignVertical.center,
+                            decoration: InputDecoration(
+                              hintText: 'Cari layanan, informasi, berita...',
+                              hintStyle: TextStyle(
+                                color: effectiveDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                                fontSize: 13,
+                              ),
+                              prefixIcon: Icon(
+                                Icons.search_rounded,
+                                color: effectiveDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                size: 19,
+                              ),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  Icons.campaign_rounded,
+                                  color: effectiveDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
+                                  size: 21,
+                                ),
+                                onPressed: onQrTap,
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Streamlined Weather Info Row
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: GestureDetector(
+                          onTap: onWeatherTap,
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.wb_sunny_rounded,
+                                color: Color(0xFFFBBF24),
+                                size: 15,
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  '$temperature · $weatherCondition · $windSpeed',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 0.1,
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-
-                        // Theme Toggle
-                        InkWell(
-                          onTap: onToggleTheme,
-                          borderRadius: BorderRadius.circular(20),
-                          child: Container(
-                            padding: const EdgeInsets.all(7),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withAlpha(25),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              effectiveDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
-                              color: effectiveDark ? Colors.amber : Colors.white,
-                              size: 19,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-
-                        // Notification Bell
-                        AnimatedBuilder(
-                          animation: NotificationService.instance,
-                          builder: (context, child) {
-                            final unreadCount = NotificationService.instance.unreadCount;
-                            return Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                InkWell(
-                                  onTap: onNotificationTap,
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(7),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withAlpha(25),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.notifications_none_rounded,
-                                      color: Colors.white,
-                                      size: 19,
-                                    ),
-                                  ),
-                                ),
-                                if (unreadCount > 0)
-                                  Positioned(
-                                    right: 2,
-                                    top: 2,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(3),
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xFFEF4444),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      constraints: const BoxConstraints(
-                                        minWidth: 14,
-                                        minHeight: 14,
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          '$unreadCount',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 9,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 8),
-
-                        // User Profile Avatar
-                        GestureDetector(
-                          onTap: onProfileTap,
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: buildAvatarCircle(
-                              UserProfileData.avatarType,
-                              16,
-                              20,
-                              avatarImagePath: UserProfileData.avatarImagePath,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Search Bar
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: effectiveDark ? const Color(0xFF1E293B) : Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        border: effectiveDark ? Border.all(color: const Color(0xFF334155), width: 1) : null,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withAlpha(25),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
                       ),
-                      child: TextField(
-                        controller: searchController,
-                        onChanged: onSearchChanged,
-                        style: TextStyle(
-                          color: effectiveDark ? Colors.white : const Color(0xFF0F172A),
-                          fontSize: 13.5,
-                        ),
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                          hintText: 'Cari layanan, informasi, berita...',
-                          hintStyle: TextStyle(
-                            color: effectiveDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                            fontSize: 13,
-                          ),
-                          prefixIcon: Icon(
-                            Icons.search_rounded,
-                            color: effectiveDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                            size: 19,
-                          ),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              Icons.campaign_rounded,
-                              color: effectiveDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
-                              size: 21,
-                            ),
-                            onPressed: onQrTap,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                        ),
-                      ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(height: 10),
-
-                  // Streamlined Weather Info Row
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: GestureDetector(
-                      onTap: onWeatherTap,
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.wb_sunny_rounded,
-                            color: Color(0xFFFBBF24),
-                            size: 15,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            '$temperature · $weatherCondition · $windSpeed',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 0.1,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ],

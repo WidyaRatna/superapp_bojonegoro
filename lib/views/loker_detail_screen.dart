@@ -3,17 +3,20 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/loker_model.dart';
+import '../widgets/admin/admin_form_dialog.dart';
 
 class LokerDetailScreen extends StatefulWidget {
   final LokerItem loker;
   final bool isDarkMode;
   final VoidCallback? onToggleDarkMode;
+  final bool isAdmin;
 
   const LokerDetailScreen({
     super.key,
     required this.loker,
     required this.isDarkMode,
     this.onToggleDarkMode,
+    this.isAdmin = false,
   });
 
   @override
@@ -170,6 +173,100 @@ class _LokerDetailScreenState extends State<LokerDetailScreen> {
     }
   }
 
+  void _openEditDialogInDetail(BuildContext context) {
+    final titleController = TextEditingController(text: widget.loker.title);
+    final companyController = TextEditingController(text: widget.loker.companyName);
+    final salaryController = TextEditingController(text: widget.loker.salaryRange);
+    final addressController = TextEditingController(text: widget.loker.fullAddress);
+    final descController = TextEditingController(text: widget.loker.description);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AdminFormDialog(
+          title: 'Edit Lowongan Kerja',
+          subtitle: 'Perbarui informasi posisi pekerjaan dan syarat loker Bojonegoro',
+          isEditing: true,
+          fields: [
+            AdminFormField(
+              label: 'Judul Posisi Pekerjaan',
+              controller: titleController,
+              hint: 'Contoh: Staf Administrasi & Kasir',
+            ),
+            AdminFormField(
+              label: 'Nama Perusahaan / PT / Instansi',
+              controller: companyController,
+              hint: 'PT Surya Bojonegoro',
+            ),
+            AdminFormField(
+              label: 'Kisaran Gaji',
+              controller: salaryController,
+              hint: 'Rp 2.500.000 - Rp 3.500.000 / bulan',
+            ),
+            AdminFormField(
+              label: 'Alamat Lengkap Kantor / Lokasi Kerja',
+              controller: addressController,
+              hint: 'Jl. Raya Bojonegoro No. 12',
+            ),
+            AdminFormField(
+              label: 'Deskripsi Pekerjaan',
+              controller: descController,
+              hint: 'Deskripsi pekerjaan...',
+              minLines: 4,
+              maxLines: 8,
+            ),
+          ],
+          onSave: () {
+            setState(() {
+              widget.loker.title = titleController.text.trim();
+              widget.loker.companyName = companyController.text.trim();
+              widget.loker.salaryRange = salaryController.text.trim();
+              widget.loker.fullAddress = addressController.text.trim();
+              widget.loker.description = descController.text.trim();
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Lowongan kerja berhasil diperbarui!'),
+                backgroundColor: Color(0xFF10B981),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _confirmDeleteLokerInDetail(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Hapus Lowongan Kerja?'),
+        content: Text('Apakah Anda yakin ingin menghapus lowongan "${widget.loker.title}" dari ${widget.loker.companyName}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              Navigator.pop(context); // Return to job list
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Lowongan "${widget.loker.title}" telah dihapus.'),
+                  backgroundColor: const Color(0xFFEF4444),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF4444)),
+            child: const Text('Hapus', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = _isDarkModeActive(context);
@@ -287,47 +384,73 @@ class _LokerDetailScreenState extends State<LokerDetailScreen> {
 
                   // Role & Job Type Badges
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: isAparat
-                              ? const Color(0xFF059669).withAlpha(isDark ? 35 : 15)
-                              : const Color(0xFF0284C7).withAlpha(isDark ? 35 : 15),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: isAparat
-                                ? const Color(0xFF059669).withAlpha(30)
-                                : const Color(0xFF0284C7).withAlpha(30),
-                            width: 1.0,
-                          ),
-                        ),
-                        child: Text(
-                          widget.loker.postedByRole,
-                          style: TextStyle(
-                            color: isAparat ? const Color(0xFF059669) : const Color(0xFF0284C7),
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      Expanded(
+                        child: Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: isAparat
+                                    ? const Color(0xFF059669).withAlpha(isDark ? 35 : 15)
+                                    : const Color(0xFF0284C7).withAlpha(isDark ? 35 : 15),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: isAparat
+                                      ? const Color(0xFF059669).withAlpha(30)
+                                      : const Color(0xFF0284C7).withAlpha(30),
+                                  width: 1.0,
+                                ),
+                              ),
+                              child: Text(
+                                widget.loker.postedByRole,
+                                style: TextStyle(
+                                  color: isAparat ? const Color(0xFF059669) : const Color(0xFF0284C7),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                widget.loker.jobType,
+                                style: TextStyle(
+                                  color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            if (widget.loker.isVerified)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: const Color(0xFF10B981).withAlpha(120), width: 0.8),
+                                ),
+                                child: const Text(
+                                  'Terverifikasi',
+                                  style: TextStyle(
+                                    color: Color(0xFF059669),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          widget.loker.jobType,
-                          style: TextStyle(
-                            color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const Spacer(),
                       Text(
                         widget.loker.postedDate,
                         style: const TextStyle(color: Colors.grey, fontSize: 12),
@@ -525,6 +648,103 @@ class _LokerDetailScreenState extends State<LokerDetailScreen> {
                             onPressed: () => _openWebsite(widget.loker.website),
                           ),
                       ],
+                    ),
+                  ],
+                  if (widget.isAdmin) ...[
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(8),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.admin_panel_settings_rounded, size: 18, color: Color(0xFF0D62F1)),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Aksi Kelola Admin',
+                                style: TextStyle(
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: () {
+                                    setState(() {
+                                      widget.loker.isVerified = !widget.loker.isVerified;
+                                    });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(widget.loker.isVerified ? 'Lowongan "${widget.loker.title}" diverifikasi!' : 'Status verifikasi dibatalkan.'),
+                                        backgroundColor: widget.loker.isVerified ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
+                                      ),
+                                    );
+                                  },
+                                  icon: Icon(
+                                    widget.loker.isVerified ? Icons.verified_rounded : Icons.check_circle_outline_rounded,
+                                    size: 14,
+                                    color: Colors.white,
+                                  ),
+                                  label: Text(
+                                    widget.loker.isVerified ? 'Terverifikasi' : 'Verifikasi',
+                                    style: const TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.bold),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: widget.loker.isVerified ? const Color(0xFF059669) : const Color(0xFFF59E0B),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: () => _openEditDialogInDetail(context),
+                                  icon: const Icon(Icons.edit_rounded, size: 14, color: Color(0xFF0D62F1)),
+                                  label: const Text('Edit Loker', style: TextStyle(color: Color(0xFF0D62F1), fontSize: 11.5, fontWeight: FontWeight.bold)),
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(color: Color(0xFF0D62F1)),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: () => _confirmDeleteLokerInDetail(context),
+                                  icon: const Icon(Icons.delete_outline_rounded, size: 14, color: Colors.white),
+                                  label: const Text('Hapus', style: TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.bold)),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFEF4444),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                   const SizedBox(height: 24),

@@ -5,6 +5,8 @@ class AdminFormField {
   final TextEditingController controller;
   final String hint;
   final bool isMultiLine;
+  final int? minLines;
+  final int? maxLines;
   final bool isRequired;
   final List<String>? options; // If set, renders as Dropdown
 
@@ -13,6 +15,8 @@ class AdminFormField {
     required this.controller,
     this.hint = '',
     this.isMultiLine = false,
+    this.minLines,
+    this.maxLines,
     this.isRequired = true,
     this.options,
   });
@@ -80,11 +84,17 @@ class _AdminFormDialogState extends State<AdminFormDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 8,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      elevation: 12,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 580, maxHeight: 720),
+        constraints: BoxConstraints(
+          maxWidth: 680,
+          maxHeight: screenHeight * 0.88,
+        ),
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
@@ -178,7 +188,8 @@ class _AdminFormDialogState extends State<AdminFormDialog> {
                                 else
                                   TextFormField(
                                     controller: field.controller,
-                                    maxLines: field.isMultiLine ? 3 : 1,
+                                    minLines: field.minLines ?? (field.isMultiLine ? 6 : 1),
+                                    maxLines: field.maxLines ?? (field.isMultiLine ? 14 : 1),
                                     validator: (val) {
                                       if (field.isRequired && (val == null || val.trim().isEmpty)) {
                                         return '${field.label} wajib diisi';

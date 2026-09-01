@@ -501,37 +501,46 @@ class _AdminPertanianScreenState extends State<AdminPertanianScreen> {
                     ),
                     child: Column(
                       children: [
-                        ListTile(
-                          leading: const Icon(Icons.insert_chart_outlined_rounded, color: primaryGreen),
-                          title: Text(
-                            'Harga Komoditas',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF0F172A)),
+                        Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: const Icon(Icons.insert_chart_outlined_rounded, color: primaryGreen),
+                            title: Text(
+                              'Harga Komoditas',
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF0F172A)),
+                            ),
+                            subtitle: const Text('Pantau harga gabah & beras di Bojonegoro', style: TextStyle(fontSize: 11.5)),
+                            trailing: const Icon(Icons.chevron_right_rounded, color: primaryGreen),
+                            onTap: () => _openWebUrl('https://disdag-online.bojonegorokab.go.id/trend/tabel'),
                           ),
-                          subtitle: const Text('Pantau harga gabah & beras di Bojonegoro', style: TextStyle(fontSize: 11.5)),
-                          trailing: const Icon(Icons.chevron_right_rounded, color: primaryGreen),
-                          onTap: () => _openWebUrl('https://disdag-online.bojonegorokab.go.id/trend/tabel'),
                         ),
                         const Divider(height: 1, indent: 16, endIndent: 16),
-                        ListTile(
-                          leading: const Icon(Icons.newspaper_rounded, color: primaryGreen),
-                          title: Text(
-                            'Informasi Pertanian',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF0F172A)),
+                        Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: const Icon(Icons.newspaper_rounded, color: primaryGreen),
+                            title: Text(
+                              'Informasi Pertanian',
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF0F172A)),
+                            ),
+                            subtitle: const Text('Informasi dan berita pertanian Bojonegoro', style: TextStyle(fontSize: 11.5)),
+                            trailing: const Icon(Icons.chevron_right_rounded, color: primaryGreen),
+                            onTap: () => _openWebUrl('https://dinperta.bojonegorokab.go.id/'),
                           ),
-                          subtitle: const Text('Informasi dan berita pertanian Bojonegoro', style: TextStyle(fontSize: 11.5)),
-                          trailing: const Icon(Icons.chevron_right_rounded, color: primaryGreen),
-                          onTap: () => _openWebUrl('https://dinperta.bojonegorokab.go.id/'),
                         ),
                         const Divider(height: 1, indent: 16, endIndent: 16),
-                        ListTile(
-                          leading: const Icon(Icons.calendar_today_rounded, color: primaryGreen),
-                          title: Text(
-                            'Jadwal & Informasi',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF0F172A)),
+                        Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: const Icon(Icons.calendar_today_rounded, color: primaryGreen),
+                            title: Text(
+                              'Jadwal & Informasi',
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF0F172A)),
+                            ),
+                            subtitle: const Text('Informasi kegiatan & program DKPP', style: TextStyle(fontSize: 11.5)),
+                            trailing: const Icon(Icons.chevron_right_rounded, color: primaryGreen),
+                            onTap: () => _openWebUrl('https://dinperta.bojonegorokab.go.id/'),
                           ),
-                          subtitle: const Text('Informasi kegiatan & program DKPP', style: TextStyle(fontSize: 11.5)),
-                          trailing: const Icon(Icons.chevron_right_rounded, color: primaryGreen),
-                          onTap: () => _openWebUrl('https://dinperta.bojonegorokab.go.id/'),
                         ),
                       ],
                     ),

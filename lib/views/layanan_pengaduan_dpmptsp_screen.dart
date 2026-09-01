@@ -4,16 +4,24 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import '../widgets/superapp_header.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../services/admin_data_service.dart';
+import '../widgets/admin/admin_form_dialog.dart';
 
 class LayananPengaduanDpmptspScreen extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback? onToggleDarkMode;
+  final bool isAdmin;
+  final bool showHeader;
 
   const LayananPengaduanDpmptspScreen({
     super.key,
     required this.isDarkMode,
     this.onToggleDarkMode,
+    this.isAdmin = false,
+    this.showHeader = true,
   });
+
+
 
   @override
   State<LayananPengaduanDpmptspScreen> createState() => _LayananPengaduanDpmptspScreenState();
@@ -21,7 +29,7 @@ class LayananPengaduanDpmptspScreen extends StatefulWidget {
 
 class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspScreen> {
 
-  // URL Launching Helpers
+  
   Future<void> _makePhoneCall(String phone) async {
     final cleanPhone = phone.replaceAll(RegExp(r'[^0-9+]'), '');
     if (cleanPhone.isEmpty) return;
@@ -219,13 +227,15 @@ class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspS
       backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       body: Column(
         children: [
-          SuperAppHeader(
-            title: 'Layanan Pengaduan DPMPTSP',
-            subtitle: 'Kabupaten Bojonegoro',
-            isDarkMode: isDark,
-            onToggleDarkMode: widget.onToggleDarkMode,
-          ),
+          if (widget.showHeader)
+            SuperAppHeader(
+              title: 'Layanan Pengaduan DPMPTSP',
+              subtitle: 'Kabupaten Bojonegoro',
+              isDarkMode: isDark,
+              onToggleDarkMode: widget.onToggleDarkMode,
+            ),
           Expanded(
+
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -269,7 +279,7 @@ class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspS
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'Jadwal Tatap Muka: Senin - Jumat (08.00 - 15.00 WIB)',
+                            AdminDataService().jadwalTatapMuka,
                             style: TextStyle(
                               fontSize: 12.5,
                               fontWeight: FontWeight.w600,
@@ -277,6 +287,47 @@ class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspS
                             ),
                           ),
                         ),
+                        if (widget.isAdmin) ...[
+                          const SizedBox(width: 6),
+                          InkWell(
+                            onTap: () {
+                              final ctrl = TextEditingController(text: AdminDataService().jadwalTatapMuka);
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AdminFormDialog(
+                                  title: 'Edit Jadwal Operasional',
+                                  subtitle: 'Atur jam & hari pelayanan tatap muka',
+                                  isEditing: true,
+                                  fields: [
+                                    AdminFormField(
+                                      label: 'Jadwal Tatap Muka',
+                                      controller: ctrl,
+                                      hint: 'Contoh: Jadwal Tatap Muka: Senin - Jumat (08.00 - 15.00 WIB)',
+                                    ),
+                                  ],
+                                  onSave: () {
+                                    AdminDataService().updateJadwalTatapMuka(ctrl.text.trim());
+                                    setState(() {});
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Jadwal pelayanan diperbarui!'),
+                                        backgroundColor: Color(0xFF10B981),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0D62F1).withAlpha(30),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.edit_rounded, color: Color(0xFF0D62F1), size: 14),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -307,11 +358,15 @@ class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspS
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => SopPengaduanDpmptspScreen(isDarkMode: isDark),
+                              builder: (context) => SopPengaduanDpmptspScreen(
+                                isDarkMode: isDark,
+                                isAdmin: widget.isAdmin,
+                              ),
                             ),
                           );
                         },
                         borderRadius: BorderRadius.circular(16),
+
                         child: Padding(
                           padding: const EdgeInsets.all(14),
                           child: Row(
@@ -549,9 +604,45 @@ class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspS
     );
   }
 
+  void _showEditInformasiDialog(BuildContext context) {
+    final controller = TextEditingController(text: AdminDataService().informasiKetentuanPengaduan);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AdminFormDialog(
+          title: 'Edit Informasi & Ketentuan Pengaduan',
+          subtitle: 'Perbarui teks informasi dan ketentuan layanan pengaduan DPMPTSP',
+          isEditing: true,
+          fields: [
+            AdminFormField(
+              label: 'Isi Teks Informasi & Ketentuan',
+              controller: controller,
+              hint: 'Tuliskan teks ketentuan pengaduan...',
+              isMultiLine: true,
+              minLines: 8,
+              maxLines: 16,
+            ),
+
+          ],
+          onSave: () {
+            AdminDataService().updateInformasiKetentuanPengaduan(controller.text.trim());
+            setState(() {});
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Informasi & Ketentuan Pengaduan berhasil diperbarui!'),
+                backgroundColor: Color(0xFF10B981),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   // Official Notice Box
   Widget _buildInformasiKetentuanBox(bool isDark) {
     const primaryColor = Color(0xFF0D62F1);
+    final textContent = AdminDataService().informasiKetentuanPengaduan;
 
     return Container(
       width: double.infinity,
@@ -586,19 +677,34 @@ class _LayananPengaduanDpmptspScreenState extends State<LayananPengaduanDpmptspS
                 child: const Icon(Icons.info_outline_rounded, color: primaryColor, size: 18),
               ),
               const SizedBox(width: 10),
-              Text(
-                'Informasi & Ketentuan Pengaduan',
-                style: TextStyle(
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+              Expanded(
+                child: Text(
+                  'Informasi & Ketentuan Pengaduan',
+                  style: TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
                 ),
               ),
+              if (widget.isAdmin) ...[
+                const SizedBox(width: 6),
+                IconButton(
+                  onPressed: () => _showEditInformasiDialog(context),
+                  icon: const Icon(Icons.edit_rounded, color: primaryColor, size: 18),
+                  tooltip: 'Edit Informasi & Ketentuan',
+                  style: IconButton.styleFrom(
+                    backgroundColor: primaryColor.withAlpha(15),
+                    padding: const EdgeInsets.all(6),
+                  ),
+
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 10),
           Text(
-            'Melalui pengaduan ini, pengguna jasa dapat menyampaikan keluhan maupun komentar terhadap fasilitas gedung, pelayanan, pelanggaran kode etik, serta hal-hal yang terkait dengan pelaksanaan prosedur pelayanan di Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kabupaten Bojonegoro. Pengaduan ini disampaikan secara langsung atau melalui email dengan mengisi formulir pengaduan secara lengkap, agar petugas kami dapat menindaklanjuti pengaduan yang telah disampaikan. Apabila data yang disampaikan tidak benar, pengaduan tidak akan diproses lebih lanjut.',
+            textContent,
             style: TextStyle(
               fontSize: 11.5,
               height: 1.45,
@@ -668,28 +774,18 @@ class _KanalOption {
   });
 }
 
-class _SopStep {
-  final String stepNumber;
-  final String role;
-  final String duration;
-  final String output;
-  final String description;
 
-  const _SopStep({
-    required this.stepNumber,
-    required this.role,
-    required this.duration,
-    required this.output,
-    required this.description,
-  });
-}
 
 class SopPengaduanDpmptspScreen extends StatefulWidget {
   final bool isDarkMode;
+  final bool isAdmin;
+  final int initialTabIndex;
 
   const SopPengaduanDpmptspScreen({
     super.key,
     required this.isDarkMode,
+    this.isAdmin = false,
+    this.initialTabIndex = 0,
   });
 
   @override
@@ -703,13 +799,32 @@ class _SopPengaduanDpmptspScreenState extends State<SopPengaduanDpmptspScreen>
   @override
   void initState() {
     super.initState();
-    _sopTabController = TabController(length: 8, vsync: this);
+    _sopTabController = TabController(
+      length: 8,
+      vsync: this,
+      initialIndex: widget.initialTabIndex,
+    );
+    _sopTabController.addListener(() {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
   void dispose() {
     _sopTabController.dispose();
     super.dispose();
+  }
+
+  Widget _buildDynamicSopTab(String channelKey, String title, bool isDark) {
+    final steps = AdminDataService().getDpmptspSopSteps(channelKey);
+    return _InteractiveSopContainer(
+      isDark: isDark,
+      title: title,
+      channelKey: channelKey,
+      steps: steps,
+      isAdmin: widget.isAdmin,
+      onRefresh: () => setState(() {}),
+    );
   }
 
   @override
@@ -722,14 +837,14 @@ class _SopPengaduanDpmptspScreenState extends State<SopPengaduanDpmptspScreen>
         backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFF0D62F1),
         foregroundColor: Colors.white,
         elevation: 0,
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Alur & SOP Pengaduan Resmi',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            Text(
+            const Text(
               'DPMPTSP Kabupaten Bojonegoro',
               style: TextStyle(fontSize: 11, color: Colors.white70),
             ),
@@ -819,7 +934,7 @@ class _SopPengaduanDpmptspScreenState extends State<SopPengaduanDpmptspScreen>
             ),
             const SizedBox(height: 8),
 
-            // Ultra Modern SOP Tab Switcher (8 Dragable Tabs: Tatap Muka, Surat, LAPOR, Website, Email, WhatsApp, Instagram, Twitter)
+            // SOP Tab Switcher
             Container(
               height: 48,
               padding: const EdgeInsets.all(4),
@@ -870,89 +985,14 @@ class _SopPengaduanDpmptspScreenState extends State<SopPengaduanDpmptspScreen>
                     padding: EdgeInsets.zero,
                     labelPadding: const EdgeInsets.symmetric(horizontal: 14),
                     tabs: const [
-                      Tab(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.people_alt_rounded, size: 14),
-                            SizedBox(width: 6),
-                            Text('Tatap Muka'),
-                          ],
-                        ),
-                      ),
-                      Tab(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.mark_as_unread_rounded, size: 14),
-                            SizedBox(width: 6),
-                            Text('Surat'),
-                          ],
-                        ),
-                      ),
-                      Tab(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.campaign_rounded, size: 14),
-                            SizedBox(width: 6),
-                            Text('LAPOR'),
-                          ],
-                        ),
-                      ),
-                      Tab(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.language_rounded, size: 14),
-                            SizedBox(width: 6),
-                            Text('Website'),
-                          ],
-                        ),
-                      ),
-                      Tab(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.mark_email_read_rounded, size: 14),
-                            SizedBox(width: 6),
-                            Text('Email'),
-                          ],
-                        ),
-                      ),
-                      Tab(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.chat_bubble_rounded, size: 14),
-                            SizedBox(width: 6),
-                            Text('WhatsApp'),
-                          ],
-                        ),
-                      ),
-                      Tab(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.camera_alt_rounded, size: 14),
-                            SizedBox(width: 6),
-                            Text('Instagram'),
-                          ],
-                        ),
-                      ),
-                      Tab(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '𝕏',
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
-                            ),
-                            SizedBox(width: 6),
-                            Text('Twitter'),
-                          ],
-                        ),
-                      ),
+                      Tab(child: Row(children: [Icon(Icons.people_alt_rounded, size: 14), SizedBox(width: 6), Text('Tatap Muka')])),
+                      Tab(child: Row(children: [Icon(Icons.mark_as_unread_rounded, size: 14), SizedBox(width: 6), Text('Surat')])),
+                      Tab(child: Row(children: [Icon(Icons.campaign_rounded, size: 14), SizedBox(width: 6), Text('LAPOR')])),
+                      Tab(child: Row(children: [Icon(Icons.language_rounded, size: 14), SizedBox(width: 6), Text('Website')])),
+                      Tab(child: Row(children: [Icon(Icons.mark_email_read_rounded, size: 14), SizedBox(width: 6), Text('Email')])),
+                      Tab(child: Row(children: [Icon(Icons.chat_bubble_rounded, size: 14), SizedBox(width: 6), Text('WhatsApp')])),
+                      Tab(child: Row(children: [Icon(Icons.camera_alt_rounded, size: 14), SizedBox(width: 6), Text('Instagram')])),
+                      Tab(child: Row(children: [Text('𝕏', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900)), SizedBox(width: 6), Text('Twitter')])),
                     ],
                   ),
                 ),
@@ -962,19 +1002,19 @@ class _SopPengaduanDpmptspScreenState extends State<SopPengaduanDpmptspScreen>
 
             // SOP Tab Content Box
             SizedBox(
-              height: 1450,
+              height: 1650,
               child: TabBarView(
                 controller: _sopTabController,
                 physics: const BouncingScrollPhysics(),
                 children: [
-                  _buildAlurTatapMukaTab(isDark),
-                  _buildSopSuratTab(isDark),
-                  _buildSopLaporTab(isDark),
-                  _buildSopWebsiteTab(isDark),
-                  _buildSopEmailTab(isDark),
-                  _buildSopWhatsappTab(isDark),
-                  _buildSopInstagramTab(isDark),
-                  _buildSopTwitterTab(isDark),
+                  _buildDynamicSopTab('tatap_muka', 'SOP Penanganan Pengaduan Melalui Tatap Muka', isDark),
+                  _buildDynamicSopTab('surat', 'SOP Penanganan Pengaduan Melalui Surat', isDark),
+                  _buildDynamicSopTab('lapor', 'SOP Penanganan Pengaduan Melalui LAPOR', isDark),
+                  _buildDynamicSopTab('website', 'SOP Penanganan Pengaduan Melalui Website', isDark),
+                  _buildDynamicSopTab('email', 'SOP Penanganan Pengaduan Melalui Email', isDark),
+                  _buildDynamicSopTab('whatsapp', 'SOP Penanganan Pengaduan Melalui WhatsApp', isDark),
+                  _buildDynamicSopTab('instagram', 'SOP Penanganan Pengaduan Melalui Instagram', isDark),
+                  _buildDynamicSopTab('twitter', 'SOP Penanganan Pengaduan Melalui Twitter / X', isDark),
                 ],
               ),
             ),
@@ -983,497 +1023,148 @@ class _SopPengaduanDpmptspScreenState extends State<SopPengaduanDpmptspScreen>
       ),
     );
   }
-
-  // 8 Official SOP Tab Views
-  Widget _buildAlurTatapMukaTab(bool isDark) {
-    return _buildSopContainer(
-      isDark: isDark,
-      title: 'SOP Penanganan Pengaduan Melalui Tatap Muka',
-      steps: const [
-        _SopStep(
-          stepNumber: '1',
-          role: 'Masyarakat',
-          duration: '-',
-          output: 'Pengaduan',
-          description: 'Masyarakat membuat pengaduan melalui tatap muka',
-        ),
-        _SopStep(
-          stepNumber: '2',
-          role: 'Staf Pengaduan',
-          duration: '15 Menit',
-          output: 'Berkas Pengaduan Lengkap',
-          description: 'Menerima dan mencatat pengaduan dari masyarakat yang didapat dari tatap muka',
-        ),
-        _SopStep(
-          stepNumber: '3',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '15 Menit',
-          output: 'Pengaduan telah diterima',
-          description: 'Pengaduan yang bukan kewenangan DPMPTSP. Menerima pengaduan yang diserahkan staf pengaduan kemudian meneruskan kepada OPD terkait apabila bukan kewenangan DPMPTSP untuk menjawab pengaduan. Selanjutnya OPD menindaklanjuti pengaduan langsung kepada masyarakat',
-        ),
-        _SopStep(
-          stepNumber: '4',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '30 Menit',
-          output: 'Berkas Pengaduan Lengkap dan konsep jawaban',
-          description: 'Pengaduan kewenangan DPMPTSP. Menyusun berkas pengaduan, menganalisis serta memverifikasi berkas pengaduan untuk dijadikan konsep jawaban pengaduan',
-        ),
-        _SopStep(
-          stepNumber: '5',
-          role: 'Penata Perizinan Ahli Madya',
-          duration: '15 Menit',
-          output: 'konsep jawaban',
-          description: 'Penata Perizinan Ahli Madya menerima dan memverifikasi rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '6',
-          role: 'Kepala Dinas',
-          duration: '15 Menit',
-          output: 'Jawaban pengaduan',
-          description: 'Kepala Dinas Menerima dan menyetujui rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '7',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '15 Menit',
-          output: 'Jawaban pengaduan',
-          description: 'Penata Perizinan Ahli Muda menerima persetujuan jawaban pengaduan kemudian menyampaikan jawaban kepada staf pengaduan untuk disampaikan kepada masyarakat',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSopSuratTab(bool isDark) {
-    return _buildSopContainer(
-      isDark: isDark,
-      title: 'SOP Penanganan Pengaduan Melalui Surat',
-      steps: const [
-        _SopStep(
-          stepNumber: '1',
-          role: 'Masyarakat',
-          duration: '-',
-          output: 'Pengaduan',
-          description: 'Masyarakat membuat pengaduan melalui kotak pengaduan',
-        ),
-        _SopStep(
-          stepNumber: '2',
-          role: 'Staf Pengaduan',
-          duration: '15 Menit',
-          output: 'Berkas Pengaduan Lengkap',
-          description: 'Menerima dan mencatat pengaduan dari masyarakat yang didapat dari kotak pengaduan',
-        ),
-        _SopStep(
-          stepNumber: '3',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '15 Menit',
-          output: 'Pengaduan telah diterima',
-          description: 'Pengaduan yang bukan kewenangan DPMPTSP. Menerima pengaduan yang diserahkan staf pengaduan kemudian meneruskan kepada OPD terkait apabila bukan kewenangan DPMPTSP untuk menjawab pengaduan. Selanjutnya OPD menindaklanjuti pengaduan langsung kepada masyarakat',
-        ),
-        _SopStep(
-          stepNumber: '4',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '1 Hari',
-          output: 'Berkas Pengaduan Lengkap dan konsep jawaban',
-          description: 'Pengaduan kewenangan DPMPTSP. Menyusun berkas pengaduan, menganalisis serta memverifikasi berkas pengaduan untuk dijadikan konsep jawaban pengaduan',
-        ),
-        _SopStep(
-          stepNumber: '5',
-          role: 'Penata Perizinan Ahli Madya',
-          duration: '15 Menit',
-          output: 'konsep jawaban',
-          description: 'Penata Perizinan Ahli Madya menerima dan memverifikasi rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '6',
-          role: 'Kepala Dinas',
-          duration: '1 Hari',
-          output: 'Jawaban pengaduan',
-          description: 'Kepala Dinas Menerima dan menyetujui rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '7',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '15 Menit',
-          output: 'Jawaban pengaduan',
-          description: 'Penata Perizinan Ahli Muda menerima persetujuan jawaban pengaduan kemudian menyampaikan jawaban kepada staf pengaduan untuk disampaikan kepada masyarakat',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSopLaporTab(bool isDark) {
-    return _buildSopContainer(
-      isDark: isDark,
-      title: 'SOP Penanganan Pengaduan Melalui LAPOR',
-      steps: const [
-        _SopStep(
-          stepNumber: '1',
-          role: 'Masyarakat',
-          duration: '-',
-          output: 'Pengaduan',
-          description: 'Masyarakat membuat pengaduan melalui kanal Lapor',
-        ),
-        _SopStep(
-          stepNumber: '2',
-          role: 'Tim Adm Kab',
-          duration: '15 Menit',
-          output: 'Berkas Pengaduan Lengkap',
-          description: 'Menerima dan mencatat pengaduan dari Tim Admin Kabupaten yang didapat dari kanal Lapor',
-        ),
-        _SopStep(
-          stepNumber: '3',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '30 Menit',
-          output: 'Berkas Pengaduan Lengkap dan konsep jawaban',
-          description: 'Menyusun berkas pengaduan, menganalisis serta memverifikasi berkas pengaduan untuk dijadikan konsep jawaban pengaduan',
-        ),
-        _SopStep(
-          stepNumber: '4',
-          role: 'Penata Perizinan Ahli Madya',
-          duration: '15 Menit',
-          output: 'konsep jawaban',
-          description: 'Penata Perizinan Ahli Madya menerima dan memverifikasi rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '5',
-          role: 'Kepala Dinas',
-          duration: '14 Hari',
-          output: 'Jawaban pengaduan',
-          description: 'Kepala Dinas Menerima dan menyetujui rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '6',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '30 Menit',
-          output: 'Jawaban pengaduan',
-          description: 'Penata Perizinan Ahli Muda menerima persetujuan jawaban pengaduan kemudian menyampaikan jawaban kepada staf pengaduan untuk disampaikan kepada Tim Admin Kabupaten untuk disampaikan kepada masyarakat',
-        ),
-        _SopStep(
-          stepNumber: '7',
-          role: 'Tim Adm Kab',
-          duration: '-',
-          output: 'Respon masyarakat terhadap Jawaban pengaduan',
-          description: 'Direspon oleh Tim Admin Kabupaten dan tindak lanjut oleh masyarakat',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSopWebsiteTab(bool isDark) {
-    return _buildSopContainer(
-      isDark: isDark,
-      title: 'SOP Penanganan Pengaduan Melalui Website',
-      steps: const [
-        _SopStep(
-          stepNumber: '1',
-          role: 'Masyarakat',
-          duration: '-',
-          output: 'Pengaduan',
-          description: 'Masyarakat membuat pengaduan melalui Website',
-        ),
-        _SopStep(
-          stepNumber: '2',
-          role: 'Staf Pengaduan',
-          duration: '15 Menit',
-          output: 'Berkas Pengaduan Lengkap',
-          description: 'Menerima dan mencatat pengaduan dari masyarakat yang didapat dari kanal Website',
-        ),
-        _SopStep(
-          stepNumber: '3',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '15 Menit',
-          output: 'Pengaduan telah diterima',
-          description: 'Pengaduan yang bukan kewenangan DPMPTSP. Menerima pengaduan yang diserahkan staf pengaduan kemudian meneruskan kepada OPD terkait apabila bukan kewenangan DPMPTSP untuk menjawab pengaduan. Selanjutnya OPD menindaklanjuti pengaduan langsung kepada masyarakat',
-        ),
-        _SopStep(
-          stepNumber: '4',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '30 Menit',
-          output: 'Berkas Pengaduan Lengkap dan konsep jawaban',
-          description: 'Pengaduan kewenangan DPMPTSP. Menyusun berkas pengaduan, menganalisis serta memverifikasi berkas pengaduan untuk dijadikan konsep jawaban pengaduan',
-        ),
-        _SopStep(
-          stepNumber: '5',
-          role: 'Penata Perizinan Ahli Madya',
-          duration: '15 Menit',
-          output: 'konsep jawaban',
-          description: 'Penata Perizinan Ahli Madya menerima dan memverifikasi rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '6',
-          role: 'Kepala Dinas',
-          duration: '15 Menit',
-          output: 'Jawaban pengaduan',
-          description: 'Kepala Dinas Menerima dan menyetujui rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '7',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '15 Menit',
-          output: 'Jawaban pengaduan',
-          description: 'Penata Perizinan Ahli Muda menerima persetujuan jawaban pengaduan kemudian menyampaikan jawaban kepada staf pengaduan untuk disampaikan kepada masyarakat',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSopEmailTab(bool isDark) {
-    return _buildSopContainer(
-      isDark: isDark,
-      title: 'SOP Penanganan Pengaduan Melalui Email',
-      steps: const [
-        _SopStep(
-          stepNumber: '1',
-          role: 'Masyarakat',
-          duration: '-',
-          output: 'Pengaduan',
-          description: 'Masyarakat membuat pengaduan melalui Email',
-        ),
-        _SopStep(
-          stepNumber: '2',
-          role: 'Staf Pengaduan',
-          duration: '15 Menit',
-          output: 'Berkas Pengaduan Lengkap',
-          description: 'Menerima dan mencatat pengaduan dari masyarakat yang didapat dari kanal Email',
-        ),
-        _SopStep(
-          stepNumber: '3',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '15 Menit',
-          output: 'Pengaduan telah diterima',
-          description: 'Pengaduan yang bukan kewenangan DPMPTSP. Menerima pengaduan yang diserahkan staf pengaduan kemudian meneruskan kepada OPD terkait apabila bukan kewenangan DPMPTSP untuk menjawab pengaduan. Selanjutnya OPD menindaklanjuti pengaduan langsung kepada masyarakat',
-        ),
-        _SopStep(
-          stepNumber: '4',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '30 Menit',
-          output: 'Berkas Pengaduan Lengkap dan konsep jawaban',
-          description: 'Pengaduan kewenangan DPMPTSP. Menyusun berkas pengaduan, menganalisis serta memverifikasi berkas pengaduan untuk dijadikan konsep jawaban pengaduan',
-        ),
-        _SopStep(
-          stepNumber: '5',
-          role: 'Penata Perizinan Ahli Madya',
-          duration: '15 Menit',
-          output: 'konsep jawaban',
-          description: 'Penata Perizinan Ahli Madya menerima dan memverifikasi rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '6',
-          role: 'Kepala Dinas',
-          duration: '15 Menit',
-          output: 'Jawaban pengaduan',
-          description: 'Kepala Dinas Menerima dan menyetujui rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '7',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '15 Menit',
-          output: 'Jawaban pengaduan',
-          description: 'Penata Perizinan Ahli Muda menerima persetujuan jawaban pengaduan kemudian menyampaikan jawaban kepada staf pengaduan untuk disampaikan kepada masyarakat',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSopWhatsappTab(bool isDark) {
-    return _buildSopContainer(
-      isDark: isDark,
-      title: 'SOP Penanganan Pengaduan Melalui WhatsApp',
-      steps: const [
-        _SopStep(
-          stepNumber: '1',
-          role: 'Masyarakat',
-          duration: '-',
-          output: 'Pengaduan',
-          description: 'Masyarakat membuat pengaduan melalui Whatsapp',
-        ),
-        _SopStep(
-          stepNumber: '2',
-          role: 'Staf Pengaduan',
-          duration: '15 Menit',
-          output: 'Berkas Pengaduan Lengkap',
-          description: 'Menerima dan mencatat pengaduan dari masyarakat yang didapat dari kanal Whatsapp',
-        ),
-        _SopStep(
-          stepNumber: '3',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '15 Menit',
-          output: 'Pengaduan telah diterima',
-          description: 'Pengaduan yang bukan kewenangan DPMPTSP. Menerima pengaduan yang diserahkan staf pengaduan kemudian meneruskan kepada OPD terkait apabila bukan kewenangan DPMPTSP untuk menjawab pengaduan. Selanjutnya OPD menindaklanjuti pengaduan langsung kepada masyarakat',
-        ),
-        _SopStep(
-          stepNumber: '4',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '30 Menit',
-          output: 'Berkas Pengaduan Lengkap dan konsep jawaban',
-          description: 'Pengaduan kewenangan DPMPTSP. Menyusun berkas pengaduan, menganalisis serta memverifikasi berkas pengaduan untuk dijadikan konsep jawaban pengaduan',
-        ),
-        _SopStep(
-          stepNumber: '5',
-          role: 'Penata Perizinan Ahli Madya',
-          duration: '15 Menit',
-          output: 'konsep jawaban',
-          description: 'Penata Perizinan Ahli Madya menerima dan memverifikasi rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '6',
-          role: 'Kepala Dinas',
-          duration: '15 Menit',
-          output: 'Jawaban pengaduan',
-          description: 'Kepala Dinas Menerima dan menyetujui rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '7',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '15 Menit',
-          output: 'Jawaban pengaduan',
-          description: 'Penata Perizinan Ahli Muda menerima persetujuan jawaban pengaduan kemudian menyampaikan jawaban kepada staf pengaduan untuk disampaikan kepada masyarakat',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSopInstagramTab(bool isDark) {
-    return _buildSopContainer(
-      isDark: isDark,
-      title: 'SOP Penanganan Pengaduan Melalui Instagram',
-      steps: const [
-        _SopStep(
-          stepNumber: '1',
-          role: 'Masyarakat',
-          duration: '-',
-          output: 'Pengaduan',
-          description: 'Masyarakat membuat pengaduan melalui Instagram',
-        ),
-        _SopStep(
-          stepNumber: '2',
-          role: 'Staf Pengaduan',
-          duration: '15 Menit',
-          output: 'Berkas Pengaduan Lengkap',
-          description: 'Menerima dan mencatat pengaduan dari masyarakat yang didapat dari kanal Instagram',
-        ),
-        _SopStep(
-          stepNumber: '3',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '15 Menit',
-          output: 'Pengaduan telah diterima',
-          description: 'Pengaduan yang bukan kewenangan DPMPTSP. Menerima pengaduan yang diserahkan staf pengaduan kemudian meneruskan kepada OPD terkait apabila bukan kewenangan DPMPTSP untuk menjawab pengaduan. Selanjutnya OPD menindaklanjuti pengaduan langsung kepada masyarakat',
-        ),
-        _SopStep(
-          stepNumber: '4',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '30 Menit',
-          output: 'Berkas Pengaduan Lengkap dan konsep jawaban',
-          description: 'Pengaduan kewenangan DPMPTSP. Menyusun berkas pengaduan, menganalisis serta memverifikasi berkas pengaduan untuk dijadikan konsep jawaban pengaduan',
-        ),
-        _SopStep(
-          stepNumber: '5',
-          role: 'Penata Perizinan Ahli Madya',
-          duration: '15 Menit',
-          output: 'konsep jawaban',
-          description: 'Penata Perizinan Ahli Madya menerima dan memverifikasi rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '6',
-          role: 'Kepala Dinas',
-          duration: '15 Menit',
-          output: 'Jawaban pengaduan',
-          description: 'Kepala Dinas Menerima dan menyetujui rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '7',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '15 Menit',
-          output: 'Jawaban pengaduan',
-          description: 'Penata Perizinan Ahli Muda menerima persetujuan jawaban pengaduan kemudian menyampaikan jawaban kepada staf pengaduan untuk disampaikan kepada masyarakat',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSopTwitterTab(bool isDark) {
-    return _buildSopContainer(
-      isDark: isDark,
-      title: 'SOP Penanganan Pengaduan Melalui Twitter / X',
-      steps: const [
-        _SopStep(
-          stepNumber: '1',
-          role: 'Masyarakat',
-          duration: '-',
-          output: 'Pengaduan',
-          description: 'Masyarakat membuat pengaduan melalui Twitter / X',
-        ),
-        _SopStep(
-          stepNumber: '2',
-          role: 'Staf Pengaduan',
-          duration: '15 Menit',
-          output: 'Berkas Pengaduan Lengkap',
-          description: 'Menerima dan mencatat pengaduan dari masyarakat yang didapat dari kanal Twitter / X',
-        ),
-        _SopStep(
-          stepNumber: '3',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '15 Menit',
-          output: 'Pengaduan telah diterima',
-          description: 'Pengaduan yang bukan kewenangan DPMPTSP. Menerima pengaduan yang diserahkan staf pengaduan kemudian meneruskan kepada OPD terkait apabila bukan kewenangan DPMPTSP untuk menjawab pengaduan. Selanjutnya OPD menindaklanjuti pengaduan langsung kepada masyarakat',
-        ),
-        _SopStep(
-          stepNumber: '4',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '30 Menit',
-          output: 'Berkas Pengaduan Lengkap dan konsep jawaban',
-          description: 'Pengaduan kewenangan DPMPTSP. Menyusun berkas pengaduan, menganalisis serta memverifikasi berkas pengaduan untuk dijadikan konsep jawaban pengaduan',
-        ),
-        _SopStep(
-          stepNumber: '5',
-          role: 'Penata Perizinan Ahli Madya',
-          duration: '15 Menit',
-          output: 'konsep jawaban',
-          description: 'Penata Perizinan Ahli Madya menerima dan memverifikasi rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '6',
-          role: 'Kepala Dinas',
-          duration: '15 Menit',
-          output: 'Jawaban pengaduan',
-          description: 'Kepala Dinas Menerima dan menyetujui rekomendasi / jawaban dari hasil penyusunan konsep yang diserahkan oleh Penata Perizinan Ahli Muda',
-        ),
-        _SopStep(
-          stepNumber: '7',
-          role: 'Penata Perizinan Ahli Muda',
-          duration: '15 Menit',
-          output: 'Jawaban pengaduan',
-          description: 'Penata Perizinan Ahli Muda menerima persetujuan jawaban pengaduan kemudian menyampaikan jawaban kepada staf pengaduan untuk disampaikan kepada masyarakat',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSopContainer({
-    required bool isDark,
-    required String title,
-    required List<_SopStep> steps,
-  }) {
-    return _InteractiveSopContainer(
-      isDark: isDark,
-      title: title,
-      steps: steps,
-    );
-  }
 }
+
 
 class _InteractiveSopContainer extends StatelessWidget {
   final bool isDark;
   final String title;
-  final List<_SopStep> steps;
+  final String channelKey;
+  final List<DpmptspSopStep> steps;
+  final bool isAdmin;
+  final VoidCallback onRefresh;
 
   const _InteractiveSopContainer({
     required this.isDark,
     required this.title,
+    required this.channelKey,
     required this.steps,
+    this.isAdmin = false,
+    required this.onRefresh,
   });
 
+  void _showAddEditSopStepDialog(
+    BuildContext context,
+    String channelKey,
+    DpmptspSopStep? step,
+    VoidCallback onSaveCallback,
+  ) {
+    final nextStepNum = (AdminDataService().getDpmptspSopSteps(channelKey).length + 1).toString();
+    final stepNumController = TextEditingController(text: step?.stepNumber ?? nextStepNum);
+    final roleController = TextEditingController(text: step?.role ?? 'Staf Pengaduan');
+    final durationController = TextEditingController(text: step?.duration ?? '15 Menit');
+    final outputController = TextEditingController(text: step?.output ?? 'Berkas Pengaduan Lengkap');
+    final descController = TextEditingController(text: step?.description ?? '');
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AdminFormDialog(
+          title: step != null ? 'Edit Langkah SOP' : 'Tambah Langkah SOP Baru',
+          subtitle: 'Atur alur pelaksana, durasi, output, dan keterangan langkah',
+          isEditing: step != null,
+          fields: [
+            AdminFormField(
+              label: 'Nomor Urut Langkah',
+              controller: stepNumController,
+              hint: 'Contoh: 1, 2, 3...',
+            ),
+            AdminFormField(
+              label: 'Pelaksana / Role (Penanggung Jawab)',
+              controller: roleController,
+              hint: 'Contoh: Masyarakat, Staf Pengaduan, Penata Perizinan Ahli Muda',
+            ),
+            AdminFormField(
+              label: 'Waktu / Durasi Penanganan',
+              controller: durationController,
+              hint: 'Contoh: 15 Menit, 30 Menit, 1 Hari, -',
+            ),
+            AdminFormField(
+              label: 'Output / Hasil Langkah',
+              controller: outputController,
+              hint: 'Contoh: Berkas Pengaduan Lengkap, Jawaban Pengaduan',
+            ),
+            AdminFormField(
+              label: 'Deskripsi / Keterangan Mekanisme',
+              controller: descController,
+              hint: 'Tuliskan rincian tugas & mekanisme langkah...',
+              isMultiLine: true,
+            ),
+          ],
+          onSave: () {
+            final service = AdminDataService();
+            if (step != null) {
+              step.stepNumber = stepNumController.text.trim();
+              step.role = roleController.text.trim();
+              step.duration = durationController.text.trim();
+              step.output = outputController.text.trim();
+              step.description = descController.text.trim();
+              service.updateDpmptspSopStep(channelKey, step);
+            } else {
+              final newStep = DpmptspSopStep(
+                id: '${channelKey}_${DateTime.now().millisecondsSinceEpoch}',
+                stepNumber: stepNumController.text.trim().isEmpty ? nextStepNum : stepNumController.text.trim(),
+                role: roleController.text.trim().isEmpty ? 'Staf Pengaduan' : roleController.text.trim(),
+                duration: durationController.text.trim().isEmpty ? '-' : durationController.text.trim(),
+                output: outputController.text.trim().isEmpty ? 'Proses Selesai' : outputController.text.trim(),
+                description: descController.text.trim(),
+              );
+              service.addDpmptspSopStep(channelKey, newStep);
+            }
+            onSaveCallback();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(step != null ? 'Langkah SOP berhasil diperbarui!' : 'Langkah SOP baru berhasil ditambahkan!'),
+                backgroundColor: const Color(0xFF10B981),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _confirmDeleteSopStep(
+    BuildContext context,
+    String channelKey,
+    String stepId,
+    VoidCallback onDeleteCallback,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Hapus Langkah SOP?'),
+          content: const Text('Langkah SOP ini akan dihapus dari alur mekanisme pengaduan.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF4444)),
+              onPressed: () {
+                AdminDataService().deleteDpmptspSopStep(channelKey, stepId);
+                Navigator.pop(context);
+                onDeleteCallback();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Langkah SOP berhasil dihapus!'),
+                    backgroundColor: Color(0xFFEF4444),
+                  ),
+                );
+              },
+              child: const Text('Hapus', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _showStepDetailDialog(BuildContext context, int initialIndex) {
+    if (steps.isEmpty) return;
     showDialog(
       context: context,
       builder: (context) {
@@ -1618,7 +1309,7 @@ class _InteractiveSopContainer extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 8),
 
-                                // Large Text Box for Seniors (15.5px Bold)
+                                // Large Text Box
                                 Container(
                                   width: double.infinity,
                                   padding: const EdgeInsets.all(14),
@@ -1677,7 +1368,6 @@ class _InteractiveSopContainer extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
 
-                    // Gesture Hint & Swipe Navigation Controls
                     Row(
                       children: [
                         IconButton(
@@ -1765,202 +1455,265 @@ class _InteractiveSopContainer extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       child: Container(
         padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(isDark ? 50 : 10),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(isDark ? 50 : 10),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                      color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF0D62F1),
+                    ),
+                  ),
+                ),
+                if (isAdmin)
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0D62F1),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      elevation: 2,
+                    ),
+                    onPressed: () => _showAddEditSopStepDialog(context, channelKey, null, onRefresh),
+                    icon: const Icon(Icons.add_rounded, size: 14),
+                    label: const Text('Tambah Langkah', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                  )
+                else
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0D62F1).withAlpha(15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.touch_app_rounded, color: Color(0xFF0D62F1), size: 12),
+                        SizedBox(width: 4),
+                        Text(
+                          'Ketuk Nomer / Langkah',
+                          style: TextStyle(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF0D62F1),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 10),
+
+            if (steps.isEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                alignment: Alignment.center,
                 child: Text(
-                  title,
+                  'Belum ada langkah SOP untuk kanal ini.',
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.w900,
-                    color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF0D62F1),
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                   ),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0D62F1).withAlpha(15),
-                  borderRadius: BorderRadius.circular(12),
+              )
+            else
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: steps.length,
+                separatorBuilder: (context, index) => Padding(
+                  padding: const EdgeInsets.only(left: 18),
+                  child: Container(
+                    height: 10,
+                    width: 2,
+                    color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                  ),
                 ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.touch_app_rounded, color: Color(0xFF0D62F1), size: 12),
-                    SizedBox(width: 4),
-                    Text(
-                      'Ketuk Nomer / Langkah',
-                      style: TextStyle(
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0D62F1),
+                itemBuilder: (context, index) {
+                  final s = steps[index];
+
+                  return Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF0F172A).withAlpha(120) : const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-
-          // Vertical Scrollable List extending downwards
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: steps.length,
-            separatorBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.only(left: 18),
-              child: Container(
-                height: 10,
-                width: 2,
-                color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
-              ),
-            ),
-            itemBuilder: (context, index) {
-              final s = steps[index];
-
-              return InkWell(
-                onTap: () => _showStepDetailDialog(context, index),
-                borderRadius: BorderRadius.circular(14),
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF0F172A).withAlpha(120) : const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          onTap: () => _showStepDetailDialog(context, index),
+                          borderRadius: BorderRadius.circular(14),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 34,
+                                height: 34,
+                                decoration: const BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [Color(0xFF0D62F1), Color(0xFF0284C7)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  shape: BoxShape.circle,
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  s.stepNumber,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Wrap(
+                                      spacing: 6,
+                                      runSpacing: 4,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF0D62F1).withAlpha(20),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            s.role,
+                                            style: TextStyle(
+                                              fontSize: 10.5,
+                                              fontWeight: FontWeight.bold,
+                                              color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF0D62F1),
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF10B981).withAlpha(20),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            '⏱️ ${s.duration}',
+                                            style: TextStyle(
+                                              fontSize: 10.5,
+                                              fontWeight: FontWeight.bold,
+                                              color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      s.description,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        height: 1.4,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF10B981).withAlpha(15),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        'Output: ${s.output}',
+                                        style: TextStyle(
+                                          fontSize: 10.5,
+                                          fontWeight: FontWeight.bold,
+                                          color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF0D62F1).withAlpha(15),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.zoom_in_rounded, color: Color(0xFF0D62F1), size: 16),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (isAdmin) ...[
+                          const SizedBox(height: 8),
+                          const Divider(height: 1),
+                          const SizedBox(height: 6),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              OutlinedButton.icon(
+                                onPressed: () => _showAddEditSopStepDialog(context, channelKey, s, onRefresh),
+                                icon: const Icon(Icons.edit_rounded, size: 13, color: Color(0xFF0D62F1)),
+                                label: const Text('Edit Langkah', style: TextStyle(fontSize: 11, color: Color(0xFF0D62F1), fontWeight: FontWeight.bold)),
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: Color(0xFF0D62F1)),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              IconButton(
+                                onPressed: () => _confirmDeleteSopStep(context, channelKey, s.id, onRefresh),
+                                tooltip: 'Hapus Langkah',
+                                icon: const Icon(Icons.delete_outline_rounded, size: 16, color: Color(0xFFEF4444)),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: const Color(0xFFEF4444).withAlpha(15),
+                                  padding: const EdgeInsets.all(6),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
                     ),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 34,
-                        height: 34,
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Color(0xFF0D62F1), Color(0xFF0284C7)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          shape: BoxShape.circle,
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          s.stepNumber,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Wrap(
-                              spacing: 6,
-                              runSpacing: 4,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF0D62F1).withAlpha(20),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    s.role,
-                                    style: TextStyle(
-                                      fontSize: 10.5,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF0D62F1),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF10B981).withAlpha(20),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    '⏱️ ${s.duration}',
-                                    style: TextStyle(
-                                      fontSize: 10.5,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              s.description,
-                              style: TextStyle(
-                                fontSize: 12,
-                                height: 1.4,
-                                fontWeight: FontWeight.w600,
-                                color: isDark ? Colors.white : const Color(0xFF0F172A),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF10B981).withAlpha(15),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                'Output: ${s.output}',
-                                style: TextStyle(
-                                  fontSize: 10.5,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF0D62F1).withAlpha(15),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.zoom_in_rounded, color: Color(0xFF0D62F1), size: 16),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
+                  );
+                },
+              ),
+          ],
+        ),
       ),
-    ),
     );
   }
 }
+

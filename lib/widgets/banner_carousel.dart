@@ -259,23 +259,26 @@ class _BannerCarouselWidgetState extends State<BannerCarouselWidget> {
         const SizedBox(height: 10),
 
         // Carousel Dot Indicators (● ○ ○ ○)
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(_posters.length, (index) {
-            final isActive = _currentPage == index;
-            return AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              width: isActive ? 16 : 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: isActive
-                    ? (isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7))
-                    : (isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1)),
-                borderRadius: BorderRadius.circular(3),
-              ),
-            );
-          }),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(_posters.length, (index) {
+              final isActive = _currentPage == index;
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                width: isActive ? 16 : 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: isActive
+                      ? (isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7))
+                      : (isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1)),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              );
+            }),
+          ),
         ),
       ],
     );

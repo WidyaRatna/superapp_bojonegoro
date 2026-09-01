@@ -3,10 +3,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io';
 import '../widgets/superapp_header.dart';
+import '../services/admin_data_service.dart';
 import 'bansos_terpadu_detail_screen.dart';
 import 'persyaratan_pelayanan_publik_screen.dart';
-import 'news_screen.dart';
-import '../widgets/auth_guard.dart';
 
 class LayananSosialScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -50,30 +49,6 @@ class _LayananSosialScreenState extends State<LayananSosialScreen> {
     }
   }
 
-  void _openPermohonanRumahSinggah() {
-    AuthGuard.requireLogin(
-      context,
-      serviceName: 'Permohonan Rekomendasi Rumah Singgah',
-      isDarkMode: widget.isDarkMode,
-      onToggleDarkMode: widget.onToggleDarkMode,
-      onAuthenticated: () {
-        _openWebUrl('https://rumahsinggahbjn.com/rumahSG.html');
-      },
-    );
-  }
-
-  void _openKritikSaran() {
-    AuthGuard.requireLogin(
-      context,
-      serviceName: 'Formulir Kritik & Saran Layanan Sosial',
-      isDarkMode: widget.isDarkMode,
-      onToggleDarkMode: widget.onToggleDarkMode,
-      onAuthenticated: () {
-        _openWebUrl('https://rumahsinggahbjn.com/kritik&saran/index.html');
-      },
-    );
-  }
-
   void _openBansosTerpadu() {
     Navigator.push(
       context,
@@ -97,23 +72,11 @@ class _LayananSosialScreenState extends State<LayananSosialScreen> {
       ),
     );
   }
-
-  void _openBeritaTerkini() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => NewsScreen(
-          isDarkMode: widget.isDarkMode,
-        ),
-      ),
-    );
-  }
  
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark || widget.isDarkMode;
 
-    // Palette definition consistent with SuperApp Bojonegoro (e.g. Perhubungan / Pertanian)
     final bgColor = isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC);
     final cardBgColor = isDark ? const Color(0xFF1E293B) : Colors.white;
     final textMain = isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A);
@@ -133,133 +96,189 @@ class _LayananSosialScreenState extends State<LayananSosialScreen> {
             colors: [Color(0xFF0052D4), Color(0xFF0D62F1)],
           );
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: Column(
-        children: [
-          SuperAppHeader(
-            title: 'Layanan Sosial',
-            subtitle: 'Dinas Sosial Kabupaten Bojonegoro',
-            gradient: headerGradient,
-            isDarkMode: isDark,
-            onToggleDarkMode: widget.onToggleDarkMode,
-          ),
+    return AnimatedBuilder(
+      animation: AdminDataService(),
+      builder: (context, _) {
+        final items = AdminDataService().layananSosialList.where((e) => e.id != 'SOS-003' && e.id != 'SOS-004').toList();
 
-          // 2. Scrollable Body Content
-          Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 800),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ==========================================
-                      // SECTION 1: LAYANAN KAMI (2 Main Services)
-                      // ==========================================
-                      _buildSectionHeader('Layanan Kami', textMain, textSecondary),
-                      const SizedBox(height: 12),
+        return Scaffold(
+          backgroundColor: bgColor,
+          body: Column(
+            children: [
+              SuperAppHeader(
+                title: 'Layanan Sosial',
+                subtitle: 'Dinas Sosial Kabupaten Bojonegoro',
+                gradient: headerGradient,
+                isDarkMode: isDark,
+                onToggleDarkMode: widget.onToggleDarkMode,
+              ),
 
-                      _buildMainServiceItem(
-                        title: 'Permohonan Surat Rumah Singgah',
-                        description:
-                            'Pengajuan surat rekomendasi penggunaan layanan rumah singgah Dinas Sosial Kabupaten Bojonegoro.',
-                        buttonText: 'Ajukan Sekarang',
-                        icon: Icons.house_outlined,
-                        primaryColor: primaryBlue,
-                        cardBgColor: cardBgColor,
-                        borderColor: borderColor,
-                        textMain: textMain,
-                        textSecondary: textSecondary,
-                        isDark: isDark,
-                        onTap: _openPermohonanRumahSinggah,
-                      ),
-                      const SizedBox(height: 10),
+              // 2. Scrollable Body Content
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 800),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // ==========================================
+                          // SECTION 1: LAYANAN UNGGULAN (Compact List)
+                          // ==========================================
+                          _buildSectionHeader('Layanan Unggulan', textMain, textSecondary),
+                          const SizedBox(height: 12),
 
-                      _buildMainServiceItem(
-                        title: 'Masukan, Kritik dan Saran',
-                        description:
-                            'Fasilitas bagi masyarakat untuk menyampaikan kritik, saran, atau masukan terkait pelayanan.',
-                        buttonText: 'Kirim Masukan',
-                        icon: Icons.rate_review_outlined,
-                        primaryColor: primaryBlue,
-                        cardBgColor: cardBgColor,
-                        borderColor: borderColor,
-                        textMain: textMain,
-                        textSecondary: textSecondary,
-                        isDark: isDark,
-                        onTap: _openKritikSaran,
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // ==========================================
-                      // SECTION 2: LAYANAN UNGGULAN (Compact List)
-                      // ==========================================
-                      _buildSectionHeader('Layanan Unggulan', textMain, textSecondary),
-                      const SizedBox(height: 12),
-
-                      Container(
-                        decoration: BoxDecoration(
-                          color: cardBgColor,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: borderColor, width: 1),
-                        ),
-                        child: Column(
-                          children: [
-                            _buildCompactServiceTile(
-                              title: 'Bantuan Sosial Terpadu',
-                              description:
-                                  'Informasi dan tata cara pengajuan PKH, BPNT, serta DTKS Kemensos.',
-                              actionText: 'Lihat Layanan',
-                              icon: Icons.volunteer_activism_outlined,
-                              primaryColor: primaryBlue,
-                              textMain: textMain,
-                              textSecondary: textSecondary,
-                              isDark: isDark,
-                              onTap: _openBansosTerpadu,
+                          Container(
+                            decoration: BoxDecoration(
+                              color: cardBgColor,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: borderColor, width: 1),
                             ),
-                            Divider(height: 1, color: borderColor),
-                            _buildCompactServiceTile(
-                              title: 'Persyaratan Pelayanan Publik',
-                              description:
-                                  'Informasi standar pelayanan publik dan dokumen persyaratan administrasi.',
-                              actionText: 'Info Detail',
-                              icon: Icons.assignment_outlined,
-                              primaryColor: primaryBlue,
-                              textMain: textMain,
-                              textSecondary: textSecondary,
-                              isDark: isDark,
-                              onTap: _openPersyaratanPelayananPublik,
-                            ),
-                            Divider(height: 1, color: borderColor),
-                            _buildCompactServiceTile(
-                              title: 'Berita Terkini',
-                              description:
-                                  'Informasi dan pengumuman kegiatan terbaru Dinas Sosial Kabupaten Bojonegoro.',
-                              actionText: 'Lihat Berita',
-                              icon: Icons.newspaper_outlined,
-                              primaryColor: primaryBlue,
-                              textMain: textMain,
-                              textSecondary: textSecondary,
-                              isDark: isDark,
-                              onTap: _openBeritaTerkini,
-                            ),
-                          ],
-                        ),
-                      ),
+                            child: Column(
+                              children: items.asMap().entries.map((entry) {
+                                final index = entry.key;
+                                final item = entry.value;
+                                final isFirst = index == 0;
 
-                      const SizedBox(height: 32),
-                    ],
+                                VoidCallback onTapAction;
+                                if (item.id == 'SOS-001') {
+                                  onTapAction = _openBansosTerpadu;
+                                } else if (item.id == 'SOS-002') {
+                                  onTapAction = _openPersyaratanPelayananPublik;
+                                } else {
+                                  onTapAction = () {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Membuka detail "${item.title}"...')),
+                                    );
+                                  };
+                                }
+
+                                return Column(
+                                  children: [
+                                    if (!isFirst) Divider(height: 1, color: borderColor),
+                                    _buildCompactServiceTile(
+                                      title: item.title,
+                                      description: item.description,
+                                      actionText: item.id == 'SOS-002' ? 'Info Detail' : 'Lihat Layanan',
+                                      icon: item.id == 'SOS-002' ? Icons.assignment_outlined : Icons.volunteer_activism_outlined,
+                                      primaryColor: primaryBlue,
+                                      textMain: textMain,
+                                      textSecondary: textSecondary,
+                                      isDark: isDark,
+                                      onTap: onTapAction,
+                                    ),
+                                  ],
+                                );
+                              }).toList(),
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // ==========================================
+                          // SECTION 2: QR CODE DOWNLOAD APLIKASI PPID DINSOS
+                          // ==========================================
+                          _buildSectionHeader('QR CODE DOWNLOAD APLIKASI PPID DINSOS', textMain, textSecondary),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Layanan Pengelolaan Informasi dan Dokumentasi (PPID) Dinas Sosial Kab. Bojonegoro',
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              color: textSecondary,
+                              height: 1.3,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: cardBgColor,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: borderColor, width: 1),
+                            ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  constraints: const BoxConstraints(maxWidth: 320),
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFF0F172A), width: 3),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withAlpha(isDark ? 40 : 12),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.asset(
+                                          'assets/images/qr_ppid_dinsos.png',
+                                          fit: BoxFit.contain,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Container(
+                                              height: 220,
+                                              color: Colors.white,
+                                              alignment: Alignment.center,
+                                              child: const Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(Icons.qr_code_2_rounded, size: 110, color: Color(0xFF0F172A)),
+                                                  SizedBox(height: 8),
+                                                  Text(
+                                                    'Scan QR PPID Dinsos',
+                                                    style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                ElevatedButton.icon(
+                                  onPressed: () => _openWebUrl('https://dinsos.bojonegorokab.go.id/'),
+                                  icon: const Icon(Icons.download_rounded, color: Colors.white, size: 18),
+                                  label: const Text(
+                                    'DOWNLOAD APLIKASI PPID DINSOS',
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 0.3, color: Colors.white),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF0F172A),
+                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 32),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -276,123 +295,7 @@ class _LayananSosialScreenState extends State<LayananSosialScreen> {
     );
   }
 
-  // Compact Main Service Card Layout for Section 1 ("Layanan Kami")
-  Widget _buildMainServiceItem({
-    required String title,
-    required String description,
-    required String buttonText,
-    required IconData icon,
-    required Color primaryColor,
-    required Color cardBgColor,
-    required Color borderColor,
-    required Color textMain,
-    required Color textSecondary,
-    required bool isDark,
-    required VoidCallback onTap,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cardBgColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor, width: 1),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(14),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Soft Tint Icon Container
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: primaryColor.withAlpha(isDark ? 35 : 20),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: primaryColor,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 12),
-
-                // Title & Description Content
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: textMain,
-                          height: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        description,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: textSecondary,
-                          height: 1.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 10),
-
-                // Right Action Button
-                InkWell(
-                  onTap: onTap,
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withAlpha(isDark ? 30 : 15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          buttonText,
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.bold,
-                            color: primaryColor,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          Icons.arrow_forward_rounded,
-                          size: 14,
-                          color: primaryColor,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Compact Tile Item Layout for Section 2 ("Layanan Unggulan")
+  // Compact Tile Item Layout for Section 1 ("Layanan Unggulan")
   Widget _buildCompactServiceTile({
     required String title,
     required String description,
@@ -456,7 +359,7 @@ class _LayananSosialScreenState extends State<LayananSosialScreen> {
               ),
               const SizedBox(width: 8),
 
-              // Action Text + Arrow Icon (Identical to Top Cards)
+              // Action Text + Arrow Icon
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                 decoration: BoxDecoration(
